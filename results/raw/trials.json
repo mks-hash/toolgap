@@ -1,0 +1,2552 @@
+[
+  {
+    "mode": "A",
+    "gap_ms": 100,
+    "repetition": 1,
+    "arrival_ns": 287722296366,
+    "ttft_ms": 565.421793,
+    "end_ns": 290030581202,
+    "actual_signal_to_arrival_ms": 100.085716,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 285490688566,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 286622087774,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 287739678708,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 548.2045969999945,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 500,
+    "repetition": 1,
+    "arrival_ns": 330589915932,
+    "ttft_ms": 588.730329,
+    "end_ns": 332931408395,
+    "actual_signal_to_arrival_ms": 500.093101,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 327932459349,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 329089347226,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 330607069714,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 571.3260919999925,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 500,
+    "repetition": 2,
+    "arrival_ns": 374037064322,
+    "ttft_ms": 567.705526,
+    "end_ns": 376364374614,
+    "actual_signal_to_arrival_ms": 500.08448,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 371561764720,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 372537463023,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 374054422121,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 550.582664999979,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 1000,
+    "repetition": 0,
+    "arrival_ns": 418261770644,
+    "ttft_ms": 502.398778,
+    "end_ns": 420460732696,
+    "actual_signal_to_arrival_ms": 1000.088071,
+    "restore_io_ms": 229.81775,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 415096291669,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 416261667442,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 418279100275,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 418618164707,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 418618511274,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 485.1674099999741,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 500,
+    "repetition": 1,
+    "arrival_ns": 461305438013,
+    "ttft_ms": 162.367999,
+    "end_ns": 463172982886,
+    "actual_signal_to_arrival_ms": 500.116076,
+    "restore_io_ms": 200.581725,
+    "restore_hidden_ms": 200.581725,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 458725678777,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 459805063130,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 461111616826,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 461322661640,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 461323478418,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-500-1",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 301.1199889999716,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 145.3126290000455,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 1000,
+    "repetition": 0,
+    "arrival_ns": 504334387563,
+    "ttft_ms": 645.233591,
+    "end_ns": 506706109299,
+    "actual_signal_to_arrival_ms": 1000.110519,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 501359628924,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 502334665057,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 504352045732,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 627.8010560000098,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 3000,
+    "repetition": 1,
+    "arrival_ns": 550065401058,
+    "ttft_ms": 508.377547,
+    "end_ns": 552275022701,
+    "actual_signal_to_arrival_ms": 3000.088045,
+    "restore_io_ms": 232.408304,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 545161595749,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 546064824208,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 550082593136,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 550426902887,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 550427312507,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 491.0802939999712,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 0,
+    "repetition": 2,
+    "arrival_ns": 592879759987,
+    "ttft_ms": 482.803906,
+    "end_ns": 595072160010,
+    "actual_signal_to_arrival_ms": 7.8559,
+    "restore_io_ms": 230.672046,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 590921441007,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 591872054754,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 592896300312,
+        "host_used_tokens": 0,
+        "inflight_tokens": 4080
+      },
+      {
+        "kind": "publish",
+        "at_ns": 593216188404,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 593216563877,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-0-2",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 338.98782700009633,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 466.2652040000239,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 3000,
+    "repetition": 0,
+    "arrival_ns": 638035739479,
+    "ttft_ms": 564.278728,
+    "end_ns": 640341626497,
+    "actual_signal_to_arrival_ms": 3000.088429,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 632974369598,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 634035023393,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 638053201443,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 546.8985049999446,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 100,
+    "repetition": 0,
+    "arrival_ns": 680202659075,
+    "ttft_ms": 568.699872,
+    "end_ns": 682523749078,
+    "actual_signal_to_arrival_ms": 100.084554,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 678240627899,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 679102245794,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 680220315167,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 551.1485949999724,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 100,
+    "repetition": 2,
+    "arrival_ns": 722928750104,
+    "ttft_ms": 569.103507,
+    "end_ns": 725216169335,
+    "actual_signal_to_arrival_ms": 100.092509,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 720729282846,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 721828500503,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 722946173164,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 551.7424750000828,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 100,
+    "repetition": 0,
+    "arrival_ns": 765508094852,
+    "ttft_ms": 504.80095,
+    "end_ns": 767738241228,
+    "actual_signal_to_arrival_ms": 100.126201,
+    "restore_io_ms": 227.850783,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 763147180569,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 764407198222,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 765525382500,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 765866131256,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 765866488526,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 487.7101340000536,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 3000,
+    "repetition": 2,
+    "arrival_ns": 807780584599,
+    "ttft_ms": 163.510606,
+    "end_ns": 809667858864,
+    "actual_signal_to_arrival_ms": 3000.091796,
+    "restore_io_ms": 200.242699,
+    "restore_hidden_ms": 200.242699,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 802742244282,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 803780842612,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 805085725963,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 807797835242,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 807798660221,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-3000-2",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 300.2226690000498,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 146.23173000006773,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 1000,
+    "repetition": 1,
+    "arrival_ns": 851379805390,
+    "ttft_ms": 568.232848,
+    "end_ns": 853675835067,
+    "actual_signal_to_arrival_ms": 1000.183986,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 848330833725,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 849379405925,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 851396900619,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 550.9127939999416,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 1000,
+    "repetition": 0,
+    "arrival_ns": 894517261082,
+    "ttft_ms": 164.323555,
+    "end_ns": 896386185765,
+    "actual_signal_to_arrival_ms": 1000.088083,
+    "restore_io_ms": 204.451627,
+    "restore_hidden_ms": 204.451627,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 891464261976,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 892516923561,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 893831249929,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 894534326499,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 894535152881,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-1000-0",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 308.97610499994244,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 147.21078099989882,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 0,
+    "repetition": 2,
+    "arrival_ns": 937192383648,
+    "ttft_ms": 501.233905,
+    "end_ns": 939403834293,
+    "actual_signal_to_arrival_ms": 0.091248,
+    "restore_io_ms": 231.501599,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 935000690126,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 936191930182,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 937209225392,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 937547881269,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 937548244855,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 484.4557540000096,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 1000,
+    "repetition": 1,
+    "arrival_ns": 980705508482,
+    "ttft_ms": 171.677089,
+    "end_ns": 982628535081,
+    "actual_signal_to_arrival_ms": 1000.084968,
+    "restore_io_ms": 202.345109,
+    "restore_hidden_ms": 202.345109,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 977741577299,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 978705687482,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 980018180106,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 980722736825,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 980723548615,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-1000-1",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 307.1916900000815,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 154.54055400005018,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 500,
+    "repetition": 2,
+    "arrival_ns": 1023951342995,
+    "ttft_ms": 165.711372,
+    "end_ns": 1025857341303,
+    "actual_signal_to_arrival_ms": 500.084382,
+    "restore_io_ms": 204.30949,
+    "restore_hidden_ms": 204.30949,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1021581986418,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1022452985485,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1023762822771,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1023968691644,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1023969520281,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-500-2",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 306.1848250000594,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 148.67363899998054,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 1000,
+    "repetition": 2,
+    "arrival_ns": 1067222718882,
+    "ttft_ms": 567.471461,
+    "end_ns": 1069539621218,
+    "actual_signal_to_arrival_ms": 1000.115793,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1064276819868,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1065222090712,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1067240566275,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 549.8371240000779,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 3000,
+    "repetition": 1,
+    "arrival_ns": 1112991044361,
+    "ttft_ms": 162.90293,
+    "end_ns": 1114859227894,
+    "actual_signal_to_arrival_ms": 3000.136851,
+    "restore_io_ms": 200.123416,
+    "restore_hidden_ms": 200.123416,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1108133843606,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1108990750540,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1110298630645,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1113008669425,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1113009477171,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-3000-1",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 302.4217869999575,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 145.34642400008124,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 3000,
+    "repetition": 0,
+    "arrival_ns": 1158853538870,
+    "ttft_ms": 507.611808,
+    "end_ns": 1161064229702,
+    "actual_signal_to_arrival_ms": 3000.085775,
+    "restore_io_ms": 231.568105,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1154000045485,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1154854848122,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1158870936910,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1159213216141,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1159213588397,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 490.31730899992,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 1000,
+    "repetition": 1,
+    "arrival_ns": 1202749182648,
+    "ttft_ms": 625.667945,
+    "end_ns": 1205105356234,
+    "actual_signal_to_arrival_ms": 1000.110147,
+    "restore_io_ms": 236.873043,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1199885833531,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1200751371292,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1202767559949,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1203226263600,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1203226606637,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 607.512603000032,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 100,
+    "repetition": 1,
+    "arrival_ns": 284857352651,
+    "ttft_ms": 438.396661,
+    "end_ns": 287053625905,
+    "actual_signal_to_arrival_ms": 100.087153,
+    "restore_io_ms": 283.758798,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 282670214503,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 283757674424,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 284874494255,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 4080
+      },
+      {
+        "kind": "publish",
+        "at_ns": 285146489100,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 285146857704,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-100-1",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 384.2688099999805,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 421.15115699999706,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 500,
+    "repetition": 1,
+    "arrival_ns": 327871231377,
+    "ttft_ms": 499.516006,
+    "end_ns": 330077438254,
+    "actual_signal_to_arrival_ms": 500.098302,
+    "restore_io_ms": 227.563604,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 325201218930,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 326371610901,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 327888483781,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 328225171508,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 328225517821,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 482.2228959999961,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 0,
+    "repetition": 2,
+    "arrival_ns": 370842025427,
+    "ttft_ms": 623.776153,
+    "end_ns": 373213517659,
+    "actual_signal_to_arrival_ms": 0.034267,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 368705288422,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 369842132492,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 370858980012,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 606.6616039999531,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 1000,
+    "repetition": 2,
+    "arrival_ns": 414405476098,
+    "ttft_ms": 166.49186,
+    "end_ns": 416318446877,
+    "actual_signal_to_arrival_ms": 1000.133868,
+    "restore_io_ms": 198.755917,
+    "restore_hidden_ms": 198.755917,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 411514826892,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 412405205240,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 413710749355,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 414422431209,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 414423268882,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-1000-2",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 300.36822300002086,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 149.53520799997477,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 0,
+    "repetition": 0,
+    "arrival_ns": 457132137951,
+    "ttft_ms": 566.304562,
+    "end_ns": 459442619140,
+    "actual_signal_to_arrival_ms": 0.080225,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 455081367103,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 456132485813,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 457149118577,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 549.3758270000058,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 100,
+    "repetition": 1,
+    "arrival_ns": 499896198739,
+    "ttft_ms": 516.571645,
+    "end_ns": 502136939339,
+    "actual_signal_to_arrival_ms": 100.124409,
+    "restore_io_ms": 239.637488,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 497703402024,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 498796018423,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 499913467798,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 500264842746,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 500265229014,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 499.2208179999693,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 0,
+    "repetition": 1,
+    "arrival_ns": 542381589806,
+    "ttft_ms": 501.537779,
+    "end_ns": 544611147663,
+    "actual_signal_to_arrival_ms": 0.078875,
+    "restore_io_ms": 228.579752,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 540431473793,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 541381221113,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 542398506453,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 542735994557,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 542736393218,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 484.83069600001727,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 3000,
+    "repetition": 2,
+    "arrival_ns": 588104947113,
+    "ttft_ms": 613.349747,
+    "end_ns": 590421142699,
+    "actual_signal_to_arrival_ms": 3000.084872,
+    "restore_io_ms": 246.014795,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 582983068253,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 584104700238,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 588121974092,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 588570178210,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 588570522964,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 596.3443839999627,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 500,
+    "repetition": 2,
+    "arrival_ns": 631176198068,
+    "ttft_ms": 543.139705,
+    "end_ns": 633470436208,
+    "actual_signal_to_arrival_ms": 500.090563,
+    "restore_io_ms": 266.730195,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 628560304162,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 629676672684,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 631193489174,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 631569477292,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 631569828776,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 525.784509999994,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 100,
+    "repetition": 2,
+    "arrival_ns": 674374826339,
+    "ttft_ms": 375.902193,
+    "end_ns": 676457710563,
+    "actual_signal_to_arrival_ms": 100.099578,
+    "restore_io_ms": 224.889137,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 672212432567,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 673274646775,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 674393585544,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 4080
+      },
+      {
+        "kind": "publish",
+        "at_ns": 674605657793,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 674606043255,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-100-2",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 325.9246200000234,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 357.37283399998887,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 3000,
+    "repetition": 2,
+    "arrival_ns": 719818199993,
+    "ttft_ms": 573.479047,
+    "end_ns": 722121388780,
+    "actual_signal_to_arrival_ms": 3000.11027,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 714873846415,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 715818231434,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 719836272786,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 555.4531809999617,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 0,
+    "repetition": 0,
+    "arrival_ns": 762576581874,
+    "ttft_ms": 490.001004,
+    "end_ns": 764770489064,
+    "actual_signal_to_arrival_ms": 8.136852,
+    "restore_io_ms": 230.054771,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 760559837817,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 761568737285,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 762600192487,
+        "host_used_tokens": 0,
+        "inflight_tokens": 4080
+      },
+      {
+        "kind": "publish",
+        "at_ns": 762918659286,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 762919036324,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-0-0",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 345.23576300000514,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 466.5582349999795,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 3000,
+    "repetition": 1,
+    "arrival_ns": 807691301434,
+    "ttft_ms": 571.270248,
+    "end_ns": 810001654413,
+    "actual_signal_to_arrival_ms": 3000.09917,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 802846977782,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 803691354358,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 807708491753,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 554.1246609999462,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 100,
+    "repetition": 0,
+    "arrival_ns": 850711529956,
+    "ttft_ms": 477.339276,
+    "end_ns": 852911686786,
+    "actual_signal_to_arrival_ms": 100.087253,
+    "restore_io_ms": 230.209221,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 848763404749,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 849611492922,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 850728871337,
+        "host_used_tokens": 0,
+        "inflight_tokens": 4080
+      },
+      {
+        "kind": "publish",
+        "at_ns": 851041775047,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 851042168425,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-100-0",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 425.27737499995055,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 460.18868800001655,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 100,
+    "repetition": 2,
+    "arrival_ns": 893568681735,
+    "ttft_ms": 513.58262,
+    "end_ns": 895817703364,
+    "actual_signal_to_arrival_ms": 100.092392,
+    "restore_io_ms": 234.980382,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 891349946328,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 892467901767,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 893585661668,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 893932326904,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 893932666364,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 496.69439900003454,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 500,
+    "repetition": 0,
+    "arrival_ns": 936007971136,
+    "ttft_ms": 576.795476,
+    "end_ns": 938315619784,
+    "actual_signal_to_arrival_ms": 500.128072,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 933656892051,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 934509510366,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 936024931697,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 559.8363629999312,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 500,
+    "repetition": 0,
+    "arrival_ns": 975858085923,
+    "ttft_ms": 169.417982,
+    "end_ns": 977739054915,
+    "actual_signal_to_arrival_ms": 500.185873,
+    "restore_io_ms": 200.047251,
+    "restore_hidden_ms": 200.047251,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 973210784197,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 974357652631,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 975741220644,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 975877112007,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 975877927868,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-500-0",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 378.4068620000198,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 150.29736000008143,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 3000,
+    "repetition": 0,
+    "arrival_ns": 1020887289425,
+    "ttft_ms": 162.123659,
+    "end_ns": 1022764917982,
+    "actual_signal_to_arrival_ms": 3000.101639,
+    "restore_io_ms": 199.693625,
+    "restore_hidden_ms": 199.693625,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 255,
+    "published_before_arrival": true,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1015832327961,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1016887581826,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1018192529395,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1020904623665,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1020905425881,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-3000-0",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 299.63423800006694,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 144.74523399996997,
+    "output_correct": true
+  },
+  {
+    "mode": "A",
+    "gap_ms": 0,
+    "repetition": 1,
+    "arrival_ns": 1063428815111,
+    "ttft_ms": 572.017355,
+    "end_ns": 1065744420083,
+    "actual_signal_to_arrival_ms": 0.091818,
+    "restore_io_ms": 0,
+    "restore_hidden_ms": 0,
+    "restored_bytes": 0,
+    "backend_read_pages": 0,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 0,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1061533830235,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1062428288329,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1063445782790,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": null,
+    "server_first_token_latency_ms": 554.9935960000312,
+    "output_correct": true
+  },
+  {
+    "mode": "C",
+    "gap_ms": 0,
+    "repetition": 1,
+    "arrival_ns": 1106254856649,
+    "ttft_ms": 580.263692,
+    "end_ns": 1108556100890,
+    "actual_signal_to_arrival_ms": 7.761536,
+    "restore_io_ms": 230.748879,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1104118155241,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1105247352790,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1106271493636,
+        "host_used_tokens": 0,
+        "inflight_tokens": 4080
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1106688911464,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1106689322729,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": {
+      "operation_id": "C-0-1",
+      "state": "SUCCESS",
+      "requested_tokens": 4080,
+      "restored_tokens": 4080,
+      "restored_bytes": 116981760,
+      "elapsed_ms": 436.58395800002836,
+      "cleanup_pending": false,
+      "host_available_tokens": 135392,
+      "inflight_tokens": 0
+    },
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 4080,
+      "storage": 0,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 563.9626629999839,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 0,
+    "repetition": 0,
+    "arrival_ns": 1148808584915,
+    "ttft_ms": 506.58767,
+    "end_ns": 1151040334522,
+    "actual_signal_to_arrival_ms": 0.104689,
+    "restore_io_ms": 229.975492,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1146960480954,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1147809937306,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1148825798273,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1149166924138,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1149167316389,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 489.5277199998418,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 500,
+    "repetition": 0,
+    "arrival_ns": 1192194765039,
+    "ttft_ms": 528.487359,
+    "end_ns": 1194453798254,
+    "actual_signal_to_arrival_ms": 500.099435,
+    "restore_io_ms": 254.796218,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1189513613459,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1190694781909,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1192211925133,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1192576036388,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1192576406477,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 511.4596050000273,
+    "output_correct": true
+  },
+  {
+    "mode": "B",
+    "gap_ms": 1000,
+    "repetition": 2,
+    "arrival_ns": 1236204835929,
+    "ttft_ms": 582.191394,
+    "end_ns": 1238508633041,
+    "actual_signal_to_arrival_ms": 1000.089906,
+    "restore_io_ms": 223.54754,
+    "restore_hidden_ms": 0.0,
+    "restored_bytes": 116981760,
+    "backend_read_pages": 255,
+    "duplicate_backend_read_pages": 0,
+    "read_pages_completed_before_arrival": 0,
+    "published_before_arrival": false,
+    "restored_tokens": 4080,
+    "host_evicted_tokens": 0,
+    "host_occupancy_snapshots": [
+      {
+        "kind": "generation_received",
+        "at_ns": 1233095505463,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1234204633145,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "generation_received",
+        "at_ns": 1236221962168,
+        "host_used_tokens": 0,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "publish",
+        "at_ns": 1236639870112,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      },
+      {
+        "kind": "h2d_submit",
+        "at_ns": 1236640255004,
+        "host_used_tokens": 4080,
+        "inflight_tokens": 0
+      }
+    ],
+    "status": null,
+    "cached_tokens_details": {
+      "device": 0,
+      "host": 0,
+      "storage": 4080,
+      "storage_backend": "HiCacheFile"
+    },
+    "server_first_token_latency_ms": 565.2258659999916,
+    "output_correct": true
+  }
+]

@@ -1,0 +1,63 @@
+{
+  "trials": 45,
+  "repetitions": 3,
+  "summary": [
+    {
+      "gap_ms": 0,
+      "A_ttft_median_ms": 572.017355,
+      "B_ttft_median_ms": 501.537779,
+      "C_ttft_median_ms": 490.001004,
+      "C_hidden_median_ms": 0.0,
+      "B_restore_median_ms": 229.975492,
+      "B_minus_C_ms": 11.536774999999977
+    },
+    {
+      "gap_ms": 100,
+      "A_ttft_median_ms": 568.699872,
+      "B_ttft_median_ms": 513.58262,
+      "C_ttft_median_ms": 438.396661,
+      "C_hidden_median_ms": 0.0,
+      "B_restore_median_ms": 234.980382,
+      "B_minus_C_ms": 75.18595900000003
+    },
+    {
+      "gap_ms": 500,
+      "A_ttft_median_ms": 576.795476,
+      "B_ttft_median_ms": 528.487359,
+      "C_ttft_median_ms": 165.711372,
+      "C_hidden_median_ms": 200.581725,
+      "B_restore_median_ms": 254.796218,
+      "B_minus_C_ms": 362.775987
+    },
+    {
+      "gap_ms": 1000,
+      "A_ttft_median_ms": 568.232848,
+      "B_ttft_median_ms": 582.191394,
+      "C_ttft_median_ms": 166.49186,
+      "C_hidden_median_ms": 202.345109,
+      "B_restore_median_ms": 229.81775,
+      "B_minus_C_ms": 415.69953399999997
+    },
+    {
+      "gap_ms": 3000,
+      "A_ttft_median_ms": 571.270248,
+      "B_ttft_median_ms": 508.377547,
+      "C_ttft_median_ms": 162.90293,
+      "C_hidden_median_ms": 200.123416,
+      "B_restore_median_ms": 232.408304,
+      "B_minus_C_ms": 345.47461699999997
+    }
+  ],
+  "all_outputs_correct": true,
+  "duplicate_backend_read_pages": 0,
+  "host_evicted_tokens": 0,
+  "wasted_prefetch": {
+    "restored_tokens": 4080,
+    "wasted_bytes": 116981760,
+    "host_available_token_delta": 4080,
+    "resident_after_cancel": "SUCCESS",
+    "policy": "Completed restore is ordinary evictable L2, no pin or post-publication lease; entire staged prefix is wasted if continuation never arrives",
+    "host_available_after_flush": 139520
+  },
+  "scope": "one L4, FULL resident file, TP1 PP1, no injected delay"
+}

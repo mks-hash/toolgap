@@ -1,0 +1,6 @@
+.git
+vendor
+work
+results/local
+.venv
+__pycache__

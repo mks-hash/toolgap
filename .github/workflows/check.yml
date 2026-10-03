@@ -1,0 +1,14 @@
+name: Source and evidence checks
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/check_evidence.py
+      - run: bash scripts/install.sh
+      - run: python -m compileall -q scripts benchmark vendor/sglang/python/sglang/srt/mem_cache/proactive_prefetch.py
+      - run: bash -n scripts/*.sh examples/*.sh repro/*.sh
