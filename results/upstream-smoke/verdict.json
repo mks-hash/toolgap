@@ -1,0 +1,28 @@
+{
+  "GPU_SMOKE": "PASS",
+  "MAIN_SHA": "4ab720e6557b44d07bde471ed52a178795298f1a",
+  "FEATURE_SHA": "d1140b5ec5c320a440fc35b0704f78dbdff31449",
+  "TESTS": "29 passed / 0 failed / 0 skipped",
+  "REAL_L3_L2_H2D": "PASS",
+  "DETERMINISTIC_OUTPUT": "PASS",
+  "WASTED_PREFETCH_CLEANUP": "PASS",
+  "GPU": "L4",
+  "DRIVER": "580.178.04",
+  "CUDA": "13.0",
+  "WALL_MINUTES_UPPER_BOUND": 18.11306666666667,
+  "COST_USD_UPPER_BOUND": 0.26540841479061333,
+  "VM_DELETED": true,
+  "DISK_DELETED": true,
+  "PERFORMANCE_SCOPE": "One500ms sanity run, not a replacement for45 trials",
+  "SUMMARY": [
+    {
+      "gap_ms": 500,
+      "A_ttft_median_ms": 575.050826,
+      "B_ttft_median_ms": 537.183985,
+      "C_ttft_median_ms": 182.850665,
+      "C_hidden_median_ms": 210.907926,
+      "B_restore_median_ms": 245.111444,
+      "B_minus_C_ms": 354.33332
+    }
+  ]
+}

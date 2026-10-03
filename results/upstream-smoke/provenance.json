@@ -1,0 +1,5 @@
+{
+  "upstream_main": "4ab720e6557b44d07bde471ed52a178795298f1a",
+  "feature_head": "d1140b5ec5c320a440fc35b0704f78dbdff31449",
+  "scope": "one500ms ABC smoke, full source overlay; no full benchmark"
+}

@@ -1,0 +1,27 @@
+{
+  "trials": 3,
+  "repetitions": 1,
+  "summary": [
+    {
+      "gap_ms": 500,
+      "A_ttft_median_ms": 575.050826,
+      "B_ttft_median_ms": 537.183985,
+      "C_ttft_median_ms": 182.850665,
+      "C_hidden_median_ms": 210.907926,
+      "B_restore_median_ms": 245.111444,
+      "B_minus_C_ms": 354.33332
+    }
+  ],
+  "all_outputs_correct": true,
+  "duplicate_backend_read_pages": 0,
+  "host_evicted_tokens": 0,
+  "wasted_prefetch": {
+    "restored_tokens": 4080,
+    "wasted_bytes": 116981760,
+    "host_available_token_delta": 4080,
+    "resident_after_cancel": "SUCCESS",
+    "policy": "Completed restore is ordinary evictable L2, no pin or post-publication lease; entire staged prefix is wasted if continuation never arrives",
+    "host_available_after_flush": 139520
+  },
+  "scope": "one L4, FULL resident file, TP1 PP1, no injected delay"
+}

@@ -103,7 +103,9 @@ flowchart LR
 The Stage reports are historical validation records, not current instructions.
 No public repository or release depends on upstream merging the patches.
 The separate [draft feature PR #42434](https://github.com/sgl-project/sglang/pull/42434)
-is an additional upstream distribution path.
+is an additional upstream distribution path. A separate
+[latest-main GPU smoke](docs/UPSTREAM_SMOKE.md) passed 29 tests and three A/B/C
+sanity trials; it does not change the pinned v0.1 or its 45-trial measurements.
 
 ## Limitations
 

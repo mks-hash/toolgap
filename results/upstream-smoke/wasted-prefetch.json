@@ -1,0 +1,8 @@
+{
+  "restored_tokens": 4080,
+  "wasted_bytes": 116981760,
+  "host_available_token_delta": 4080,
+  "resident_after_cancel": "SUCCESS",
+  "policy": "Completed restore is ordinary evictable L2, no pin or post-publication lease; entire staged prefix is wasted if continuation never arrives",
+  "host_available_after_flush": 139520
+}
