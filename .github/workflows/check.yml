@@ -11,4 +11,4 @@ jobs:
       - run: python scripts/check_evidence.py
       - run: bash scripts/install.sh
       - run: python -m compileall -q scripts benchmark vendor/sglang/python/sglang/srt/mem_cache/proactive_prefetch.py
-      - run: bash -n scripts/*.sh examples/*.sh repro/*.sh
+      - run: for script in scripts/*.sh examples/*.sh repro/*.sh; do bash -n "$script"; done

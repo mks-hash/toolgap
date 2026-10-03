@@ -102,6 +102,8 @@ flowchart LR
 [raw JSON/traces](results/raw), and [median CSV](results/medians.csv).
 The Stage reports are historical validation records, not current instructions.
 No public repository or release depends on upstream merging the patches.
+The separate [draft feature PR #42434](https://github.com/sgl-project/sglang/pull/42434)
+is an additional upstream distribution path.
 
 ## Limitations
 
