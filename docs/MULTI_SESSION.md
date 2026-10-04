@@ -46,8 +46,11 @@ The existing server admission is authoritative across other clients.
 After terminal cleanup, `lease.status()` returns its historical snapshot without
 a new server call; host availability in that snapshot is not live occupancy.
 
-There is no background poller. The owner calls `lease.status()` or `lease.cancel()`
-to reconcile unknown work. Calls for one lease are serialized so a late RUNNING
+By default there is no background poller. The owner calls `lease.status()` or
+`lease.cancel()` to reconcile unknown work. The post-v0.3.0 development branch
+also offers [opt-in bounded status reconciliation](RECONCILIATION.md), which
+releases local admission after confirmed cleanup independently of the owner's
+tool/continuation completion. Calls for one lease are serialized so a late RUNNING
 status cannot overwrite a confirmed cancellation. A permanently blocked backend
 still has no safe automatic reclamation guarantee.
 

@@ -24,6 +24,7 @@ class PrefetchLease:
         self._remote = False
         self._settled = False
         self._finished = False
+        self._reconciliation_started = False
         self._state = dict(state="SUBMITTING", accepted=None, cleanup_pending=True)
 
     @property
@@ -71,25 +72,112 @@ class PrefetchLease:
 class PrefetchAdmission:
     """Share ONE instance per worker in one orchestrator process/event loop.
 
-    No queue, background polling, GPU movement, host reservation, or eviction.
+    No queue, GPU movement, host reservation, or eviction. Background status
+    reconciliation is opt-in and bounded per operation; default behavior is manual.
     The runtime still admits one restore; competing sessions fall back normally.
-    An ambiguous transport/cancellation outcome retains the local slot until an
-    explicit status/cancel confirms terminal cleanup. Other processes are still
+    An ambiguous transport/cancellation outcome retains the local slot until
+    status/cancel confirms terminal cleanup. Other processes are still
     governed by server admission. This is not an authentication boundary.
     """
 
-    def __init__(self, client, *, max_prefix_tokens=8192, history_size=32):
+    def __init__(
+        self,
+        client,
+        *,
+        max_prefix_tokens=8192,
+        history_size=32,
+        reconcile_interval_ms=None,
+        reconcile_max_checks=100,
+        reconcile_timeout_ms=1000,
+    ):
         if type(max_prefix_tokens) is not int or max_prefix_tokens < 1:
             raise ValueError("max_prefix_tokens must be a positive integer")
         if type(history_size) is not int or history_size < 1:
             raise ValueError("history_size must be a positive integer")
+        for name, value in (
+            ("reconcile_interval_ms", reconcile_interval_ms),
+            ("reconcile_max_checks", reconcile_max_checks),
+            ("reconcile_timeout_ms", reconcile_timeout_ms),
+        ):
+            if name == "reconcile_interval_ms" and value is None:
+                continue
+            if type(value) is not int or value < 1:
+                raise ValueError(f"{name} must be a positive integer")
         self.client = client
         self.max_prefix_tokens = max_prefix_tokens
         self.history_size = history_size
+        self.reconcile_interval_ms = reconcile_interval_ms
+        self.reconcile_max_checks = reconcile_max_checks
+        self.reconcile_timeout_ms = reconcile_timeout_ms
         self._lock = asyncio.Lock()
         self._active = None
         self._records = OrderedDict()
         self._metrics = Counter()
+        self._reconcile_task = None
+        self._closed = False
+
+    async def __aenter__(self):
+        if self._closed:
+            raise RuntimeError("Admission is closed")
+        return self
+
+    async def __aexit__(self, *exc):
+        await self.aclose()
+
+    async def aclose(self):
+        """Stop/reap local polling; do not cancel or reclaim remote work.
+
+        Close admission before its borrowed HTTP client. Existing leases remain
+        available for explicit status/cancel while that client is still open.
+        """
+        self._closed = True
+        task = self._reconcile_task
+        if task is not None:
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+            # A task cancelled before its first tick never enters its finally.
+            if self._reconcile_task is task:
+                self._reconcile_task = None
+
+    def _start_reconciliation(self):
+        if (
+            self._closed
+            or self.reconcile_interval_ms is None
+            or self._active is None
+            or self._active._reconciliation_started
+            or self._reconcile_task is not None
+        ):
+            return
+        self._active._reconciliation_started = True
+        self._reconcile_task = asyncio.create_task(
+            self._reconcile(self._active), name="toolgap-reconciliation"
+        )
+
+    async def _reconcile(self, lease):
+        try:
+            for _ in range(self.reconcile_max_checks):
+                await asyncio.sleep(self.reconcile_interval_ms / 1000)
+                if lease._settled:
+                    return
+                self._metrics["reconciliation_checks"] += 1
+                try:
+                    # Includes waiting for the lease's control lock. Cancellation
+                    # during transport retains UNKNOWN through _control_locked.
+                    await asyncio.wait_for(
+                        lease.status(), self.reconcile_timeout_ms / 1000
+                    )
+                except asyncio.TimeoutError:
+                    self._metrics["reconciliation_timeouts"] += 1
+                if lease._settled:
+                    return
+            self._metrics["reconciliation_exhausted"] += 1
+        finally:
+            self._reconcile_task = None
+            # A later caller may have acquired the slot during the last status
+            # response. Only transfer polling to that new identity; never reset
+            # an exhausted operation's budget or retry a rejected submission.
+            if self._active is not lease:
+                self._start_reconciliation()
 
     @property
     def metrics(self):
@@ -117,6 +205,8 @@ class PrefetchAdmission:
             self._active = None
 
     async def submit(self, session_id, input_ids, *, cache_salt=None, ttl_ms=10000):
+        if self._closed:
+            raise RuntimeError("Admission is closed")
         if not isinstance(session_id, str) or not 1 <= len(session_id) <= 128:
             raise ValueError("session_id must contain 1..128 characters")
         tokens = list(islice(input_ids, self.max_prefix_tokens + 1))
@@ -124,6 +214,8 @@ class PrefetchAdmission:
         # IDs are never caller-selected, so late events cannot target new work.
         lease = PrefetchLease(self, session_id, uuid.uuid4().hex, tokens, cache_salt)
         async with self._lock:
+            if self._closed:
+                raise RuntimeError("Admission is closed")
             self._metrics["submissions"] += 1
             if len(tokens) > self.max_prefix_tokens:
                 reason = "LOCAL_LIMIT"
@@ -140,9 +232,18 @@ class PrefetchAdmission:
                 lease._remote = True
             self._remember(lease)
         if not lease._settled:
-            await self._control(
-                lease, "submit", input_ids=tokens, cache_salt=cache_salt, ttl_ms=ttl_ms
-            )
+            try:
+                await self._control(
+                    lease,
+                    "submit",
+                    input_ids=tokens,
+                    cache_salt=cache_salt,
+                    ttl_ms=ttl_ms,
+                )
+            finally:
+                # Also reconcile an ambiguous/cancelled submit: active retains
+                # the owned ID even when the caller did not receive its lease.
+                self._start_reconciliation()
         return lease
 
     async def _control(self, lease, action, **kwargs):

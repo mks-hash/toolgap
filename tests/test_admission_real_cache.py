@@ -1,5 +1,6 @@
 """Admission over real SGLang file I/O, host allocation and terminal drain (CPU)."""
 
+import asyncio
 import json
 import threading
 import unittest
@@ -54,6 +55,62 @@ class TestAdmissionRealCache(unittest.IsolatedAsyncioTestCase):
         self.f.pump_until(done)
         self.f.cache.drain_storage_control_queues()
         self.manager.tick()
+
+    async def test_background_reconciliation_waits_for_real_cancelled_read_drain(self):
+        self.policy = PrefetchAdmission(
+            self.client,
+            reconcile_interval_ms=1,
+            reconcile_max_checks=100,
+            reconcile_timeout_ms=100,
+        )
+        self.addAsyncCleanup(self.policy.aclose)
+        entered, resume = threading.Event(), threading.Event()
+        original = self.f.backend.batch_get
+        reads = []
+
+        def blocked(*args, **kwargs):
+            reads.append(1)
+            entered.set()
+            if not resume.wait(5):
+                raise RuntimeError("fixture read timed out")
+            return original(*args, **kwargs)
+
+        async def observed_cleanup():
+            while self.policy.active is not None:
+                await asyncio.sleep(0.001)
+
+        try:
+            with mock.patch.object(self.f.backend, "batch_get", side_effect=blocked):
+                a = await self.policy.submit("A", self.f.tokens)
+                self.f.pump_until(entered.is_set)
+                self.assertTrue((await a.cancel())["cleanup_pending"])
+                await asyncio.sleep(0.005)
+                self.assertGreater(self.policy.metrics["reconciliation_checks"], 0)
+                self.assertIs(self.policy.active, a)
+                self.assertLess(self.f.pool.available_size(), self.f.initial_slots)
+                self.assertEqual(
+                    (await self.policy.submit("early-B", self.f.tokens)).state["state"],
+                    "LOCAL_BUSY",
+                )
+                resume.set()
+                self.drain()
+                await asyncio.wait_for(observed_cleanup(), 1)
+        finally:
+            resume.set()
+        self.assertEqual(a.state["state"], "CANCELLED")
+        self.assertFalse(a.state["cleanup_pending"])
+        self.f.conservation(self.manager.records[a.operation_id].handle)
+        a.finish(used_tokens=0)
+        b = await self.policy.submit("later-B", self.f.tokens)
+        self.drain()
+        await asyncio.wait_for(observed_cleanup(), 1)
+        self.assertEqual(b.state["state"], "SUCCESS")
+        self.assertEqual(b.state["restored_tokens"], 12)
+        b.finish(used_tokens=12)
+        self.f.conservation(self.manager.records[b.operation_id].handle, resident=12)
+        self.assertEqual(len(reads), 1)
+        self.assertEqual(self.policy.metrics["active_slots"], 0)
+        self.assertTrue(self.f.cc.prefetch_io_aux_thread.is_alive())
 
     async def test_two_sessions_cancel_ownership_cleanup_then_next_real_restore(self):
         entered, resume = threading.Event(), threading.Event()

@@ -126,6 +126,11 @@ and cleanup to baseline. One admitted caller benefited; pair-level latency did
 not improve in this single-repeat run. See [policy and API](docs/MULTI_SESSION.md)
 and the [demo plan and command](docs/MULTI_SESSION_DEMO.md).
 
+Post-v0.3.0 development adds [opt-in bounded status reconciliation](docs/RECONCILIATION.md)
+for later callers: local admission is released after confirmed terminal cleanup
+while the earlier owner's tool/continuation may still run. Defaults remain manual;
+this increment has CPU validation and no new GPU performance claim.
+
 ## CLI and diagnostics
 
 Available in experimental `v0.3.0`. Install from the tagged checkout with

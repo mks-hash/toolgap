@@ -2,9 +2,14 @@
 
 import asyncio
 import importlib.util
+import json
 import sys
 import unittest
 from pathlib import Path
+
+import httpx
+
+from toolgap import PrefetchAdmission, PrefetchClient
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "examples/multi_session"))
@@ -58,6 +63,56 @@ class WorkflowTest(unittest.IsolatedAsyncioTestCase):
         )
         self.assertIsNotNone(row["response"])
         self.assertEqual(lease.calls, ["status", {"used_tokens": None}])
+
+    async def test_real_admission_poller_does_not_gate_workflow_continuation(self):
+        polling, continuation_entered, publish = (
+            asyncio.Event(),
+            asyncio.Event(),
+            asyncio.Event(),
+        )
+        calls = []
+
+        async def handler(request):
+            p = json.loads(request.content)
+            calls.append(p["action"])
+            if p["action"] == "status":
+                polling.set()
+                await publish.wait()
+            state = dict(
+                operation_id=p["operation_id"],
+                state="SUCCESS" if publish.is_set() else "RUNNING",
+                cleanup_pending=False,
+                restored_tokens=0,
+                restored_bytes=0,
+            )
+            return httpx.Response(200, json=dict(success=True, result=state))
+
+        async def tool():
+            await polling.wait()
+            return {"document_id": "DOC-00173"}
+
+        async def continuation(result):
+            continuation_entered.set()
+            # The poller cannot complete until generation was submitted.
+            publish.set()
+            return {"correct": True}, {}
+
+        async with PrefetchClient(
+            "http://engine", transport=httpx.MockTransport(handler)
+        ) as client:
+            async with PrefetchAdmission(
+                client, reconcile_interval_ms=1, reconcile_timeout_ms=500
+            ) as admission:
+                gate = asyncio.Event()
+                gate.set()
+                row = await asyncio.wait_for(
+                    trajectory(self.session, gate, tool, continuation, admission), 1
+                )
+                self.assertTrue(continuation_entered.is_set())
+                self.assertTrue(row["response"]["correct"])
+                self.assertEqual(calls, ["submit", "status"])
+                self.assertEqual(admission.metrics["active_slots"], 0)
+                self.assertEqual(admission.metrics["usage_unknown_operations"], 1)
 
     async def tool(self):
         return {"document_id": "DOC-00173"}
