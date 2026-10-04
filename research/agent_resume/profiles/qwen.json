@@ -1,0 +1,60 @@
+{
+  "family": "qwen",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "tokenizer_files": {
+    "config.json": {
+      "bytes": 660,
+      "sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670"
+    },
+    "merges.txt": {
+      "bytes": 1671839,
+      "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+    },
+    "tokenizer.json": {
+      "bytes": 7031645,
+      "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+    },
+    "tokenizer_config.json": {
+      "bytes": 7305,
+      "sha256": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+    },
+    "vocab.json": {
+      "bytes": 2776833,
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  },
+  "dtype": "bfloat16",
+  "approximate_raw_kv_bytes_per_token": 28672,
+  "gpu_fit": "NOT_VALIDATED",
+  "model_weights": "NOT_LOADED",
+  "date_string": "04 Oct 2026",
+  "profile_id": "qwen",
+  "source_commit": "fe6217292ce4f01c592a2d7274137d826a75e1a0",
+  "runtime_candidate_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+  "status": "CPU_TOKENIZER_ONLY",
+  "server_settings": {
+    "tp_size": 1,
+    "pp_size": 1,
+    "dp_size": 1,
+    "nnodes": 1,
+    "dtype": "bfloat16",
+    "attention_backend": "triton",
+    "max_running_requests": 1,
+    "context_length": 8192,
+    "max_total_tokens": 8192,
+    "page_size": 16,
+    "enable_hierarchical_cache": true,
+    "hicache_host_memory_mode": "cache",
+    "hicache_size": 4,
+    "hicache_io_backend": "kernel",
+    "hicache_mem_layout": "page_first",
+    "hicache_write_policy": "write_through",
+    "hicache_storage_backend": "file",
+    "hicache_storage_prefetch_policy": "wait_complete",
+    "enable_deterministic_inference": true,
+    "sampling_backend": "pytorch",
+    "random_seed": 42,
+    "stream_interval": 1
+  }
+}

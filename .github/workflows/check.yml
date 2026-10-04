@@ -14,5 +14,5 @@ jobs:
       - run: bash scripts/test_client.sh
       - run: python examples/admission/local_check.py
       - run: bash scripts/install.sh
-      - run: python -m compileall -q scripts benchmark src examples/tool_loop tests vendor/sglang/python/sglang/srt/mem_cache/proactive_prefetch.py
+      - run: python -m compileall -q scripts benchmark src examples/tool_loop tests research vendor/sglang/python/sglang/srt/mem_cache/proactive_prefetch.py
       - run: for script in scripts/*.sh examples/*.sh repro/*.sh; do bash -n "$script"; done

@@ -10,3 +10,4 @@ python -m unittest discover -s "$root/tests" -p 'test_admission_hints.py' -v
 python -m unittest discover -s "$root/tests" -p 'test_reconciliation.py' -v
 python -m unittest discover -s "$root/tests" -p 'test_multi_session_workflow.py' -v
 python -m unittest discover -s "$root/tests" -p 'test_cli.py' -v
+python -m unittest discover -s "$root/tests" -p 'test_research_harness.py' -v

@@ -1,0 +1,149 @@
+{
+  "updated": "2026-10-04",
+  "validation_type": "CPU_PREPARATION_ONLY",
+  "gpu_execution": false,
+  "model_weights_loaded": false,
+  "combined_regression": {
+    "passed": 149,
+    "subtests_passed": 58,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 22
+  },
+  "harness_tests": {
+    "passed": 19,
+    "failed": 0,
+    "skipped": 0
+  },
+  "client_suite": {
+    "passed": 104,
+    "failed": 0,
+    "skipped": 0
+  },
+  "models": [
+    {
+      "profile_id": "qwen",
+      "model": "Qwen/Qwen2.5-1.5B-Instruct",
+      "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+      "native_tokenizer_passed": true,
+      "model_generation": false,
+      "gpu_fit": "NOT_VALIDATED",
+      "scripted_two_tool_round_tasks": 3,
+      "expected_invalid_decisions_retained": 1,
+      "exact_prefix_preserved": true,
+      "native_boundary_checks": [
+        {
+          "ending": "",
+          "exact_ids_preserved": true
+        },
+        {
+          "ending": "<|im_end|>",
+          "exact_ids_preserved": true
+        },
+        {
+          "ending": "<|im_end|>\n",
+          "exact_ids_preserved": true
+        }
+      ],
+      "mistral_system_guard": null,
+      "regression_tool_tests": [
+        9
+      ],
+      "source_commit": "fe6217292ce4f01c592a2d7274137d826a75e1a0",
+      "raw_report_sha256": "b1b06de3063410c53f6b8a6ab62d9c6f137c93d66398c86362b8760dac43891f",
+      "python": "3.12.14",
+      "transformers": "5.17.0"
+    },
+    {
+      "profile_id": "qwen7",
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+      "native_tokenizer_passed": true,
+      "model_generation": false,
+      "gpu_fit": "NOT_VALIDATED",
+      "scripted_two_tool_round_tasks": 3,
+      "expected_invalid_decisions_retained": 1,
+      "exact_prefix_preserved": true,
+      "native_boundary_checks": [
+        {
+          "ending": "",
+          "exact_ids_preserved": true
+        },
+        {
+          "ending": "<|im_end|>",
+          "exact_ids_preserved": true
+        },
+        {
+          "ending": "<|im_end|>\n",
+          "exact_ids_preserved": true
+        }
+      ],
+      "mistral_system_guard": null,
+      "regression_tool_tests": [
+        9
+      ],
+      "source_commit": "fe6217292ce4f01c592a2d7274137d826a75e1a0",
+      "raw_report_sha256": "6c5390683fa08c75670b88eab1257b842e49eedc63b3df97b0e53f68330aa712",
+      "python": "3.12.14",
+      "transformers": "5.17.0"
+    },
+    {
+      "profile_id": "mistral",
+      "model": "mistralai/Mistral-7B-Instruct-v0.3",
+      "revision": "c170c708c41dac9275d15a8fff4eca08d52bab71",
+      "native_tokenizer_passed": true,
+      "model_generation": false,
+      "gpu_fit": "NOT_VALIDATED",
+      "scripted_two_tool_round_tasks": 3,
+      "expected_invalid_decisions_retained": 1,
+      "exact_prefix_preserved": true,
+      "native_boundary_checks": [
+        {
+          "ending": "",
+          "exact_ids_preserved": true
+        },
+        {
+          "ending": "</s>",
+          "exact_ids_preserved": true
+        },
+        {
+          "ending": "</s>",
+          "exact_ids_preserved": true
+        }
+      ],
+      "mistral_system_guard": "UNNORMALIZED_HISTORY_REJECTED",
+      "regression_tool_tests": [
+        9
+      ],
+      "source_commit": "fe6217292ce4f01c592a2d7274137d826a75e1a0",
+      "raw_report_sha256": "91b9c052b1b80cbe44c7ae1eec64691872f911695d01e51fd4785b113a40493a",
+      "python": "3.12.14",
+      "transformers": "5.17.0"
+    }
+  ],
+  "llama": {
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+    "native_tokenizer_validated": false,
+    "model_generation": false,
+    "gpu_fit": "NOT_VALIDATED",
+    "files_http_errors": {
+      "config.json": {
+        "http_status": 401
+      },
+      "tokenizer_config.json": {
+        "http_status": 401
+      },
+      "special_tokens_map.json": {
+        "http_status": 401
+      },
+      "tokenizer.json": {
+        "http_status": 401
+      }
+    },
+    "format_fixtures_only": true
+  },
+  "clean_mistral_tokenizer_download": "ALL_FOUR_FILES_HASH_AND_SIZE_VERIFIED",
+  "historical_evidence": "PASS: v0.1 45 trials; v0.2 12 runs; replay only",
+  "performance_claim": null
+}

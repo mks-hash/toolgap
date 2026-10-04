@@ -1,6 +1,8 @@
 # ToolGap: cross-family agent-resume research
 
-Status: **planned, not executed**. Updated 2026-10-04 after inspection of the
+Status: **local harness foundation implemented; GPU research not executed**.
+See [CPU preparation and limits](CROSS_FAMILY_PREPARATION.md).
+Updated 2026-10-04 after inspection of the
 existing harness and official candidate model cards/configuration. Existing
 v0.1/v0.2/v0.3 GPU evidence remains unchanged. No GPU resources, model-weight
 downloads, new runtime implementation or publication accompany this plan.
@@ -27,7 +29,7 @@ features should address an observed workload limitation.
 | One two-caller correctness smoke, n=1 | Aggregate latency, throughput and fairness under sustained load |
 | CPU ownership, cancellation and optional admission checks | GPU benefit/cost of the new reconciliation/hint policies |
 
-The current tool-loop uses a synthetic document archive and explicit flush for
+The historical tool-loop uses a synthetic document archive and explicit flush for
 L3-only conditions. Its exact-token continuation and parser are Qwen-specific.
 `Engine.start()` derives settings from the old 8192-token server command. Passing
 a different `--model-path` alone does not make a valid cross-family experiment.
@@ -38,7 +40,7 @@ a different `--model-path` alone does not make a valid cross-family experiment.
 |---|---|---|
 | Qwen/Qwen2.5-1.5B-Instruct | Historical reference and cheap harness checks | Existing GPU evidence only for pinned historical setup |
 | Qwen/Qwen2.5-7B-Instruct | Size change within Qwen | Candidate; ToolGap GPU validation pending |
-| mistralai/Mistral-7B-Instruct-v0.3 | Second family, comparable dense-model size | Candidate; template/runtime validation pending |
+| mistralai/Mistral-7B-Instruct-v0.3 | Second family, comparable dense-model size | Native-template CPU checks passed; model/runtime validation pending |
 | meta-llama/Llama-3.1-8B-Instruct | Third family | Candidate; model-access and runtime validation pending |
 
 These choices isolate useful axes rather than selecting models by popularity.

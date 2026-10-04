@@ -137,6 +137,9 @@ and slot timing. Estimates stay separate from restore/usage evidence.
 The next [research milestone](docs/RESEARCH_PLAN.md) evaluates multiple model
 families and useful agent workloads under cache pressure. It is a plan, not new
 measured model support or a cross-family performance claim.
+The [local preparation](docs/CROSS_FAMILY_PREPARATION.md) adds native-tokenizer
+checks for Qwen/Mistral and a useful multi-round repository investigation runner.
+Actual cross-family generation and pressure evaluation remain pending.
 
 ## CLI and diagnostics
 
