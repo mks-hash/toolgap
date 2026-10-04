@@ -1,0 +1,179 @@
+{
+  "status": "PASS",
+  "author": "Maxim Yakimov",
+  "date": "2026-10-04",
+  "new_gpu_execution": false,
+  "published": false,
+  "latex_compile_status": "PASS",
+  "latex_compile_reason": "The current source compiled successfully with the desktop editor's compiler.",
+  "pdf_layout_verified": true,
+  "pdf_review_provenance": {
+    "checked_at_utc": "2026-10-04T03:37:00.068594+00:00",
+    "builtin_compile_status": "PASS",
+    "builtin_source_sha256": "174335b0d5093f29ff1d17305fb94848c79a626e46483880935c125bfcbfdb2a",
+    "builtin_compiler_message": "The current source compiled successfully with the desktop editor's compiler.",
+    "reviewed_pdf": "toolgap-technical-report.pdf",
+    "reviewed_pdf_sha256": "25dab3fa98c82f63e8067583f80dc2a8721878121f9b4f23eaa048c30381a2c3",
+    "reviewed_pdf_origin": "Author-exported Overleaf revision 2, before source-only line-wrap adjustments",
+    "reviewed_pdf_pages": 8,
+    "reviewed_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "pdf_layout_verified": true,
+    "visual_defects_found": 0,
+    "separate_pdf_generated": false,
+    "published": false
+  },
+  "intended_pages": 8,
+  "software_snapshot": "74a541e785650537766567b48d2f38cee17199b8",
+  "v1_trials": 45,
+  "v1_groups": [
+    {
+      "gap_ms": 0,
+      "ttft_median_ms": {
+        "A": 572.017355,
+        "B": 501.537779,
+        "C": 490.001004
+      },
+      "B_minus_C_ms": 11.536774999999977,
+      "reduction_percent": 2.3002803543539194
+    },
+    {
+      "gap_ms": 100,
+      "ttft_median_ms": {
+        "A": 568.699872,
+        "B": 513.58262,
+        "C": 438.396661
+      },
+      "B_minus_C_ms": 75.18595900000003,
+      "reduction_percent": 14.639506103224448
+    },
+    {
+      "gap_ms": 500,
+      "ttft_median_ms": {
+        "A": 576.795476,
+        "B": 528.487359,
+        "C": 165.711372
+      },
+      "B_minus_C_ms": 362.775987,
+      "reduction_percent": 68.64421273697864
+    },
+    {
+      "gap_ms": 1000,
+      "ttft_median_ms": {
+        "A": 568.232848,
+        "B": 582.191394,
+        "C": 166.49186
+      },
+      "B_minus_C_ms": 415.69953399999997,
+      "reduction_percent": 71.4025556344792
+    },
+    {
+      "gap_ms": 3000,
+      "ttft_median_ms": {
+        "A": 571.270248,
+        "B": 508.377547,
+        "C": 162.90293
+      },
+      "B_minus_C_ms": 345.47461699999997,
+      "reduction_percent": 67.9563090539087
+    }
+  ],
+  "v2_runs": 12,
+  "v2_groups": [
+    {
+      "scenario": "l3_only",
+      "groups": {
+        "baseline": {
+          "continuation_ttft_ms": 511.964993,
+          "agent_step_ms": 1158.862354,
+          "io_duration_ms": 355.969141,
+          "io_hidden_ms": 0.0,
+          "tool_duration_ms": 642.066509,
+          "ttft_all_ms": [
+            573.099848,
+            455.499901,
+            511.964993
+          ]
+        },
+        "proactive": {
+          "continuation_ttft_ms": 134.302635,
+          "agent_step_ms": 763.893394,
+          "io_duration_ms": 296.801942,
+          "io_hidden_ms": 296.801942,
+          "tool_duration_ms": 630.390503,
+          "ttft_all_ms": [
+            132.5504,
+            137.198867,
+            134.302635
+          ]
+        }
+      }
+    },
+    {
+      "scenario": "resident",
+      "groups": {
+        "baseline": {
+          "continuation_ttft_ms": 128.156139,
+          "agent_step_ms": 748.391944,
+          "io_duration_ms": 0,
+          "io_hidden_ms": 0,
+          "tool_duration_ms": 619.450533,
+          "ttft_all_ms": [
+            135.500961,
+            128.156139,
+            127.265956
+          ]
+        },
+        "proactive": {
+          "continuation_ttft_ms": 126.977102,
+          "agent_step_ms": 759.105607,
+          "io_duration_ms": 0,
+          "io_hidden_ms": 0,
+          "tool_duration_ms": 632.080109,
+          "ttft_all_ms": [
+            126.977102,
+            128.622138,
+            126.239724
+          ]
+        }
+      }
+    }
+  ],
+  "regressions": {
+    "passed": 52,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fresh_main_smoke": {
+    "passed": 29,
+    "purpose": "compatibility; separate from both performance datasets"
+  },
+  "sha256": {
+    "compatibility.json": "4b4516e26457d53c94eac0b7e8646a6e485aa893950b2a8a31101e81bea712e3",
+    "results/trials.csv": "74a33d8c77b37a2fa6a2d644d3a0915dd4d57bc9ea59d0972cec00a4f556ecc1",
+    "results/medians.csv": "60b1f4b7809f5e8e0d89e3d48b271ec8654be05e9f4e309c0456f011638a030c",
+    "results/raw/trials.json": "8af2ae4fd17e88df56f0896b6f74169bcdee15da7ac2a11d09a118446a6c05fc",
+    "results/raw/wasted-prefetch.json": "784844bff9030afd8e30859827e0647c826e53fdf2b05461c7d06027fe0d9236",
+    "results/tool-loop/tool-loop-trials.csv": "e3e1e2716249ec7256725f7574db2ececb486568d51cc63078b6280c6128dd92",
+    "results/tool-loop/tool-loop-trials.json": "3bd6a19727728b7da4c0fbc2cc2295f1fdb2a5a6c10b48c903650928fb245745",
+    "results/tool-loop/tool-loop-summary.json": "bf5ca262d513b84347faa605f8cf28d02f2d8588e8aa475acf5ed317b08e640f",
+    "results/tool-loop/tool-loop-trace.jsonl": "d08fb252e45df2223aa248ebc2fc0aa16c6e87857e58eac5e70bea87eeb251de",
+    "results/tool-loop/local-regressions.xml": "82f661850ce60e69b2e42b587a7b19a7476060cd4328500c7284847197463626",
+    "results/tool-loop/VERDICT.json": "4da9dc49343169c688d982fdb71c1d1969827e43b872f5873e306902280d7458",
+    "results/tool-loop/demo-config.json": "419739a64e67153e91b0b770df309359bc6ba1a58711a7d2642cd0812dfd6d65",
+    "docs/UPSTREAM_SMOKE.md": "ede25b898eafd18481c1e8b7075086efa22148b324e321f341b5bf1050738073",
+    "docs/report/toolgap-report.tex": "174335b0d5093f29ff1d17305fb94848c79a626e46483880935c125bfcbfdb2a",
+    "docs/report/technical-report.md": "b00ef789460dbcdf9c6236b0668e190cf842c11ed525291e6f7ce4c287ddd6d9",
+    "CITATION.cff": "5a1c3251b34dd4f684225d2765278cc2e29ab76c2dabea7aae1324e3b10b3b89",
+    "docs/report/toolgap-technical-report.pdf": "25dab3fa98c82f63e8067583f80dc2a8721878121f9b4f23eaa048c30381a2c3",
+    "docs/report/pdf-validation.json": "fe96a7081a117fddba627aeaee7f3ad129775e80586a5c10f40b5c2680641883"
+  }
+}

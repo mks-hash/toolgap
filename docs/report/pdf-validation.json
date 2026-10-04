@@ -1,0 +1,24 @@
+{
+  "checked_at_utc": "2026-10-04T03:37:00.068594+00:00",
+  "builtin_compile_status": "PASS",
+  "builtin_source_sha256": "174335b0d5093f29ff1d17305fb94848c79a626e46483880935c125bfcbfdb2a",
+  "builtin_compiler_message": "The current source compiled successfully with the desktop editor's compiler.",
+  "reviewed_pdf": "toolgap-technical-report.pdf",
+  "reviewed_pdf_sha256": "25dab3fa98c82f63e8067583f80dc2a8721878121f9b4f23eaa048c30381a2c3",
+  "reviewed_pdf_origin": "Author-exported Overleaf revision 2, before source-only line-wrap adjustments",
+  "reviewed_pdf_pages": 8,
+  "reviewed_pages": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "pdf_layout_verified": true,
+  "visual_defects_found": 0,
+  "separate_pdf_generated": false,
+  "published": false
+}

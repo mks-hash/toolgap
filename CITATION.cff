@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use ToolGap, please cite this software and identify the measured version."
+type: software
+title: "ToolGap: Experimental proactive KV prefetch for SGLang tool-using agents"
+authors:
+  - family-names: Yakimov
+    given-names: Maxim
+version: 0.2.0
+date-released: 2026-10-04
+license: Apache-2.0
+url: "https://github.com/mks-hash/toolgap"
+repository-code: "https://github.com/mks-hash/toolgap"
+commit: 74a541e785650537766567b48d2f38cee17199b8
+keywords:
+  - KV cache
+  - SGLang
+  - inference serving
+  - tool-using agents
+  - prefetch
+abstract: >-
+  Experimental exact-prefix restoration from file-backed storage into resident
+  host KV cache during tool execution. Ordinary continuation requests reuse
+  the restored prefix through normal cache matching and host-to-device transfer.
+  The repository includes pinned source patches and reproducible, controlled
+  single-NVIDIA-L4 experiments. Results are workload- and version-specific.
+preferred-citation:
+  type: report
+  title: "ToolGap: Hiding KV-Cache Restore Latency During LLM Agent Tool Execution"
+  authors:
+    - family-names: Yakimov
+      given-names: Maxim
+  year: 2026
+  month: 10
+  date-released: 2026-10-04
+  version: "revision 2"
+  url: "https://github.com/mks-hash/toolgap/releases/tag/report-v1.0.0"

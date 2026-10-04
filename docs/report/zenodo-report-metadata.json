@@ -1,0 +1,36 @@
+{
+  "resource_type": "publication-technicalreport",
+  "title": "ToolGap: Hiding KV-Cache Restore Latency During LLM Agent Tool Execution",
+  "creators": [
+    {
+      "type": "personal",
+      "family_name": "Yakimov",
+      "given_name": "Maxim"
+    }
+  ],
+  "publication_date": "2026-10-04",
+  "version": "revision 2",
+  "license": "Apache-2.0",
+  "language": "eng",
+  "description": "Experimental SGLang exact-prefix prefetch from file-backed L3 into resident host L2 during LLM agent tool execution. Two controlled single-NVIDIA-L4 evaluations use Qwen2.5-1.5B-Instruct, one worker, full attention and TP1/PP1. The v0.1 synthetic-gap experiment includes 45 trials and observes 67–71% lower median continuation TTFT at 500–3000 ms gaps. The v0.2 real document-search tool loop includes 12 runs: L3-only median continuation TTFT is 511.96 versus 134.30 ms; tool-dispatch-to-first-token latency is 1158.86 versus 763.89 ms and excludes the initial tool-selection model turn. The GPU-resident negative control shows no meaningful TTFT improvement. Each condition has three repetitions. A separate fresh-main 29-test smoke checks compatibility, not performance. The report includes architecture, finite-I/O/cancellation ownership semantics, exact cache-state and publication-timing evidence, limitations, related work and reproduction. No universal speedup, statistical significance or production-readiness claim is made.",
+  "keywords": [
+    "KV cache",
+    "SGLang",
+    "LLM agents",
+    "prefetch",
+    "inference serving",
+    "latency hiding"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/mks-hash/toolgap",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://github.com/mks-hash/toolgap/tree/v0.2.0",
+      "relation": "references",
+      "scheme": "url"
+    }
+  ]
+}

@@ -16,6 +16,15 @@ prefix, 3 runs per condition**, single worker, full attention, TP1/PP1.
 These are controlled experimental observations, not a universal speedup or
 production-readiness claim.
 
+## Technical report
+
+**[Read the eight-page report](docs/report/toolgap-technical-report.pdf)**
+by **Maxim Yakimov** (October 4, 2026).
+It covers architecture, lifecycle, methodology, both performance datasets,
+resident negative control, related work, limitations, and exact reproduction.
+[LaTeX / Markdown / evidence audit](docs/report/) ·
+[Report release](https://github.com/mks-hash/toolgap/releases/tag/report-v1.0.0).
+
 ## v0.2: real model → tool → continuation
 
 The model emits a real `search_documents` call. A subprocess searches a fixed
