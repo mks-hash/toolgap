@@ -4,11 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "toolgap"
-version = "0.2.0.dev0"
+version = "0.2.0"
 description = "Experimental exact-prefix KV prefetch client for SGLang"
+readme = "README.md"
 requires-python = ">=3.10"
+classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Intended Audience :: Developers"]
 dependencies = ["httpx>=0.28,<0.29"]
 license = "Apache-2.0"
+
+[project.urls]
+Repository = "https://github.com/mks-hash/toolgap"
+Issues = "https://github.com/mks-hash/toolgap/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

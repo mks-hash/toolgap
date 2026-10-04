@@ -23,14 +23,17 @@ prepares source; dependencies below are a separate step.
 ## Container (recommended reproduction environment)
 
 ```bash
-docker build -f repro/Dockerfile -t toolgap:v0.1 .
-docker run --rm --gpus all --shm-size=2g toolgap:v0.1 tests
+docker build -f repro/Dockerfile -t toolgap:v0.2.0 .
+docker run --rm --gpus all --shm-size=2g toolgap:v0.2.0 tests
 mkdir -p results/local
 docker run --rm --gpus all --shm-size=2g \
-  -v "$PWD/results/local:/results" toolgap:v0.1 demo
+  -v "$PWD/results/local:/results" toolgap:v0.2.0 tool-loop
+# Earlier synthetic 500ms systems demo:
+docker run --rm --gpus all --shm-size=2g \
+  -v "$PWD/results/local:/results" toolgap:v0.2.0 demo
 # Full 45 trials, no injected delays; save logs/JSON/trace:
 docker run --rm --gpus all --shm-size=2g \
-  -v "$PWD/results/local:/results" toolgap:v0.1 benchmark
+  -v "$PWD/results/local:/results" toolgap:v0.2.0 benchmark
 ```
 These run on your host GPU, with no cloud API calls. Each run creates a unique
 results directory. No automatic retries or automatic second execution. Docker
@@ -45,7 +48,9 @@ both local patches, installs the locked environment, and downloads
 The combined release image was not newly built/GPU-executed at publication;
 the source patches and CPU/controller imports/tests were checked from a clean
 checkout, and the recorded L4 results validate the pinned measured implementation.
-The six-line backend guard added for release was tested on CPU only.
+The v0.2 demo subsequently validated the exact release runtime and client/tool-loop
+overlay on L4; see [TOOL_LOOP_VALIDATION.md](TOOL_LOOP_VALIDATION.md).
+This does not constitute a new test of the assembled public Docker recipe.
 
 ## Native commands inside that environment
 
@@ -56,7 +61,8 @@ export SGLANG_UNIFIED_RADIX_TREE_CORE_BACKEND=python
 export CUBLAS_WORKSPACE_CONFIG=:4096:8 TORCH_CUDA_ARCH_LIST=8.9
 export MODEL_PATH=/absolute/path/to/pinned-model
 bash scripts/test.sh
-bash examples/demo.sh
+bash examples/tool_loop.sh
+# Original synthetic-gap benchmark:
 python benchmark/run.py --model-path "$MODEL_PATH" \
   --work-dir /tmp/toolgap-fresh-work --results-dir results/local/full \
   --repetitions 3 --gaps-ms 0 100 500 1000 3000
@@ -75,7 +81,9 @@ wait_complete threshold64, Triton attention/PyTorch sampling, CUDA graphs off.
 
 ```bash
 bash examples/demo.sh --replay  # no GPU; verifies recorded data only
+python scripts/check_tool_loop_evidence.py
 python -m pip install matplotlib==3.10.8
+python examples/tool_loop/plot_results.py results/tool-loop
 python scripts/plot.py
 ```
 `results/trials.csv` is all 45 observations; `medians.csv` is the five-gap

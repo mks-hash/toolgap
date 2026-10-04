@@ -1,4 +1,4 @@
-# v0.2 development: a real tool loop
+# ToolGap v0.2: a real tool loop
 
 Status: experimental real model/tool/continuation demo validated in one L4 session.
 See [the measured results and controls](TOOL_LOOP_VALIDATION.md).

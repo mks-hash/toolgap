@@ -2,15 +2,149 @@
 
 **Experimental proactive KV prefetch for SGLang tool-using agents.**
 
-Hide KV-cache restore latency inside agent tool calls: restore a known prefix
-from file-backed storage into resident CPU L2 before the continuation arrives.
-The continuation uses ordinary SGLang prefix matching, H2D and generation.
+Restore reusable KV from file-backed L3 into resident host L2 while a tool works.
+The ordinary continuation request then reuses it through normal prefix matching,
+H2D and generation.
 
-**67–71% lower median continuation TTFT versus request-time L3 restore at
-500–3000 ms tool gaps in our single-L4 benchmark.** Qwen2.5-1.5B-Instruct,
-4096 input tokens (4080 restored), file-backed L3, single worker, TP1/PP1,
-three repetitions per condition. This is a scoped experiment, not a universal
-performance or production-readiness claim.
+**73.8% lower median continuation TTFT when reusable KV is L3-only; no meaningful
+change when KV is already GPU-resident.**
+
+**34.1% lower end-to-end tool-dispatch-to-first-token latency in the L3-only scenario.**
+This interval starts at tool dispatch and excludes the model's earlier tool-selection
+turn. **1× NVIDIA L4, Qwen2.5-1.5B-Instruct, file-backed L3, 3520-token reusable
+prefix, 3 runs per condition**, single worker, full attention, TP1/PP1.
+These are controlled experimental observations, not a universal speedup or
+production-readiness claim.
+
+## v0.2: real model → tool → continuation
+
+The model emits a real `search_documents` call. A subprocess searches a fixed
+10,000-record synthetic document archive; the model then consumes that actual
+tool result and returns the correct document ID. No artificial `sleep` is used.
+
+| Verified initial prefix state | Baseline median TTFT | ToolGap median TTFT | Baseline tool → first token | ToolGap tool → first token |
+|---|---:|---:|---:|---:|
+| L3-only | 512 ms | 134 ms | 1159 ms | 764 ms |
+| Resident GPU | 128 ms | 127 ms | 748 ms | 759 ms |
+
+![All measured trials and median continuation TTFT](results/tool-loop/ttft.png)
+
+Before tool dispatch, both L3-only treatments had **GPU hit=0, host hit=0,
+3520 storage tokens available**, with identical L3 payloads. All three proactive
+restores published L2 before both tool completion and continuation submission.
+The continuation consumed 3520 host tokens, versus 3520 storage tokens in the
+baseline. Resident controls issued zero L3 reads. All 12 runs produced identical
+output token IDs; duplicate reads=0, proactive H2D=0, cleanup returned host slots
+and in-flight operations to baseline. **52/52 regressions and 12/12 real GPU runs
+passed**, without skips. The regressions include CPU fixtures run in the GPU image;
+they are not 52 CUDA-specific tests.
+
+Cache eviction is controlled explicitly, preserving L3; tool calls do not themselves
+cause eviction in this demo. File payload verification and the initial turn can warm
+OS page cache. n=3 does not establish statistical significance. The resident result
+shows no useful benefit, including a slightly slower median full step with ToolGap.
+
+**When ToolGap helps:** the reusable prefix is in slower storage and tool execution
+provides enough time to restore it.
+
+**When ToolGap does not help:** KV is already GPU-resident, or the tool finishes too
+quickly to hide meaningful restore work.
+
+[Validation and provenance](docs/TOOL_LOOP_VALIDATION.md) ·
+[Raw CSV](results/tool-loop/tool-loop-trials.csv) ·
+[Full trials and timestamps](results/tool-loop/tool-loop-trials.json) ·
+[Trace](results/tool-loop/tool-loop-trace.jsonl) ·
+[Machine-readable verdict](results/tool-loop/VERDICT.json)
+
+## Start
+
+```bash
+git clone https://github.com/mks-hash/toolgap.git
+cd toolgap
+git checkout v0.2.0
+bash scripts/install.sh
+# In the compatible SGLang/CUDA Python environment:
+python -m pip install -e .
+```
+
+The installer creates a pinned SGLang checkout and applies the lifecycle and
+prefetch patches. It prepares source; install the locked GPU dependencies and
+pinned model as described in [reproduction](docs/REPRODUCE.md).
+
+**One-command real tool-loop demo on an existing compatible GPU:**
+
+```bash
+MODEL_PATH=/absolute/path/to/Qwen2.5-1.5B-Instruct \
+SGLANG_CHECKOUT="$PWD/vendor/sglang" bash examples/tool_loop.sh
+```
+
+The runner verifies source/tokenizer hashes, starts servers sequentially, executes
+all four conditions with three repetitions, and writes JSON/CSV/trace results
+under `work/`. It does not provision cloud resources. See
+[exact tool-loop instructions](docs/TOOL_LOOP.md) for model identity, cache controls,
+output validation, and cancellation/fallback policy.
+
+A Docker recipe for the same pinned dependencies is also provided:
+
+```bash
+docker build -f repro/Dockerfile -t toolgap:v0.2.0 .
+mkdir -p results/local
+docker run --rm --gpus all --shm-size=2g \
+  -v "$PWD/results/local:/results" toolgap:v0.2.0 tool-loop
+```
+
+The published Docker recipe was not newly built or GPU-executed for this release.
+The recorded demo used the validated immutable CUDA image with the exact source
+and ToolGap overlay; [validation](docs/TOOL_LOOP_VALIDATION.md) records its digest.
+
+**Offline audit of both recorded datasets** (no GPU or model download):
+
+```bash
+python scripts/check_evidence.py
+python scripts/check_tool_loop_evidence.py
+```
+
+## Thin Python client and control API
+
+```python
+from toolgap import PrefetchClient
+
+async with PrefetchClient(url, headers=admin_headers) as client:
+    state = await client.submit(operation_id, exact_token_ids,
+                                cache_salt=salt, ttl_ms=10000)
+    state = await client.status(operation_id)
+    state = await client.cancel(operation_id)
+```
+
+`POST /hicache/prefetch` accepts `submit`, `status`, and `cancel`. Supply the actual
+saved model token IDs and salt namespace, not decoded/re-encoded history or a
+predicted prefix. The client creates no session abstraction and performs no GPU
+transfer. A successful tool must not cancel a still-useful in-flight restore;
+early continuation can join it. Tool failure/cancel attempts bounded cancellation
+of its owned operation; admission rejection falls back to ordinary generation.
+Transport errors can leave acceptance/cleanup uncertain; server TTL is a backstop.
+
+[API/lifecycle contract](docs/API.md) · [Integration policy](docs/TOOL_LOOP.md)
+
+```mermaid
+flowchart LR
+  Model[Model tool call] --> Tool[Document search]
+  Model --> Signal[Exact-prefix prefetch signal]
+  Signal --> L3[File L3 read]
+  L3 --> L2[Terminal ACK and resident host L2]
+  Tool --> Request[Ordinary continuation request]
+  Request --> Match[Normal prefix match]
+  L2 --> Match
+  Match --> H2D[Normal H2D]
+  H2D --> Generate[Generation]
+```
+
+## Earlier v0.1 systems benchmark
+
+The original **45-trial A/B/C benchmark** used synthetic tool gaps, 4096 input
+tokens (4080 restored), 32 output tokens, and three repetitions per condition.
+It observed 67–71% lower median continuation TTFT at 500–3000 ms gaps. These
+numbers belong to that measured version and workload, not the v0.2 tool-loop demo.
 
 | Tool gap | Recompute A | Request-time restore B | Proactive restore C | Reduction vs B |
 |---:|---:|---:|---:|---:|
@@ -20,68 +154,10 @@ performance or production-readiness claim.
 | 1000 ms | 568 ms | 582 ms | 166 ms | 71% |
 | 3000 ms | 571 ms | 508 ms | 163 ms | 68% |
 
-![Median TTFT and individual trials](results/ttft.png)
-
-All 45 trials produced identical 32 output token IDs. B consumed 4080 storage
-tokens; C consumed 4080 host tokens. No duplicate backend pages were read and no
-relevant host eviction occurred. All nine C trials at gaps ≥500 ms published L2
-before continuation submission; no proactive H2D occurred. At zero gap there is
-no convincing benefit (one paired C trial was slower). Local files may have warm
-OS page cache. n=3 does not establish statistical significance.
-
-## Start
-
-```bash
-git clone https://github.com/mks-hash/toolgap.git
-cd toolgap
-bash scripts/install.sh
-# Offline audit; no model download, server, GPU or cloud resources:
-bash examples/demo.sh --replay
-```
-
-The installer creates a pinned SGLang source checkout and applies two patches.
-It deliberately does not install CUDA dependencies into your current Python.
-For a real GPU demo on an existing NVIDIA L4 machine:
-
-```bash
-docker build -f repro/Dockerfile -t toolgap:v0.1 .
-mkdir -p results/local
-docker run --rm --gpus all --shm-size=2g \
-  -v "$PWD/results/local:/results" toolgap:v0.1 demo
-```
-
-The demo seeds file L3, starts fresh empty L1/L2 servers, submits proactive
-prefetch before a synthetic 500 ms tool wait ends, and checks the normal model
-continuation against A/B baselines. It also checks wasted-prefetch reclamation.
-It is a systems demo; it does not invoke a real external tool or agent framework.
-The release Dockerfile wraps the validated source/environment; its assembled
-image has not been rebuilt or rerun on GPU for this release. See
-[reproduction](docs/REPRODUCE.md) for prerequisites and exact commands.
-
-## Control API
-
-`POST /hicache/prefetch` accepts `submit`, `status`, and `cancel`.
-Send exact model token IDs, not text or a speculative future prefix. Example
-request shape (use a prefix above the configured threshold in a real call):
-
-```json
-{"action":"submit","operation_id":"session-1-tool-1","input_ids":[1,2,3,4],"ttl_ms":10000}
-```
-
-[API and lifecycle semantics](docs/API.md) explain page alignment, salts,
-idempotency, TTL, terminal ACKs and cleanup. Authentication follows SGLang's admin
-API. Submit does no generation and no GPU transfer.
-
-```mermaid
-flowchart LR
-  Tool[Tool gap signal] --> Restore[File L3 read]
-  Restore --> ACK[Terminal ACK]
-  ACK --> L2[Resident host L2]
-  Request[Later continuation] --> Match[Ordinary prefix match]
-  L2 --> Match
-  Match --> H2D[Normal H2D]
-  H2D --> Generate[Generation]
-```
+All 45 outputs matched, with no duplicate backend reads or relevant host eviction.
+At zero gap there was no convincing benefit. Files may have warm OS page cache.
+[Historical Stage 2B report](docs/STAGE_2B.md) · [Raw CSV](results/trials.csv) ·
+[Chart](results/ttft.png) · [Raw JSON/traces](results/raw)
 
 ## Compatibility and validation
 
@@ -89,58 +165,35 @@ flowchart LR
 - `patches/0001-lifecycle.patch`: prerequisite finite-I/O fix, separately proposed
   in [SGLang #42149](https://github.com/sgl-project/sglang/pull/42149).
 - `patches/0002-proactive-prefetch.patch`: runtime, regression tests and benchmark.
-- GPU-validated feature: `4a7c68d30913cb084c821ad044ae4ef037933c29`.
-  v0.1 adds a six-line backend-change rejection guard plus two CPU tests.
-  No inference/restore algorithm change; that guard has CPU validation only.
-- 27 current CPU/controller/API tests passed; the measured version had 25 tests
-  also pass inside the L4 environment. These are not 25 CUDA kernel tests.
-- Stage 2A: 41 passed / six SWA-only skips, real L3→L2→H2D and deterministic
-  generation. Stage 2B: 45 successful real-model trials.
+- v0.2 demo runtime: `3e60ad803c6b01832b527f4a1dcbeb7a5449964b`, which includes
+  the release backend-replacement guard. v0.2 adds the client/integration/demo;
+  it introduces no new SGLang runtime patch.
+- Model revision: `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`.
+- Stage 2A: 41 passed / six SWA-only skips, real L3→L2→H2D and generation.
+- v0.1 measured feature: `4a7c68d30913cb084c821ad044ae4ef037933c29`.
+- The separate [feature PR #42434](https://github.com/sgl-project/sglang/pull/42434)
+  targets a later upstream main. Its [29-test GPU smoke](docs/UPSTREAM_SMOKE.md)
+  establishes compatibility; it does not replace either performance dataset.
 
-[Review and release checks](docs/REVIEW.md), [Stage 2A](docs/STAGE_2A.md),
-[Stage 2B](docs/STAGE_2B.md), [raw CSV](results/trials.csv),
-[raw JSON/traces](results/raw), and [median CSV](results/medians.csv).
-The Stage reports are historical validation records, not current instructions.
-No public repository or release depends on upstream merging the patches.
-The separate [draft feature PR #42434](https://github.com/sgl-project/sglang/pull/42434)
-is an additional upstream distribution path. A separate
-[latest-main GPU smoke](docs/UPSTREAM_SMOKE.md) passed 29 tests and three A/B/C
-sanity trials; it does not change the pinned v0.1 or its 45-trial measurements.
+[Historical release review](docs/REVIEW.md) · [Stage 2A](docs/STAGE_2A.md) ·
+[Reproduction](docs/REPRODUCE.md)
+The standalone project does not depend on upstream merging either PR.
 
 ## Limitations
 
 One active restore, one trajectory, fixed model/tokenizer, FULL resident cache,
 file backend, TP1/PP1/DP1, Python TreeCore. No SWA, distributed recovery, LoRA,
-speculation, multimodal, proactive GPU/HBM load, prediction or general control
-framework. Do not change model weights or storage namespace during a process;
-restart with an appropriately isolated file store. The API cannot identify an
-incorrect model's KV from a caller-provided token prefix. Backend replacement
-is rejected by v0.1. API outcomes describe history, not guaranteed residency.
+speculation, multimodal, proactive GPU/HBM load, prediction or general framework.
+Do not change model weights or storage namespace during a process; restart with
+an isolated file store. The API cannot recognize a wrong model's KV from token IDs.
+Source/tokenizer guards do not hash every model-weight file. API outcomes describe
+history, not guaranteed continued residency.
 
-Finite I/O exceptions are recoverable. Permanently blocked backend calls are not.
-When continuation never arrives, a successful restore wastes 111.56 MiB in this
-benchmark. Completed KV stays ordinarily evictable; cancel does not evict shared
-pages. Normal cache flush returned availability to baseline. Use a new operation
-ID for a new restore attempt after eviction.
+Finite I/O exceptions are recoverable; permanently blocked calls are unsupported.
+When continuation never arrives, a completed restore occupies ordinarily evictable
+L2; cancel does not evict shared pages. The v0.1 waste fixture restored 111.56 MiB
+and normal flush reclaimed it. The v0.2 L3-only runs restored 96.25 MiB each and
+normal flush returned all host slots to baseline. Use a new operation ID for a
+new restore attempt after eviction.
 
-Next product step: a real tool-calling example using this control API.
 Apache-2.0; see [LICENSE](LICENSE) and [NOTICE](NOTICE).
-
-## Real tool-loop development
-
-The v0.2 development branch adds a thin Python client and a real document-search
-tool loop with verified L3-only and resident-cache controls. One L4 session
-passed 52 regressions and 12 real tool-loop runs (three per condition).
-
-| Initial prefix state | Baseline median TTFT | ToolGap median TTFT |
-|---|---:|---:|
-| L3-only |512ms|134ms|
-| Resident GPU |128ms|127ms|
-
-The L3-only measured tool-dispatch → first-token median fell 1159→764ms.
-Qwen2.5-1.5B, 3520 saved tokens, file L3,fixed 10000-record document-search
-fixture,single worker, TP1/PP1, n=3. Controlled eviction; OS page cache may be warm.
-Resident control shows no useful benefit. These are separate v0.2 demo results;
-the performance numbers above remain exclusively the v0.1 benchmark.
-See [the tool-loop instructions](docs/TOOL_LOOP.md) and
-[validation with raw evidence](docs/TOOL_LOOP_VALIDATION.md).
