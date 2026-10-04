@@ -63,4 +63,6 @@ is bounded and can be uncertain after transport failure; permanently blocked I/O
 remains unsupported. No new GPU run accompanied publication.
 
 v0.1.0 and its 45-trial synthetic-gap benchmark remain intact. Upstream lifecycle
-PR #42149 and feature PR #42434 remain separate; this release does not update them.
+[PR #42149](https://github.com/sgl-project/sglang/pull/42149) and feature
+[PR #42434](https://github.com/sgl-project/sglang/pull/42434) remain separate;
+this release does not update them.
