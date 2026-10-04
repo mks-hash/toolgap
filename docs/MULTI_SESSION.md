@@ -1,6 +1,6 @@
-# v0.3 development: bounded admission across callers
+# v0.3: bounded admission across callers
 
-This is a **development increment**, not a new GPU release.
+This is an **experimental process-local coordinator**, included in v0.3.0.
 The [two-caller GPU smoke](MULTI_SESSION_GPU_SMOKE.md) passed; broader load and
 statistical performance evaluation remain unvalidated.
 It uses the pinned v0.2 SGLang runtime and does not change the published benchmark,
@@ -96,7 +96,7 @@ Without attributable trace evidence, use `finish()` and report unknown usage.
 `finish(used_tokens=0)` explicitly records an abandoned published restore. It
 neither evicts L2 nor measures partial/cancelled backend I/O. These counters do
 not claim duplicate reads, actual device/host hits, L2 eviction, or GPU latency;
-those require the existing runtime trace and future multi-agent GPU validation.
+those require runtime trace evidence such as the recorded two-caller GPU smoke.
 
 ## CPU verification
 
@@ -121,9 +121,9 @@ cancellation while a read holds host slots, baseline accounting after drain,
 next restore usability, and abandonment accounting. They do not run model
 forward/H2D or measure simultaneous-agent TTFT.
 
-Next validation: two real agent loops with matched cache state and fallback,
-then 5–20 callers with admission/waste and inference contention measurements.
-A new GPU experiment and release remain separate from this local increment.
+The recorded two-caller smoke establishes correctness and fallback for one
+repetition. It does not establish a pair-level speedup or validate 5–20 callers.
+Larger-load and statistical performance evaluation remain future work.
 
 The [two-trajectory demo harness](MULTI_SESSION_DEMO.md) covers baseline,
 shared-admission and owned-abandonment treatments. Its

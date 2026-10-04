@@ -1,7 +1,7 @@
 # Two-trajectory demo plan
 
-This development harness uses the v0.2 pinned SGLang runtime. It is not a
-published v0.3 release. One separately authorized
+This harness is included in experimental v0.3.0 and uses the v0.2 pinned SGLang
+runtime. One separately authorized
 [single-repeat GPU smoke](MULTI_SESSION_GPU_SMOKE.md) has passed; the default
 three-repetition evaluation below has not been run. Another paid GPU run
 requires separate authorization.

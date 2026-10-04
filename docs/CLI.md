@@ -1,10 +1,10 @@
-# Control CLI and read-only diagnostics (v0.3 development)
+# Control CLI and read-only diagnostics (v0.3.0)
 
-This CLI is available in the development checkout, version `0.3.0.dev0`.
-It is not a published release. The released v0.2.0 package predates these commands.
+This CLI is included in experimental `v0.3.0`. Install from its tagged checkout
+or its release wheel. The v0.2.0 package predates these commands.
 SGLang runtime patches and existing GPU measurements are unchanged.
 
-## Install from this checkout
+## Install from the v0.3.0 checkout
 
 Use a Python 3.10+ environment. Only the existing httpx dependency is needed for
 CLI commands; no SGLang, Torch or model package is imported by the CLI itself.

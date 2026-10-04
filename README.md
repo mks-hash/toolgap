@@ -73,7 +73,7 @@ quickly to hide meaningful restore work.
 ```bash
 git clone https://github.com/mks-hash/toolgap.git
 cd toolgap
-git checkout v0.2.0
+git checkout v0.3.0
 bash scripts/install.sh
 # In the compatible SGLang/CUDA Python environment:
 python -m pip install -e .
@@ -99,13 +99,13 @@ output validation, and cancellation/fallback policy.
 A Docker recipe for the same pinned dependencies is also provided:
 
 ```bash
-docker build -f repro/Dockerfile -t toolgap:v0.2.0 .
+docker build -f repro/Dockerfile -t toolgap:v0.3.0 .
 mkdir -p results/local
 docker run --rm --gpus all --shm-size=2g \
-  -v "$PWD/results/local:/results" toolgap:v0.2.0 tool-loop
+  -v "$PWD/results/local:/results" toolgap:v0.3.0 tool-loop
 ```
 
-The published Docker recipe was not newly built or GPU-executed for this release.
+The Docker recipe was not newly built or GPU-executed for v0.3.0.
 The recorded demo used the validated immutable CUDA image with the exact source
 and ToolGap overlay; [validation](docs/TOOL_LOOP_VALIDATION.md) records its digest.
 
@@ -116,9 +116,9 @@ python scripts/check_evidence.py
 python scripts/check_tool_loop_evidence.py
 ```
 
-## v0.3 development: bounded multi-caller admission
+## v0.3: bounded multi-caller admission and CLI
 
-A local development layer shares one proactive restore slot across callers,
+A process-local coordinator shares one proactive restore slot across callers,
 with immediate fallback, owned cancellation, and explicit unknown-usage accounting.
 It retains the v0.2 runtime contract. A [two-caller real-GPU smoke](docs/MULTI_SESSION_GPU_SMOKE.md)
 passed: 80 regressions, five correct continuations, zero duplicate prefix reads
@@ -126,10 +126,11 @@ and cleanup to baseline. One admitted caller benefited; pair-level latency did
 not improve in this single-repeat run. See [policy and API](docs/MULTI_SESSION.md)
 and the [demo plan and command](docs/MULTI_SESSION_DEMO.md).
 
-## CLI and diagnostics (v0.3 development)
+## CLI and diagnostics
 
-Install from this development checkout with `python -m pip install -e .`.
-The package is marked `0.3.0.dev0`; this is not a published release.
+Available in experimental `v0.3.0`. Install from the tagged checkout with
+`python -m pip install -e .`.
+[Release notes](docs/RELEASE_v0.3.0.md) describe the scope and validation.
 
 ```bash
 toolgap doctor --sglang /path/to/patched/sglang --model /path/to/pinned/model
@@ -224,7 +225,9 @@ The standalone project does not depend on upstream merging either PR.
 
 ## Limitations
 
-One active restore, one trajectory, fixed model/tokenizer, FULL resident cache,
+One active proactive restore per worker. v0.3 adds process-local admission across
+callers; the live smoke covers only two trajectories, one repetition. The v0.2
+performance evaluation remains single-trajectory. Fixed model/tokenizer, FULL resident cache,
 file backend, TP1/PP1/DP1, Python TreeCore. No SWA, distributed recovery, LoRA,
 speculation, multimodal, proactive GPU/HBM load, prediction or general framework.
 Do not change model weights or storage namespace during a process; restart with

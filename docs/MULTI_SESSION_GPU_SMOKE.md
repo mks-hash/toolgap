@@ -1,6 +1,7 @@
 # v0.3 two-caller real-GPU smoke
 
-October 4, 2026. **Correctness smoke passed; not a released v0.3 benchmark.**
+October 4, 2026. **Correctness smoke passed; not a statistical performance benchmark.**
+These recorded data are included in experimental v0.3.0.
 One authorized VM execution, one repetition of three paired treatments. Runtime
 and image were not modified. No second execution or tuning followed these data.
 

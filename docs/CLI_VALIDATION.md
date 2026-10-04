@@ -1,7 +1,8 @@
 # CLI increment: local validation
 
 Validated on 2026-10-04, on development branch `feat/multi-session-admission`.
-Package version: `0.3.0.dev0`. This increment is local and unreleased.
+Historical pre-release package version: `0.3.0.dev0`. This record describes the
+local CLI increment; the final v0.3.0 packaging check is recorded below.
 
 ## Result
 
@@ -116,3 +117,33 @@ No GPU run, infrastructure mutation, runtime patch change or new performance
 measurement was performed for this CLI increment. The previous
 [two-caller GPU smoke](MULTI_SESSION_GPU_SMOKE.md) remains separate evidence.
 Published v0.1/v0.2 benchmark data and the technical report remain unchanged.
+
+## Final v0.3.0 packaging check
+
+On 2026-10-04, after updating release metadata/documentation to `0.3.0`:
+
+- Combined CPU suite: **102 passed, 22 subtests passed, zero failures/errors/skips**,
+  10.18 seconds, 22 existing deprecation warnings.
+- Final wheel built offline and installed into a separate local target. Version,
+  packaged compatibility data and console entry point were checked.
+- Installed-wheel HTTP fixture passed again: three control POSTs and four
+  read-only metadata GETs; no runtime/model imports. Local source/tokenizer doctor
+  matched all 13 guarded files.
+- Both historical dataset replay scripts passed. An independent audit of the
+  recorded two-caller JSON confirmed six tools, five consistent correct outputs,
+  L3-only initial states, zero duplicate prefix reads and cleanup to baseline.
+  Pair maximum step latency was confirmed as 1264.005 → 1289.746 ms (+2.0%).
+- Ruff lint passed across `src`, `tests` and `examples/tool_loop`; formatting
+  passed for the seven client/CLI files checked. A broader format check identified
+  the existing, unchanged `examples/tool_loop/run.py` as needing formatting;
+  the historical harness was not reformatted for this release.
+- Shell syntax and `git diff --check` passed.
+
+The final local wheel is `toolgap-0.3.0-py3-none-any.whl`:
+
+```text
+SHA256: 4983c236185d0e52ead33e632a7705eccfa6570f957fff16f6fe0e4d43e308f9
+```
+
+Logs, XML, installed target and reports are in ignored `work/release-v0.3.0/`.
+No new GPU run or runtime change accompanied these packaging checks.
