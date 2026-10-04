@@ -126,6 +126,27 @@ and cleanup to baseline. One admitted caller benefited; pair-level latency did
 not improve in this single-repeat run. See [policy and API](docs/MULTI_SESSION.md)
 and the [demo plan and command](docs/MULTI_SESSION_DEMO.md).
 
+## CLI and diagnostics (v0.3 development)
+
+Install from this development checkout with `python -m pip install -e .`.
+The package is marked `0.3.0.dev0`; this is not a published release.
+
+```bash
+toolgap doctor --sglang /path/to/patched/sglang --model /path/to/pinned/model
+toolgap submit --prefix prefix.json --url http://127.0.0.1:30000 --json
+toolgap status OPERATION_ID --json
+toolgap cancel OPERATION_ID --json
+```
+
+Supply actual saved token IDs and the original salt in `prefix.json`. Doctor
+checks only the selected local files/GPU inventory or remote metadata; it does
+not submit prefetch, generate tokens or prove cache residency. Control commands
+send one RPC, preserve the operation ID on uncertain outcomes, and distinguish
+logical cancellation from pending physical cleanup.
+
+[Installation, input format, authentication and exit codes](docs/CLI.md) ·
+[Local CLI verification](docs/CLI_VALIDATION.md)
+
 ## Thin Python client and control API
 
 ```python
