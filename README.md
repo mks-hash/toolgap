@@ -130,6 +130,9 @@ Post-v0.3.0 development adds [opt-in bounded status reconciliation](docs/RECONCI
 for later callers: local admission is released after confirmed terminal cleanup
 while the earlier owner's tool/continuation may still run. Defaults remain manual;
 this increment has CPU validation and no new GPU performance claim.
+Optional [caller-hint admission](docs/ADMISSION_DESIGN.md) skips known-resident
+prefixes or small estimated overlaps before HTTP and records local decisions
+and slot timing. Estimates stay separate from restore/usage evidence.
 
 ## CLI and diagnostics
 

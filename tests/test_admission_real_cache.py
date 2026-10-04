@@ -13,7 +13,7 @@ from sglang.srt.mem_cache.base_prefix_cache import MatchPrefixParams
 from sglang.srt.mem_cache.proactive_prefetch import ProactivePrefetch
 from sglang.srt.mem_cache.radix_cache import RadixKey
 
-from toolgap import PrefetchAdmission, PrefetchClient
+from toolgap import PrefetchAdmission, PrefetchClient, PrefetchHint
 
 
 class TestAdmissionRealCache(unittest.IsolatedAsyncioTestCase):
@@ -55,6 +55,58 @@ class TestAdmissionRealCache(unittest.IsolatedAsyncioTestCase):
         self.f.pump_until(done)
         self.f.cache.drain_storage_control_queues()
         self.manager.tick()
+
+    async def test_short_hint_skips_real_io_then_long_job_restores_same_prefix(self):
+        self.policy = PrefetchAdmission(self.client, min_overlap_ms=100)
+        reads = []
+        original = self.f.backend.batch_get
+
+        def counted(*args, **kwargs):
+            reads.append(1)
+            return original(*args, **kwargs)
+
+        with mock.patch.object(self.f.backend, "batch_get", side_effect=counted):
+            short = await self.policy.submit(
+                "short", self.f.tokens, hint=PrefetchHint("l3_only", 50, 350)
+            )
+            self.assertEqual(short.state["state"], "LOCAL_LOW_OVERLAP")
+            short.finish(used_tokens=0)
+            self.assertEqual(self.requests, [])
+            self.assertEqual(reads, [])
+            self.assertIsNone(self.manager.active)
+            self.assertEqual(self.f.pool.available_size(), self.f.initial_slots)
+            useful = await self.policy.submit(
+                "long", self.f.tokens, hint=PrefetchHint("l3_only", 600, 350)
+            )
+            self.drain()
+            await useful.status()
+        self.assertEqual(useful.state["state"], "SUCCESS")
+        self.assertEqual(useful.state["restored_tokens"], 12)
+        self.assertEqual(len(reads), 1)
+        useful.finish(used_tokens=12)
+        self.f.conservation(
+            self.manager.records[useful.operation_id].handle, resident=12
+        )
+
+    async def test_verified_resident_prefix_skip_preserves_normal_cache_matching(self):
+        a = await self.policy.submit("A", self.f.tokens)
+        self.drain()
+        await a.status()
+        a.finish(used_tokens=12)
+        params = MatchPrefixParams(key=RadixKey(self.f.tokens))
+        self.assertEqual(self.f.cache.match_prefix(params).host_hit_length, 12)
+        before = len(self.requests)
+        with mock.patch.object(
+            self.f.backend, "batch_get", side_effect=AssertionError("unneeded read")
+        ):
+            b = await self.policy.submit(
+                "resident", self.f.tokens, hint=PrefetchHint("resident")
+            )
+            self.assertEqual(b.state["state"], "LOCAL_RESIDENT")
+            b.finish(used_tokens=0)
+            self.assertEqual(len(self.requests), before)
+            self.assertEqual(self.f.cache.match_prefix(params).host_hit_length, 12)
+        self.f.conservation(self.manager.records[a.operation_id].handle, resident=12)
 
     async def test_background_reconciliation_waits_for_real_cancelled_read_drain(self):
         self.policy = PrefetchAdmission(

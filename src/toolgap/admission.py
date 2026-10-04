@@ -1,14 +1,48 @@
 """Process-local admission over the existing one-restore SGLang contract."""
 
 import asyncio
+import time
 import uuid
 from collections import Counter, OrderedDict
+from dataclasses import asdict, dataclass
 from itertools import islice
 
 
 from .client import PrefetchRejected, _validate_prefix
 
 _TERMINAL = {"SUCCESS", "CACHED", "MISS", "FAILURE", "CANCELLED", "EXPIRED", "DECLINED"}
+
+
+@dataclass(frozen=True)
+class PrefetchHint:
+    """Caller estimates for this exact prefix; never a server residency probe.
+
+    'resident' means the entire reusable prefix is believed to be in GPU/L2.
+    Tool time means remaining useful work from submission, not total tool time.
+    Restore time estimates exposed L3-to-L2 latency under comparable conditions.
+    """
+
+    cache_residency: str = "unknown"
+    expected_tool_ms: int | None = None
+    estimated_restore_ms: int | None = None
+
+    def __post_init__(self):
+        if not isinstance(self.cache_residency, str) or self.cache_residency not in {
+            "unknown",
+            "l3_only",
+            "resident",
+        }:
+            raise ValueError("cache_residency must be unknown, l3_only or resident")
+        for name in ("expected_tool_ms", "estimated_restore_ms"):
+            value = getattr(self, name)
+            if value is not None and (type(value) is not int or value < 0):
+                raise ValueError(f"{name} must be a nonnegative integer or None")
+
+    @property
+    def estimated_hidden_ms(self):
+        if self.expected_tool_ms is None or self.estimated_restore_ms is None:
+            return None
+        return min(self.expected_tool_ms, self.estimated_restore_ms)
 
 
 class PrefetchLease:
@@ -25,6 +59,10 @@ class PrefetchLease:
         self._settled = False
         self._finished = False
         self._reconciliation_started = False
+        self._hint = None
+        self._decision_reason = None
+        self._slot_reserved_ns = None
+        self._slot_released_ns = None
         self._state = dict(state="SUBMITTING", accepted=None, cleanup_pending=True)
 
     @property
@@ -35,6 +73,33 @@ class PrefetchLease:
     def state(self):
         return dict(
             self._state, session_id=self.session_id, operation_id=self.operation_id
+        )
+
+    @property
+    def decision(self):
+        """Local decision and caller estimates, separate from server evidence."""
+        return dict(
+            reason=self._decision_reason,
+            hint=asdict(self._hint) if self._hint is not None else None,
+            estimated_hidden_ms=(
+                self._hint.estimated_hidden_ms if self._hint is not None else None
+            ),
+        )
+
+    @property
+    def timing(self):
+        """Local monotonic slot timing, not physical I/O or host occupancy."""
+        end = (
+            self._slot_released_ns
+            if self._slot_released_ns is not None
+            else time.monotonic_ns()
+        )
+        return dict(
+            slot_reserved_ns=self._slot_reserved_ns,
+            slot_released_ns=self._slot_released_ns,
+            slot_hold_ms=(end - self._slot_reserved_ns) / 1e6
+            if self._slot_reserved_ns is not None
+            else None,
         )
 
     async def status(self):
@@ -86,6 +151,7 @@ class PrefetchAdmission:
         *,
         max_prefix_tokens=8192,
         history_size=32,
+        min_overlap_ms=None,
         reconcile_interval_ms=None,
         reconcile_max_checks=100,
         reconcile_timeout_ms=1000,
@@ -94,6 +160,10 @@ class PrefetchAdmission:
             raise ValueError("max_prefix_tokens must be a positive integer")
         if type(history_size) is not int or history_size < 1:
             raise ValueError("history_size must be a positive integer")
+        if min_overlap_ms is not None and (
+            type(min_overlap_ms) is not int or min_overlap_ms < 1
+        ):
+            raise ValueError("min_overlap_ms must be a positive integer or None")
         for name, value in (
             ("reconcile_interval_ms", reconcile_interval_ms),
             ("reconcile_max_checks", reconcile_max_checks),
@@ -106,6 +176,7 @@ class PrefetchAdmission:
         self.client = client
         self.max_prefix_tokens = max_prefix_tokens
         self.history_size = history_size
+        self.min_overlap_ms = min_overlap_ms
         self.reconcile_interval_ms = reconcile_interval_ms
         self.reconcile_max_checks = reconcile_max_checks
         self.reconcile_timeout_ms = reconcile_timeout_ms
@@ -185,6 +256,11 @@ class PrefetchAdmission:
             self._metrics,
             active_slots=int(self._active is not None),
             retained_records=len(self._records),
+            active_slot_age_ms=(
+                self._active.timing["slot_hold_ms"]
+                if self._active is not None
+                else None
+            ),
         )
 
     @property
@@ -201,28 +277,47 @@ class PrefetchAdmission:
 
     def _settle(self, lease):
         lease._settled = True
+        if lease._slot_reserved_ns is not None and lease._slot_released_ns is None:
+            lease._slot_released_ns = time.monotonic_ns()
+            self._metrics["slot_releases"] += 1
+            self._metrics["released_slot_hold_ms"] += lease.timing["slot_hold_ms"]
         if self._active is lease:
             self._active = None
 
-    async def submit(self, session_id, input_ids, *, cache_salt=None, ttl_ms=10000):
+    async def submit(
+        self, session_id, input_ids, *, cache_salt=None, ttl_ms=10000, hint=None
+    ):
         if self._closed:
             raise RuntimeError("Admission is closed")
         if not isinstance(session_id, str) or not 1 <= len(session_id) <= 128:
             raise ValueError("session_id must contain 1..128 characters")
+        if hint is not None and not isinstance(hint, PrefetchHint):
+            raise ValueError("hint must be a PrefetchHint or None")
         tokens = list(islice(input_ids, self.max_prefix_tokens + 1))
         _validate_prefix(tokens, cache_salt, ttl_ms)
         # IDs are never caller-selected, so late events cannot target new work.
         lease = PrefetchLease(self, session_id, uuid.uuid4().hex, tokens, cache_salt)
+        lease._hint = hint
         async with self._lock:
             if self._closed:
                 raise RuntimeError("Admission is closed")
             self._metrics["submissions"] += 1
             if len(tokens) > self.max_prefix_tokens:
                 reason = "LOCAL_LIMIT"
+            elif hint is not None and hint.cache_residency == "resident":
+                reason = "LOCAL_RESIDENT"
+            elif (
+                self.min_overlap_ms is not None
+                and hint is not None
+                and hint.estimated_hidden_ms is not None
+                and hint.estimated_hidden_ms < self.min_overlap_ms
+            ):
+                reason = "LOCAL_LOW_OVERLAP"
             elif self._active is not None:
                 reason = "LOCAL_BUSY"
             else:
                 reason = None
+            lease._decision_reason = reason or "ELIGIBLE"
             if reason:
                 lease._state = dict(state=reason, accepted=False, cleanup_pending=False)
                 self._settle(lease)
@@ -230,6 +325,7 @@ class PrefetchAdmission:
             else:
                 self._active = lease
                 lease._remote = True
+                lease._slot_reserved_ns = time.monotonic_ns()
             self._remember(lease)
         if not lease._settled:
             try:

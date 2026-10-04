@@ -30,6 +30,11 @@ HTTP. This bounds local admission; it is **not a host-memory reservation**, glob
 admission across orchestrator processes, or an L2 occupancy/eviction policy.
 The existing server admission is authoritative across other clients.
 
+Post-v0.3.0 development offers optional caller hints for known-resident prefixes
+and estimated tool/restore overlap. [Design and API](ADMISSION_DESIGN.md) describe
+`PrefetchHint`, local fallback decisions and reservation telemetry. Without hints
+and a configured threshold, existing behavior is retained.
+
 ## Lifecycle and uncertainty
 
 - `RUNNING`: retain the one local slot.

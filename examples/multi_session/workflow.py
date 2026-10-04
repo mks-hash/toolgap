@@ -29,7 +29,10 @@ async def trajectory(
     submission = (
         asyncio.create_task(
             admission.submit(
-                session["id"], session["prefix"], cache_salt=session["salt"]
+                session["id"],
+                session["prefix"],
+                cache_salt=session["salt"],
+                hint=session.get("prefetch_hint"),
             )
         )
         if admission is not None

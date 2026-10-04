@@ -9,7 +9,7 @@ from pathlib import Path
 
 import httpx
 
-from toolgap import PrefetchAdmission, PrefetchClient
+from toolgap import PrefetchAdmission, PrefetchClient, PrefetchHint
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "examples/multi_session"))
@@ -116,6 +116,30 @@ class WorkflowTest(unittest.IsolatedAsyncioTestCase):
 
     async def tool(self):
         return {"document_id": "DOC-00173"}
+
+    async def test_hint_decline_still_runs_tool_and_correct_continuation(self):
+        async def forbidden(request):
+            self.fail("Declined restore must send no control RPC")
+
+        async def continuation(result):
+            self.assertEqual(result["document_id"], "DOC-00173")
+            return {"correct": True}, {"submitted_ns": 1}
+
+        async with PrefetchClient(
+            "http://engine", transport=httpx.MockTransport(forbidden)
+        ) as client:
+            async with PrefetchAdmission(client, min_overlap_ms=100) as admission:
+                gate = asyncio.Event()
+                gate.set()
+                session = dict(
+                    self.session, prefetch_hint=PrefetchHint("l3_only", 50, 350)
+                )
+                row = await trajectory(
+                    session, gate, self.tool, continuation, admission
+                )
+                self.assertTrue(row["response"]["correct"])
+                self.assertEqual(row["lease"]["state"], "LOCAL_LOW_OVERLAP")
+                self.assertEqual(admission.metrics["active_slots"], 0)
 
     async def test_abandoned_tool_cancels_only_owned_restore(self):
         lease = Lease()
