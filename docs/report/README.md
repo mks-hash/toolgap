@@ -2,6 +2,7 @@
 
 **Maxim Yakimov · October 4, 2026 · Revision 2 · 8 pages**
 
+[Zenodo / DOI](https://doi.org/10.5281/zenodo.23130933) ·
 [Read the PDF](toolgap-technical-report.pdf) ·
 [Readable Markdown](technical-report.md) ·
 [LaTeX source](toolgap-report.tex) ·
@@ -72,5 +73,6 @@ Yakimov, Maxim. *ToolGap: Hiding KV-Cache Restore Latency During LLM Agent Tool
 Execution*. Technical report, revision 2, October 4, 2026.
 [Report release](https://github.com/mks-hash/toolgap/releases/tag/report-v1.0.0).
 Software citation metadata and the preferred report citation are in
-[CITATION.cff](../../CITATION.cff). A Zenodo report DOI will be added after the
-record is actually published; none is implied by the GitHub release.
+[CITATION.cff](../../CITATION.cff). The report is published in Zenodo as **Report**
+with DOI **[10.5281/zenodo.23130933](https://doi.org/10.5281/zenodo.23130933)**, including the PDF and editable source.
+This is the report DOI; it is not a DOI for the software archive.

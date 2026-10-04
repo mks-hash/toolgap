@@ -1,5 +1,7 @@
 # ToolGap
 
+[![Technical report DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23130933.svg)](https://doi.org/10.5281/zenodo.23130933)
+
 **Experimental proactive KV prefetch for SGLang tool-using agents.**
 
 Restore reusable KV from file-backed L3 into resident host L2 while a tool works.
@@ -22,6 +24,7 @@ production-readiness claim.
 by **Maxim Yakimov** (October 4, 2026).
 It covers architecture, lifecycle, methodology, both performance datasets,
 resident negative control, related work, limitations, and exact reproduction.
+[Zenodo report and DOI](https://doi.org/10.5281/zenodo.23130933) ·
 [LaTeX / Markdown / evidence audit](docs/report/) ·
 [Report release](https://github.com/mks-hash/toolgap/releases/tag/report-v1.0.0).
 

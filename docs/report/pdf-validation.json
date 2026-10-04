@@ -20,5 +20,5 @@
   "pdf_layout_verified": true,
   "visual_defects_found": 0,
   "separate_pdf_generated": false,
-  "published": false
+  "publication_status_at_verification": "Not yet published at the verification timestamp"
 }

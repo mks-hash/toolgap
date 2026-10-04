@@ -3,7 +3,7 @@
   "author": "Maxim Yakimov",
   "date": "2026-10-04",
   "new_gpu_execution": false,
-  "published": false,
+  "publication_performed_by_audit": false,
   "latex_compile_status": "PASS",
   "latex_compile_reason": "The current source compiled successfully with the desktop editor's compiler.",
   "pdf_layout_verified": true,
@@ -29,7 +29,7 @@
     "pdf_layout_verified": true,
     "visual_defects_found": 0,
     "separate_pdf_generated": false,
-    "published": false
+    "publication_status_at_verification": "Not yet published at the verification timestamp"
   },
   "intended_pages": 8,
   "software_snapshot": "74a541e785650537766567b48d2f38cee17199b8",
@@ -172,8 +172,8 @@
     "docs/UPSTREAM_SMOKE.md": "ede25b898eafd18481c1e8b7075086efa22148b324e321f341b5bf1050738073",
     "docs/report/toolgap-report.tex": "174335b0d5093f29ff1d17305fb94848c79a626e46483880935c125bfcbfdb2a",
     "docs/report/technical-report.md": "b00ef789460dbcdf9c6236b0668e190cf842c11ed525291e6f7ce4c287ddd6d9",
-    "CITATION.cff": "5a1c3251b34dd4f684225d2765278cc2e29ab76c2dabea7aae1324e3b10b3b89",
+    "CITATION.cff": "fe693405f8c1879d6461437077e268d4a3667d4d4122e5884eec9ca4a8ddc929",
     "docs/report/toolgap-technical-report.pdf": "25dab3fa98c82f63e8067583f80dc2a8721878121f9b4f23eaa048c30381a2c3",
-    "docs/report/pdf-validation.json": "fe96a7081a117fddba627aeaee7f3ad129775e80586a5c10f40b5c2680641883"
+    "docs/report/pdf-validation.json": "0fc3545584a891b3466157c1fc6b7e909ac7b2acb5024f4900a3c11f287de9f3"
   }
 }

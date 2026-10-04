@@ -1,5 +1,5 @@
 {
-  "resource_type": "publication-technicalreport",
+  "resource_type": "publication-report",
   "title": "ToolGap: Hiding KV-Cache Restore Latency During LLM Agent Tool Execution",
   "creators": [
     {
@@ -23,14 +23,13 @@
   ],
   "related_identifiers": [
     {
-      "identifier": "https://github.com/mks-hash/toolgap",
-      "relation": "isSupplementTo",
-      "scheme": "url"
-    },
-    {
       "identifier": "https://github.com/mks-hash/toolgap/tree/v0.2.0",
-      "relation": "references",
-      "scheme": "url"
+      "relation": "documents",
+      "scheme": "url",
+      "resource_type": "software"
     }
-  ]
+  ],
+  "doi": "10.5281/zenodo.23130933",
+  "record_url": "https://zenodo.org/records/23130933",
+  "published": true
 }

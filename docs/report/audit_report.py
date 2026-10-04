@@ -86,7 +86,7 @@ validation = json.loads((folder / "pdf-validation.json").read_text())
 source_compile_verified = validation["builtin_source_sha256"] == hashlib.sha256((folder / "toolgap-report.tex").read_bytes()).hexdigest()
 result = {
     "status": "PASS", "author": "Maxim Yakimov", "date": "2026-10-04",
-    "new_gpu_execution": False, "published": False,
+    "new_gpu_execution": False, "publication_performed_by_audit": False,
     "latex_compile_status": "PASS" if source_compile_verified else "SOURCE_CHANGED_SINCE_VERIFIED_COMPILE",
     "latex_compile_reason": validation["builtin_compiler_message"] if source_compile_verified else "Recompile the current source",
     "pdf_layout_verified": validation["pdf_layout_verified"],
