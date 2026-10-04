@@ -122,3 +122,8 @@ forward/H2D or measure simultaneous-agent TTFT.
 Next validation: two real agent loops with matched cache state and fallback,
 then 5–20 callers with admission/waste and inference contention measurements.
 A new GPU experiment and release remain separate from this local increment.
+
+The [two-trajectory demo harness](MULTI_SESSION_DEMO.md) is now prepared with
+baseline, shared-admission and owned-abandonment treatments. Its orchestration
+and trace attribution passed local CPU checks; simultaneous GPU inference has
+not been validated or executed.

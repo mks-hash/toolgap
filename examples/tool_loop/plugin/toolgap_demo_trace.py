@@ -85,6 +85,7 @@ def install():
         hicache_trace.event(
             "control_accepted_end",
             operation_id=operation_id,
+            rid=self.records[operation_id].handle.rid,
             state=result["state"],
             **hicache_trace.occupancy(self.cache),
         )

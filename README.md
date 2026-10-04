@@ -122,6 +122,8 @@ A local development layer shares one proactive restore slot across callers,
 with immediate fallback, owned cancellation, and explicit unknown-usage accounting.
 It retains the v0.2 runtime contract; multi-agent GPU performance is not yet
 validated. See [policy, API and CPU checks](docs/MULTI_SESSION.md).
+The [two-trajectory demo plan and command](docs/MULTI_SESSION_DEMO.md) cover
+ordinary restore, shared admission and abandonment; its GPU run is pending.
 
 ## Thin Python client and control API
 

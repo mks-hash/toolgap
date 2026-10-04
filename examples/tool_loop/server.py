@@ -16,12 +16,15 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class Engine:
-    def __init__(self, model_path, work, results, port=30000):
+    def __init__(
+        self, model_path, work, results, port=30000, *, max_running_requests=None
+    ):
         self.model = model_path
         self.work, self.results, self.port = Path(work), Path(results), port
         self.trace = self.results / "tool-loop-trace.jsonl"
         self.url = f"http://127.0.0.1:{port}"
         self.process = None
+        self.max_running_requests = max_running_requests
         self.http = httpx.AsyncClient(base_url=self.url, timeout=180)
 
     async def start(self, label, storage):
@@ -29,6 +32,10 @@ class Engine:
         command[:3] = [sys.executable, "-m", "sglang.launch_server"]
         for flag, value in [("--model-path", self.model), ("--port", str(self.port))]:
             command[command.index(flag) + 1] = str(value)
+        if self.max_running_requests is not None:
+            command[command.index("--max-running-requests") + 1] = str(
+                self.max_running_requests
+            )
         self.probe_dir = self.work / (label + "-probe")
         self.probe_dir.mkdir()
         paths = [str(ROOT / "examples/tool_loop/plugin"), str(ROOT / "benchmark/trace")]
@@ -80,7 +87,7 @@ class Engine:
                 await asyncio.to_thread(proc.wait, timeout=10)
         self.process = None
 
-    async def generate(self, input_ids, cache_salt, *, limit=128):
+    async def generate(self, input_ids, cache_salt, *, limit=128, rid=None):
         started = time.monotonic_ns()
         first, last = None, None
         payload = dict(
@@ -90,6 +97,8 @@ class Engine:
             return_logprob=True,
             stream=True,
         )
+        if rid is not None:
+            payload["rid"] = rid
         async with self.http.stream("POST", "/generate", json=payload) as response:
             response.raise_for_status()
             async for line in response.aiter_lines():
