@@ -1,0 +1,495 @@
+"""CPU fixtures for competing arrivals, observation and complete-row accounting."""
+
+import asyncio
+import json
+import sys
+import tempfile
+import time
+import unittest
+from pathlib import Path
+from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from research.agent_resume.load import AUDITS, fixed_trace, run_arrivals, summarize
+from research.agent_resume.sampling import FileObserver
+from research.agent_resume.trace_report import analyze, saved_span
+from research.agent_resume.adapters import FamilyAdapter, ToolCall
+from research.agent_resume.workloads import RepositoryTools
+from research.agent_resume.runner import run_task
+from research.agent_resume.prepare import ScriptedModel, call_text
+from test_research_harness import FormatFixture
+
+
+class TestPressure(unittest.IsolatedAsyncioTestCase):
+    async def test_fixed_arrivals_overlap_queue_and_keep_failure(self):
+        trace = fixed_trace(12)
+        for item in trace:
+            item["offset_ms"] = 0
+        running = peak = 0
+
+        async def work(item):
+            nonlocal running, peak
+            running += 1
+            peak = max(peak, running)
+            try:
+                await asyncio.sleep(0.01)  # test scheduler fixture, not a workload tool
+                if item["trajectory_id"] == "agent-02":
+                    raise ValueError("retained failure")
+                return dict(
+                    status="COMPLETED",
+                    task_success=True,
+                    completed_ns=time.monotonic_ns(),
+                )
+            finally:
+                running -= 1
+
+        block = await run_arrivals(trace, work, max_active=3)
+        summary = summarize(block)
+        self.assertEqual(peak, 3)
+        self.assertEqual(summary["successful"], 11)
+        self.assertEqual(summary["failed"], 1)
+        self.assertEqual(len(summary["all_caller_arrival_to_completed_ms"]), 12)
+        self.assertGreater(block["rows"][-1]["client_queue_ms"], 10)
+        self.assertEqual(len(fixed_trace()), 12)
+        self.assertEqual(fixed_trace(), fixed_trace())
+
+    async def test_cancel_reaps_every_started_caller(self):
+        started = asyncio.Event()
+        active = set()
+
+        async def work(item):
+            ident = item["trajectory_id"]
+            active.add(ident)
+            started.set()
+            try:
+                await asyncio.Event().wait()
+            finally:
+                await asyncio.sleep(
+                    0.01
+                )  # owned async cleanup must not be cancelled twice
+                active.remove(ident)
+
+        trace = fixed_trace(4)
+        for item in trace:
+            item["offset_ms"] = 0
+        task = asyncio.create_task(run_arrivals(trace, work, max_active=2))
+        await started.wait()
+        task.cancel()
+        with self.assertRaises(asyncio.CancelledError):
+            await task
+        self.assertFalse(active)
+
+    async def test_failed_quality_is_not_success_or_dropped(self):
+        async def work(item):
+            return dict(
+                status="COMPLETED", task_success=False, completed_ns=time.monotonic_ns()
+            )
+
+        block = await run_arrivals(fixed_trace(2), work)
+        self.assertEqual(summarize(block)["completed"], 2)
+        self.assertEqual(summarize(block)["successful"], 0)
+
+    async def test_multi_file_evidence_requires_both_actual_tools(self):
+        task = AUDITS[0]
+        files = {
+            r["path"]: dict(text=r["needle"], sha256="fixture")
+            for r in task["evidence_requirements"]
+        }
+        tools = RepositoryTools(dict(commit="fixture", files=files))
+        records = [dict(call=dict(name="run_regression"), result=dict(passed=True))]
+        citations = []
+        for requirement in task["evidence_requirements"]:
+            hit = tools.read(requirement["path"], 1, 1)
+            records.append(dict(call=dict(name="read_source"), result=hit))
+            citations.append(dict(path=requirement["path"], line=1))
+        final = dict(answer=task["answer"], evidence=citations)
+        self.assertTrue(tools.grade(task, json.dumps(final), records))
+        self.assertFalse(
+            tools.grade(task, json.dumps(dict(final, evidence=citations[:1])), records)
+        )
+        self.assertFalse(tools.grade(task, json.dumps(final), records[:-1]))
+
+    async def test_observe_before_dispatch_not_before_continuation(self):
+        task = AUDITS[0]
+        files = {
+            r["path"]: dict(text=r["needle"], sha256="fixture")
+            for r in task["evidence_requirements"]
+        }
+        tools = RepositoryTools(dict(commit="fixture", files=files))
+        calls = [
+            ToolCall("read_source", dict(path=r["path"], start=1, end=1))
+            for r in task["evidence_requirements"]
+        ]
+        texts = [call_text("qwen", c) for c in calls] + [
+            json.dumps(dict(answer=task["answer"], evidence=[]))
+        ]
+        observations = []
+
+        async def observe(ids, salt):
+            observations.append(time.monotonic_ns())
+            return dict(residency="UNKNOWN_STORAGE")
+
+        row = await run_task(
+            FamilyAdapter("qwen"),
+            FormatFixture(),
+            ScriptedModel(FormatFixture(), texts),
+            tools,
+            task,
+            on_boundary=observe,
+            cache_salt="fixed",
+        )
+        self.assertEqual(len(observations), 2)
+        self.assertEqual(row["cache_salt"], "fixed")
+        self.assertFalse(row["task_success"])  # missing actual regression remains wrong
+        for step, at in zip(row["tools"], observations):
+            self.assertLess(at, step["dispatched_ns"])
+            self.assertLess(step["completed_ns"], step["continuation_submitted_ns"])
+
+    async def test_mailbox_concurrency_mismatch_timeout_and_cancellation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            observer = FileObserver(root, domain="boot", timeout=0.1)
+
+            async def server(count, domain="boot"):
+                seen = set()
+                while len(seen) < count:
+                    for request in root.glob("*.request.json"):
+                        if request.name in seen:
+                            continue
+                        seen.add(request.name)
+                        data = json.loads(request.read_text())
+                        response = root / request.name.replace("request", "response")
+                        response.write_text(
+                            json.dumps(
+                                dict(clock_domain=domain, salt=data["cache_salt"])
+                            )
+                        )
+                    await asyncio.sleep(0.001)
+
+            response_task = asyncio.create_task(server(2))
+            rows = await asyncio.gather(
+                observer.snapshot([1], "one"), observer.snapshot([2], "two")
+            )
+            await response_task
+            self.assertEqual({r["salt"] for r in rows}, {"one", "two"})
+            self.assertFalse(list(root.iterdir()))
+            response_task = asyncio.create_task(server(1, "other-boot"))
+            with self.assertRaises(ValueError):
+                await observer.snapshot([1], "one")
+            await response_task
+            with self.assertRaises(TimeoutError):
+                await observer.snapshot([1], "one")
+            task = asyncio.create_task(observer.snapshot([1], "one"))
+            await asyncio.sleep(0.001)
+            task.cancel()
+            with self.assertRaises(asyncio.CancelledError):
+                await task
+            self.assertFalse(list(root.iterdir()))
+
+
+class TestTrace(unittest.TestCase):
+    def test_exact_rid_mapping_no_consumption_claim_or_inferred_duplicate_bug(self):
+        rows = [
+            dict(
+                trajectory_id="a",
+                generations=[],
+                tools=[
+                    dict(
+                        prefix_ids=[1] * 16,
+                        prefetch_operation_id="op",
+                        continuation_submitted_ns=100,
+                    )
+                ],
+            )
+        ]
+        events = [
+            dict(
+                kind="control_accepted_end",
+                clock_domain="boot",
+                operation_id="op",
+                rid="r",
+            ),
+            dict(
+                kind="read",
+                clock_domain="boot",
+                rid="r",
+                keys=["k"],
+                bytes=32,
+                start_ns=70,
+                end_ns=110,
+            ),
+            dict(
+                kind="read",
+                clock_domain="boot",
+                rid="another",
+                keys=["k"],
+                bytes=32,
+                start_ns=50,
+                end_ns=60,
+            ),
+            dict(
+                kind="publish",
+                clock_domain="boot",
+                rid="r",
+                restored_tokens=16,
+                at_ns=120,
+            ),
+        ]
+        report = analyze(rows, events, "boot")
+        self.assertEqual(report["physical_read_bytes"], 64)
+        self.assertEqual(report["repeated_successful_page_reads"], 1)
+        self.assertEqual(report["boundaries"][0]["physical_read_bytes"], 32)
+        self.assertEqual(report["boundaries"][0]["pre_arrival_published_tokens"], 0)
+        self.assertAlmostEqual(
+            report["boundaries"][0]["physical_io_before_arrival_ms"], 0.00003
+        )
+        self.assertIsNone(report["wasted_prefetch_bytes"])
+        with self.assertRaises(ValueError):
+            analyze(rows, events, "other-boot")
+
+    def test_clip_match_to_saved_prefix_not_tool_result_suffix(self):
+        state = dict(
+            prefix_tokens=32,
+            segments=[
+                dict(start=0, end=8, device=True, host=True),
+                dict(start=8, end=32, device=False, host=True),
+            ],
+        )
+        self.assertEqual(
+            saved_span(state, 16),
+            dict(device_hit_tokens=8, host_hit_tokens=8, observed_prefix_tokens=16),
+        )
+
+
+class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
+    async def test_two_mode_whole_block_mock_transport_keeps_all_rows(self):
+        import types
+        import httpx
+        from research.agent_resume.pressure import execute, digest
+        from research.agent_resume.workloads import TASKS
+        from research.agent_resume.sampling import clock_domain
+
+        task = TASKS[0]
+        profile = dict(
+            family="qwen",
+            profile_id="qwen",
+            tokenizer_files={},
+            source_commit="fixture",
+            model="model",
+            revision="revision",
+            runtime_candidate_sha="a" * 40,
+            server_settings=dict(context_length=8192),
+        )
+        deployment = dict(
+            model="model",
+            revision="revision",
+            runtime_sha="a" * 40,
+            model_path="model",
+            resolved_cache_mode="FULL",
+            clock_domain=clock_domain(),
+            pressure_match_observation=False,
+        )
+        corpus = dict(
+            commit="fixture",
+            files={task["path"]: dict(text=task["needle"], sha256="fixture")},
+        )
+        tokenizer = FormatFixture()
+        trace = fixed_trace(2)
+        for item in trace:
+            item.update(offset_ms=0, task=task)
+        packet = dict(profile=profile, arrivals=trace, max_active=2)
+        original_http = httpx.AsyncClient
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "packet.json").write_text(
+                json.dumps(dict(packet=packet, sha256=digest(packet)))
+            )
+            (root / "deployment.json").write_text(json.dumps(deployment))
+            for mode in ("request_time", "proactive"):
+                turns = {}
+
+                def handler(request):
+                    if request.url.path == "/get_server_info":
+                        return httpx.Response(
+                            200, json=dict(context_length=8192, model_path="model")
+                        )
+                    data = json.loads(request.content)
+                    if request.url.path == "/generate":
+                        salt = data["cache_salt"]
+                        turn = turns.get(salt, 0)
+                        turns[salt] = turn + 1
+                        text = (
+                            call_text(
+                                "qwen",
+                                ToolCall(
+                                    "search_repository", dict(query="cleanup_pending")
+                                ),
+                            )
+                            if turn == 0
+                            else json.dumps(
+                                dict(
+                                    answer=task["answer"],
+                                    evidence=[dict(path=task["path"], line=1)],
+                                )
+                            )
+                        )
+                        return httpx.Response(
+                            200,
+                            text="data: "
+                            + json.dumps(dict(output_ids=tokenizer.encode(text)))
+                            + "\n\ndata: [DONE]\n\n",
+                        )
+                    return httpx.Response(
+                        200,
+                        json=dict(
+                            success=True,
+                            result=dict(
+                                operation_id=data["operation_id"],
+                                state="SUCCESS",
+                                cleanup_pending=False,
+                                restored_tokens=0,
+                                restored_bytes=0,
+                            ),
+                        ),
+                    )
+
+                def factory(*args, **kwargs):
+                    kwargs["transport"] = httpx.MockTransport(handler)
+                    return original_http(*args, **kwargs)
+
+                args = types.SimpleNamespace(
+                    packet=root / "packet.json",
+                    deployment=root / "deployment.json",
+                    tokenizer=root,
+                    output=root / mode,
+                    server="http://fixture",
+                    mode=mode,
+                    observation="off",
+                    probe_dir=None,
+                    reconcile_ms=50,
+                )
+                fake_transformers = types.SimpleNamespace(
+                    AutoTokenizer=types.SimpleNamespace(
+                        from_pretrained=lambda *a, **k: tokenizer
+                    )
+                )
+                with (
+                    patch.dict(sys.modules, transformers=fake_transformers),
+                    patch(
+                        "research.agent_resume.pressure.tokenizer_manifest",
+                        return_value=dict(tokenizer_files={}),
+                    ),
+                    patch(
+                        "research.agent_resume.pressure.snapshot", return_value=corpus
+                    ),
+                    patch("httpx.AsyncClient", side_effect=factory),
+                ):
+                    self.assertTrue(await execute(args))
+                rows = [
+                    json.loads(line)
+                    for line in (args.output / "tasks.jsonl").read_text().splitlines()
+                ]
+                self.assertEqual(len(rows), 2)
+                self.assertTrue(all(row["task_success"] for row in rows))
+                self.assertTrue(
+                    all(
+                        g["rid"].startswith("tgp-")
+                        for row in rows
+                        for g in row["generations"]
+                    )
+                )
+
+
+class TestPlugin(unittest.TestCase):
+    def test_scheduler_mailbox_and_physical_read_rid_mapping(self):
+        import types
+        from research.agent_resume.plugin import toolgap_pressure_probe as plugin
+        from research.agent_resume.sampling import clock_domain
+
+        events = []
+        trace = types.SimpleNamespace(
+            event=lambda kind, **data: events.append(dict(kind=kind, **data)),
+            install=lambda: None,
+            occupancy=lambda cache: {},
+        )
+
+        class Scheduler:
+            def _process_hicache_events(self):
+                return "tick"
+
+        class Cache:
+            def match_prefix(self, params):
+                return "ordinary-match"
+
+        class Control:
+            def submit(self, operation_id, *args, **kwargs):
+                self.records = {
+                    operation_id: types.SimpleNamespace(
+                        handle=types.SimpleNamespace(rid="physical")
+                    )
+                }
+                self.cache = None
+                return dict(state="RUNNING")
+
+        class File:
+            def batch_get(self, keys):
+                trace.event("read", keys=keys, bytes=8)
+                return 8
+
+        class Controller:
+            def _page_transfer(self, op):
+                return File().batch_get(["k"])
+
+        modules = {
+            "sglang.srt.managers.scheduler": types.SimpleNamespace(Scheduler=Scheduler),
+            "sglang.srt.mem_cache.unified_radix_cache": types.SimpleNamespace(
+                UnifiedRadixCache=Cache
+            ),
+            "sglang.srt.mem_cache.proactive_prefetch": types.SimpleNamespace(
+                ProactivePrefetch=Control
+            ),
+            "sglang.srt.mem_cache.hicache_storage": types.SimpleNamespace(
+                HiCacheFile=File
+            ),
+            "sglang.srt.mem_cache.hybrid_cache.hybrid_cache_controller": types.SimpleNamespace(
+                HybridCacheController=Controller
+            ),
+            "hicache_trace": trace,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            request = root / ("a" * 32 + ".request.json")
+            request.write_text(
+                json.dumps(dict(input_ids=[1], clock_domain=clock_domain()))
+            )
+            with (
+                patch.dict(sys.modules, modules),
+                patch.dict("os.environ", TOOLGAP_PRESSURE_PROBE_DIR=directory),
+                patch.object(
+                    plugin,
+                    "probe_prefix",
+                    return_value=dict(residency="UNKNOWN_STORAGE"),
+                ) as probe,
+            ):
+                plugin.install()
+                plugin.install()  # only one layer of hooks
+                scheduler = Scheduler()
+                scheduler.tree_cache = Cache()
+                self.assertEqual(scheduler._process_hicache_events(), "tick")
+                state = json.loads((root / ("a" * 32 + ".response.json")).read_text())
+                self.assertEqual(state["clock_domain"], clock_domain())
+                self.assertEqual(probe.call_count, 1)
+                Control().submit("op")
+                Controller()._page_transfer(
+                    types.SimpleNamespace(handle=types.SimpleNamespace(rid="physical"))
+                )
+                File().batch_get(["other"])
+            reads = [e for e in events if e["kind"] == "read"]
+            self.assertEqual([e["rid"] for e in reads], ["physical", None])
+            accepted = [e for e in events if e["kind"] == "control_accepted_end"]
+            self.assertEqual(accepted[0]["rid"], "physical")
+            self.assertEqual(accepted[0]["operation_id"], "op")
+
+
+if __name__ == "__main__":
+    unittest.main()

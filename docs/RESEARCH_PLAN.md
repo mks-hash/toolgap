@@ -1,9 +1,10 @@
 # ToolGap: cross-family agent-resume research
 
-Status: **local harness foundation implemented; GPU research not executed**.
-See [CPU preparation and limits](CROSS_FAMILY_PREPARATION.md).
-Updated 2026-10-04 after inspection of the
-existing harness and official candidate model cards/configuration. Existing
+Status: **local cross-family harness, passive observation and competing workload implemented; GPU research not executed**.
+See [CPU preparation and limits](CROSS_FAMILY_PREPARATION.md) and
+[passive pressure workload preparation](PASSIVE_PRESSURE_PREPARATION.md).
+Updated 2026-10-05 with passive observation and competing arrivals, following
+the 2026-10-04 harness and official candidate model/config inspection. Existing
 v0.1/v0.2/v0.3 GPU evidence remains unchanged. No GPU resources, model-weight
 downloads, new runtime implementation or publication accompany this plan.
 

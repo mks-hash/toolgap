@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-05",
+  "validation_type": "CPU_PREPARATION_ONLY",
+  "harness_parent_sha": "32c8c11",
+  "runtime_candidate_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+  "source_commit": "fe6217292ce4f01c592a2d7274137d826a75e1a0",
+  "full_cpu_tests": 168,
+  "subtests": 58,
+  "standalone_cpu_tests": 114,
+  "real_observer_and_trace_tests": 9,
+  "pressure_transport_arrival_accounting_tests": 10,
+  "real_file_transfer_rid_mapping": "PASS",
+  "models": [
+    {
+      "profile_id": "qwen",
+      "model": "Qwen/Qwen2.5-1.5B-Instruct",
+      "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+      "packet_sha256": "090ebf699b2e1991340303569ebb45d6eb247f862756560db28f069897986248",
+      "trajectories": 12,
+      "scripted_tool_calls": 36,
+      "initial_tokens_range": [
+        3750,
+        3990
+      ],
+      "repeated_real_cpu_test_executions": 108,
+      "exact_prefix_preserved": true,
+      "scripted_correctness": true,
+      "live_model_correctness": "NOT_VALIDATED"
+    },
+    {
+      "profile_id": "qwen7",
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+      "packet_sha256": "38a65ead6dc344fa97363c39b0c58261081747a44d0b5bd8afb08e0c8dac255c",
+      "trajectories": 12,
+      "scripted_tool_calls": 36,
+      "initial_tokens_range": [
+        3750,
+        3990
+      ],
+      "repeated_real_cpu_test_executions": 108,
+      "exact_prefix_preserved": true,
+      "scripted_correctness": true,
+      "live_model_correctness": "NOT_VALIDATED"
+    },
+    {
+      "profile_id": "mistral",
+      "model": "mistralai/Mistral-7B-Instruct-v0.3",
+      "revision": "c170c708c41dac9275d15a8fff4eca08d52bab71",
+      "packet_sha256": "19ce00db2b41f16fbbb4e5fbabeac9148297cd8777f47745b7fe70f6acdb9434",
+      "trajectories": 12,
+      "scripted_tool_calls": 36,
+      "initial_tokens_range": [
+        3718,
+        3987
+      ],
+      "repeated_real_cpu_test_executions": 108,
+      "exact_prefix_preserved": true,
+      "scripted_correctness": true,
+      "live_model_correctness": "NOT_VALIDATED"
+    }
+  ],
+  "native_model_configurations": 3,
+  "native_model_families": 2,
+  "gpu_execution": false,
+  "model_weights_loaded": false,
+  "live_model_generation": false,
+  "natural_cache_pressure_validated": false,
+  "performance_claim": false,
+  "consumption_and_waste_attribution": "NOT_VALIDATED",
+  "raw_logs": "Ignored work/pressure; private paths excluded from this record",
+  "evidence_replay": {
+    "synthetic_trials": 45,
+    "real_tool_loop_runs": 12,
+    "passed": true
+  },
+  "source_files": {
+    "research/agent_resume/__init__.py": "bce551d7a066fc9ffd16b021a537284ba9b01d03981166c2ac2ed547c84318db",
+    "research/agent_resume/adapters.py": "93796cb8771aa8d6f31bfd8f8dc2a60f878cc9704c1a52fe2730431c11df342e",
+    "research/agent_resume/check_pressure.py": "c5c51fffe85b3f10de97e55222c7cd91558e72cf1773df593a97a8ea26f8b580",
+    "research/agent_resume/fetch.py": "bb6c06c5f72090ada346d315e56503a6fbf7110ab8acb0a33b5535b77b668d12",
+    "research/agent_resume/live.py": "9e5a3ca958758e73bd9269b8022a08ac14870b201d49904b8c4f700597046b39",
+    "research/agent_resume/load.py": "c83547345c1578a33937452b7415487c508a5b8ea09328d2d63a39e1b2667934",
+    "research/agent_resume/observer.py": "12cb3344fe75de353626f820a11966c926aaa072c905fdd33a1944350a905d1b",
+    "research/agent_resume/plugin/toolgap_pressure_probe-0.0.dist-info/METADATA": "54081b8bd1929f4acce1cfd3c0831f8311e72f0fa80669e3576b2faabee764ca",
+    "research/agent_resume/plugin/toolgap_pressure_probe-0.0.dist-info/entry_points.txt": "cfdfbb97e54d8e5dd1bc9d339d85a40dc7ce2c371c51eb737402245ea1a56178",
+    "research/agent_resume/plugin/toolgap_pressure_probe.py": "9b00a781ee72090706f4514f339c34da56d7d0566256532e2b81ab8767e184f5",
+    "research/agent_resume/prepare.py": "b05e52eb0b7e9b53fdc66d53a83b3f7ca6c4bf96317439f03bf9e5168857ed20",
+    "research/agent_resume/pressure.py": "564be3a57723f48d86247656501e6986a5ab8cabed8b6a57fb64d9652ab8086e",
+    "research/agent_resume/runner.py": "99e16ed487a2743c36d5168cf3fdcc686851682a22f0e9f2cb4407c7c6835eb7",
+    "research/agent_resume/sampling.py": "cfea82b7a0442cdbc890aaf3031c2caab2aee6bb3d57874739c28425f6c4f94a",
+    "research/agent_resume/trace_report.py": "5c8a6718ccdbae495112d39b5caec5467d0c79edac0e9ec6eb673acec388915b",
+    "research/agent_resume/workloads.py": "3c3f388931b7eb6002a2ef87b2d19864b7b64f02c444d47b7a3a51051892760a",
+    "tests/test_passive_observer_real_cache.py": "46bb081d773e5532ead56f91e689b5a6c4e69fb4532761a01bca4abf17ec10b1",
+    "tests/test_pressure_workload.py": "6f9bdd5198680f93c65f5f1745db87daed908633b4d3abb0d68f47d2013c8442"
+  }
+}

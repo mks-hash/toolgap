@@ -139,7 +139,11 @@ families and useful agent workloads under cache pressure. It is a plan, not new
 measured model support or a cross-family performance claim.
 The [local preparation](docs/CROSS_FAMILY_PREPARATION.md) adds native-tokenizer
 checks for Qwen/Mistral and a useful multi-round repository investigation runner.
-Actual cross-family generation and pressure evaluation remain pending.
+The [passive pressure harness](docs/PASSIVE_PRESSURE_PREPARATION.md) adds direct
+cache-state observation and twelve competing repository-audit trajectories with
+fixed arrivals, real CPU tools and all-caller accounting. It is locally CPU checked;
+actual cross-family generation, natural L3 opportunity rate and workload benefit
+remain unmeasured.
 
 ## CLI and diagnostics
 

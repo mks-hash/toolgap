@@ -244,19 +244,22 @@ class RepositoryTools:
                 if "lines" in r["result"]
                 for hit in r["result"]["lines"]
             }
-            found = False
+            requirements = task.get(
+                "evidence_requirements",
+                [dict(path=task["path"], needle=task["needle"])],
+            )
+            found = set()
             if not isinstance(answer["evidence"], list) or not answer["evidence"]:
                 return False
             for item in answer["evidence"]:
                 path, line = item["path"], item["line"]
                 if type(line) is not int or (path, line) not in retrieved:
                     return False
-                if path == task["path"]:
-                    found |= (
-                        task["needle"]
-                        in self.corpus["files"][path]["text"].splitlines()[line - 1]
-                    )
-            return found
+                text = self.corpus["files"][path]["text"].splitlines()[line - 1]
+                for index, requirement in enumerate(requirements):
+                    if path == requirement["path"] and requirement["needle"] in text:
+                        found.add(index)
+            return len(found) == len(requirements)
         except (ValueError, TypeError, KeyError, IndexError):
             pass
         return False

@@ -1,0 +1,2 @@
+[sglang.srt.plugins]
+toolgap_pressure_probe = toolgap_pressure_probe:install

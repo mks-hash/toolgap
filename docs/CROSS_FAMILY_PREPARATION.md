@@ -67,7 +67,8 @@ failures. The template date is fixed at `04 Oct 2026` and recorded in provenance
 - Three native tokenizers each ran three successful scripted two-tool-round
   trajectories and one deliberately invalid decision retained as a failure.
   Boundary checks cover missing/present end-of-turn markers. The fixed regression
-  tool actually ran **14 CPU tests** for each model's fixture.
+  tool actually ran **9 CPU tests** for each model's fixture (as recorded
+  in `local-validation.json`; corrected the earlier prose count of 14).
 - Fresh-directory public Mistral tokenizer download verified all four pinned
   file sizes and SHA-256 checksums.
 - Both historical evidence checkers passed: 45 v0.1 trials and 12 v0.2 GPU runs.
@@ -169,8 +170,9 @@ may split nodes. The probe therefore cannot be treated as passive observation
 during eviction research. Do not use it unchanged in the pressure experiment.
 Its earlier controlled-flush datasets retain their original methodology.
 
-Next, prepare a passive cache observation path, pinned useful longer tasks and
-fixed competing-arrival traces. Then perform a separately approved non-Qwen
+The [passive observer and competing-arrival workload](PASSIVE_PRESSURE_PREPARATION.md)
+are now implemented and CPU checked. They retain the same runtime/source identity
+and keep GPU fit/performance unvalidated. Next perform a separately approved non-Qwen
 compatibility pilot and persistent-worker pressure comparison without per-target
 flush/restart. Measure opportunities, physical I/O, occupancy, evictions, waste,
 all-caller latency and task quality. These steps complete the research objective;

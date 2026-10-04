@@ -16,12 +16,15 @@ class GenerationTransport:
     def __init__(self, http, *, max_new_tokens=256):
         self.http = http
         self.max_new_tokens = max_new_tokens
+        self.request_id_prefix = "tg-"
 
     async def generate(self, ids, salt):
         submitted = time.monotonic_ns()
         first, last = None, None
+        rid = self.request_id_prefix + uuid.uuid4().hex
         payload = dict(
             input_ids=ids,
+            rid=rid,
             cache_salt=salt,
             stream=True,
             return_logprob=True,
@@ -54,6 +57,7 @@ class GenerationTransport:
             first_token_ns=first,
             completed_ns=time.monotonic_ns(),
             meta_info=last.get("meta_info", {}),
+            rid=rid,
         )
 
 
@@ -101,6 +105,28 @@ async def settle_owned(policy, submissions, *, session_id, abandoned, timeout=3)
     return records
 
 
+def initial_messages(adapter, task):
+    return adapter.normalize_messages(
+        [
+            dict(
+                role="system",
+                content="Use repository tools to obtain evidence. Return final JSON only: "
+                '{"answer":"value","evidence":[{"path":"file","line":1}]}. '
+                "Call one tool at a time. Never invent file/line evidence.",
+            ),
+            dict(
+                role="user",
+                content=task["question"]
+                + (
+                    "\n\nPinned source context:\n" + task["context_pack"]
+                    if task.get("context_pack")
+                    else ""
+                ),
+            ),
+        ]
+    )
+
+
 async def run_task(
     adapter,
     tokenizer,
@@ -113,6 +139,8 @@ async def run_task(
     max_tool_rounds=4,
     context_limit=8192,
     on_record=None,
+    cache_salt=None,
+    on_boundary=None,
 ):
     """One live trajectory; no prescribed model decisions or forced cache state."""
     row = dict(
@@ -127,22 +155,29 @@ async def run_task(
         cache_state="UNMEASURED",
         physical_io="UNMEASURED",
         started_ns=time.monotonic_ns(),
-        cache_salt=uuid.uuid4().hex,
+        cache_salt=cache_salt if cache_salt is not None else uuid.uuid4().hex,
     )
-    messages = adapter.normalize_messages(
-        [
-            dict(
-                role="system",
-                content="Use repository tools to obtain evidence. Return final JSON only: "
-                '{"answer":"value","evidence":[{"path":"file","line":1}]}. '
-                "Call one tool at a time. Never invent file/line evidence.",
-            ),
-            dict(role="user", content=task["question"]),
-        ]
-    )
+    messages = initial_messages(adapter, task)
     submissions = []
+
+    async def submit_step(step):
+        lease = await policy.submit(
+            row["cache_salt"],
+            step["prefix_ids"],
+            cache_salt=row["cache_salt"],
+            hint=hint,
+        )
+        step["prefetch_operation_id"] = lease.operation_id
+        step["prefetch_decision"] = lease.decision
+        return lease
+
     try:
         ids = adapter.prompt(tokenizer, messages, SCHEMA)
+        if (
+            task.get("initial_input_ids") is not None
+            and ids != task["initial_input_ids"]
+        ):
+            raise ValueError("Prepared native initial token IDs changed")
         for turn in range(max_tool_rounds + 1):
             if len(ids) + getattr(model, "max_new_tokens", 0) > context_limit:
                 raise ValueError("Conversation exceeds declared input token limit")
@@ -178,23 +213,21 @@ async def run_task(
                 call=dict(
                     name=call.name, arguments=call.arguments, call_id=call.call_id
                 ),
-                dispatched_ns=time.monotonic_ns(),
+                boundary_ns=time.monotonic_ns(),
                 prefix_ids=prefix,
                 prefix_sha256=hashlib.sha256(json.dumps(prefix).encode()).hexdigest(),
             )
             row["tools"].append(step)
+            if on_boundary is not None:
+                sample_start = time.monotonic_ns()
+                step["cache_before_dispatch"] = await on_boundary(
+                    prefix, row["cache_salt"]
+                )
+                step["observation_wait_ms"] = (time.monotonic_ns() - sample_start) / 1e6
+            step["dispatched_ns"] = time.monotonic_ns()
             tool_task = asyncio.create_task(tools(call))
             if policy is not None and prefix:
-                submissions.append(
-                    asyncio.create_task(
-                        policy.submit(
-                            row["cache_salt"],
-                            prefix,
-                            cache_salt=row["cache_salt"],
-                            hint=hint,
-                        )
-                    )
-                )
+                submissions.append(asyncio.create_task(submit_step(step)))
             try:
                 result = await tool_task
             finally:
