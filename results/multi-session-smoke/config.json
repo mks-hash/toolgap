@@ -1,0 +1,32 @@
+{
+  "compatibility": {
+    "sglang_base": "80bb3fb6511ac421ed3b4309067681392203f3bd",
+    "lifecycle_commit": "37d07d69b62181ca8713b31441218b0591da36de",
+    "gpu_validated_feature_commit": "4a7c68d30913cb084c821ad044ae4ef037933c29",
+    "model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "validated_image_digest": "sha256:4ae0bb2222247e51d146ff0cb9807240d5abbfe7d1b5d7eb1c9db0b072da07ec",
+    "release_source_commit": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+    "runtime_additions": 341
+  },
+  "repetitions": 1,
+  "callers": 2,
+  "max_running_requests": 2,
+  "proactive_slots": 1,
+  "documents": 10000,
+  "corpus_sha256": "69f69c697a5ffdc11621728252eba7886f4f58fdfd08a12e9ab9f610edca28b1",
+  "scenarios": [
+    "baseline",
+    "admission",
+    "abandon_first"
+  ],
+  "cache_state": "L3-only, distinct salts, identical prompt",
+  "os_page_cache": "Potentially warm; source hashing/copy outside timing",
+  "usage_accounting": "unknown for continuation, zero only for abandonment",
+  "harness_sha256": {
+    "examples/multi_session/demo.py": "60b7859297c69593a41805cccb5a346003715955c17cf2f610bf67baa4ef7aea",
+    "examples/multi_session/workflow.py": "f040fb36b1a7f9c1aabaf977e5c0b1030d47f83e61a127a84eb79569b583ec6e",
+    "examples/tool_loop/server.py": "726948e2e1579e8dcd875067c7fa2673933f880c3b6767fd255566020e46c355",
+    "examples/tool_loop/plugin/toolgap_demo_trace.py": "a0a684784a65cd322d48c25474e417d45f7e15eeb4b9beb88e7e1c2fec504ca9"
+  }
+}

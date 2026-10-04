@@ -1,6 +1,8 @@
 # v0.3 development: bounded admission across callers
 
-This is a **local CPU-validated development increment**, not a new GPU release.
+This is a **development increment**, not a new GPU release.
+The [two-caller GPU smoke](MULTI_SESSION_GPU_SMOKE.md) passed; broader load and
+statistical performance evaluation remain unvalidated.
 It uses the pinned v0.2 SGLang runtime and does not change the published benchmark,
 runtime patches, storage format, scheduler, upstream PRs, or report.
 
@@ -123,7 +125,6 @@ Next validation: two real agent loops with matched cache state and fallback,
 then 5–20 callers with admission/waste and inference contention measurements.
 A new GPU experiment and release remain separate from this local increment.
 
-The [two-trajectory demo harness](MULTI_SESSION_DEMO.md) is now prepared with
-baseline, shared-admission and owned-abandonment treatments. Its orchestration
-and trace attribution passed local CPU checks; simultaneous GPU inference has
-not been validated or executed.
+The [two-trajectory demo harness](MULTI_SESSION_DEMO.md) covers baseline,
+shared-admission and owned-abandonment treatments. Its
+[one-repeat real-GPU smoke](MULTI_SESSION_GPU_SMOKE.md) has now completed.

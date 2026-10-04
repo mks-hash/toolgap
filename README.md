@@ -120,10 +120,11 @@ python scripts/check_tool_loop_evidence.py
 
 A local development layer shares one proactive restore slot across callers,
 with immediate fallback, owned cancellation, and explicit unknown-usage accounting.
-It retains the v0.2 runtime contract; multi-agent GPU performance is not yet
-validated. See [policy, API and CPU checks](docs/MULTI_SESSION.md).
-The [two-trajectory demo plan and command](docs/MULTI_SESSION_DEMO.md) cover
-ordinary restore, shared admission and abandonment; its GPU run is pending.
+It retains the v0.2 runtime contract. A [two-caller real-GPU smoke](docs/MULTI_SESSION_GPU_SMOKE.md)
+passed: 80 regressions, five correct continuations, zero duplicate prefix reads
+and cleanup to baseline. One admitted caller benefited; pair-level latency did
+not improve in this single-repeat run. See [policy and API](docs/MULTI_SESSION.md)
+and the [demo plan and command](docs/MULTI_SESSION_DEMO.md).
 
 ## Thin Python client and control API
 

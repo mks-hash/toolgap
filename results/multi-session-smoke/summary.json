@@ -1,0 +1,37 @@
+[
+  {
+    "mode": "baseline",
+    "session_id": "agent-0",
+    "n": 1,
+    "median_ttft_ms": 495.287422,
+    "median_tool_dispatch_to_first_token_ms": 1119.564413
+  },
+  {
+    "mode": "baseline",
+    "session_id": "agent-1",
+    "n": 1,
+    "median_ttft_ms": 631.873474,
+    "median_tool_dispatch_to_first_token_ms": 1264.004772
+  },
+  {
+    "mode": "admission",
+    "session_id": "agent-0",
+    "n": 1,
+    "median_ttft_ms": 141.594602,
+    "median_tool_dispatch_to_first_token_ms": 775.731762
+  },
+  {
+    "mode": "admission",
+    "session_id": "agent-1",
+    "n": 1,
+    "median_ttft_ms": 607.747817,
+    "median_tool_dispatch_to_first_token_ms": 1289.74555
+  },
+  {
+    "mode": "abandon_first",
+    "session_id": "agent-1",
+    "n": 1,
+    "median_ttft_ms": 497.031659,
+    "median_tool_dispatch_to_first_token_ms": 1140.073462
+  }
+]

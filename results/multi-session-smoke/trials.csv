@@ -1,0 +1,7 @@
+mode,repetition,session_id,abandoned,output_correct,continuation_ttft_ms,tool_dispatch_to_first_token_ms,tool_duration_ms,restore_io_ms,hidden_restore_path_ms,published_before_continuation,prefix_backend_read_pages,duplicate_prefix_read_pages
+admission,0,agent-0,False,True,141.594602,775.731762,632.889058,337.604583,359.00411,True,220,0
+admission,0,agent-1,False,True,607.747817,1289.74555,681.321314,129.337651,,False,220,0
+baseline,0,agent-0,False,True,495.287422,1119.564413,623.62374,305.425062,,False,220,0
+baseline,0,agent-1,False,True,631.873474,1264.004772,631.381374,131.241019,,False,220,0
+abandon_first,0,agent-0,True,,,,636.327312,327.016994,,False,220,0
+abandon_first,0,agent-1,False,True,497.031659,1140.073462,642.261833,319.654658,,False,220,0

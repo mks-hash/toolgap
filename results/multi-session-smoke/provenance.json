@@ -1,0 +1,15 @@
+{
+  "toolgap_commit": "0be389b39345a84281289ac8ca02a517551aec84",
+  "sglang_commit": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+  "conditions": [
+    "baseline",
+    "admission",
+    "abandon_first"
+  ],
+  "repetitions": 1,
+  "callers": 2,
+  "expected_tool_executions": 6,
+  "expected_continuations": 5,
+  "tool_documents": 10000,
+  "provisioning_approved": false
+}
