@@ -1,0 +1,74 @@
+{
+  "REAL_TOOL_LOOP_VALIDATED": true,
+  "REGRESSION_TESTS": {
+    "passed": 52,
+    "failed": 0,
+    "skipped": 0
+  },
+  "REAL_GPU_RUNS": {
+    "passed": 12,
+    "failed": 0
+  },
+  "MODEL_TOOL_CALL": true,
+  "OUTPUT_CORRECTNESS": true,
+  "L3_ONLY_INITIAL_STATE_VERIFIED": true,
+  "IDENTICAL_L3_PAYLOADS": true,
+  "ALL_PROACTIVE_L3_PUBLISHED_BEFORE_TOOL_COMPLETION": true,
+  "RESIDENT_ZERO_L3_READS": true,
+  "DUPLICATE_READS": 0,
+  "PROACTIVE_H2D": false,
+  "CLEANUP_BASELINE": true,
+  "VM_AND_DISK_DELETED": true,
+  "SGLANG_RUNTIME_CHANGES": 0,
+  "sglang_commit": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+  "toolgap_implementation_commit": "0acfc10c6f0ec807e6588384da7fb59d8f383720",
+  "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+  "saved_prefix_tokens": 3520,
+  "prompt_tokens": 3511,
+  "output_tokens": 13,
+  "tool_documents": 10000,
+  "repetitions_per_condition": 3,
+  "groups": {
+    "l3_only/baseline": {
+      "continuation_ttft_ms": 511.964993,
+      "agent_step_ms": 1158.862354,
+      "tool_duration_ms": 642.066509,
+      "hidden_restore_path_ms": 0,
+      "io_duration_ms": 355.969141,
+      "io_hidden_ms": 0.0
+    },
+    "l3_only/proactive": {
+      "continuation_ttft_ms": 134.302635,
+      "agent_step_ms": 763.893394,
+      "tool_duration_ms": 630.390503,
+      "prefetch_rpc_ms": 9.401158,
+      "hidden_restore_path_ms": 317.164901,
+      "io_duration_ms": 296.801942,
+      "io_hidden_ms": 296.801942
+    },
+    "resident/baseline": {
+      "continuation_ttft_ms": 128.156139,
+      "agent_step_ms": 748.391944,
+      "tool_duration_ms": 619.450533,
+      "hidden_restore_path_ms": 0,
+      "io_duration_ms": 0,
+      "io_hidden_ms": 0
+    },
+    "resident/proactive": {
+      "continuation_ttft_ms": 126.977102,
+      "agent_step_ms": 759.105607,
+      "tool_duration_ms": 632.080109,
+      "prefetch_rpc_ms": 7.767844,
+      "hidden_restore_path_ms": 0,
+      "io_duration_ms": 0,
+      "io_hidden_ms": 0
+    }
+  },
+  "l3_ttft_reduction_percent": 73.7672229866701,
+  "l3_agent_step_reduction_percent": 34.08247395704082,
+  "vm_created": "2026-10-03T17:23:19.711000-07:00",
+  "deletion_confirmed": "2026-10-04T00:48:20+00:00",
+  "runtime_minutes": 25.004816666666667,
+  "estimated_hourly_usd": 0.879172212,
+  "estimated_cost_usd": 0.3663923329914633
+}

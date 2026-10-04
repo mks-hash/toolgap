@@ -129,6 +129,18 @@ Apache-2.0; see [LICENSE](LICENSE) and [NOTICE](NOTICE).
 ## Real tool-loop development
 
 The v0.2 development branch adds a thin Python client and a real document-search
-tool loop with verified L3-only and resident-cache controls. GPU validation is
-pending; the performance numbers above remain exclusively the v0.1 benchmark.
-See [the tool-loop instructions](docs/TOOL_LOOP.md).
+tool loop with verified L3-only and resident-cache controls. One L4 session
+passed 52 regressions and 12 real tool-loop runs (three per condition).
+
+| Initial prefix state | Baseline median TTFT | ToolGap median TTFT |
+|---|---:|---:|
+| L3-only |512ms|134ms|
+| Resident GPU |128ms|127ms|
+
+The L3-only measured tool-dispatch → first-token median fell 1159→764ms.
+Qwen2.5-1.5B, 3520 saved tokens, file L3,fixed 10000-record document-search
+fixture,single worker, TP1/PP1, n=3. Controlled eviction; OS page cache may be warm.
+Resident control shows no useful benefit. These are separate v0.2 demo results;
+the performance numbers above remain exclusively the v0.1 benchmark.
+See [the tool-loop instructions](docs/TOOL_LOOP.md) and
+[validation with raw evidence](docs/TOOL_LOOP_VALIDATION.md).

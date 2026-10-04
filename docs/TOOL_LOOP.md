@@ -1,7 +1,8 @@
 # v0.2 development: a real tool loop
 
-Status: local implementation; real model/tool/continuation GPU validation pending.
-No v0.2 performance result or production-readiness claim is made. The v0.1
+Status: experimental real model/tool/continuation demo validated in one L4 session.
+See [the measured results and controls](TOOL_LOOP_VALIDATION.md).
+No production-readiness claim is made. The v0.1
 45-trial benchmark and its pinned release are unchanged.
 
 ToolGap hides restore latency when reusable KV has fallen below resident L2/GPU.

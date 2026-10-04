@@ -1,0 +1,30 @@
+[
+  {
+    "scenario": "l3_only",
+    "mode": "baseline",
+    "repetitions": 3,
+    "continuation_ttft_median_ms": 511.964993,
+    "agent_step_median_ms": 1158.862354
+  },
+  {
+    "scenario": "l3_only",
+    "mode": "proactive",
+    "repetitions": 3,
+    "continuation_ttft_median_ms": 134.302635,
+    "agent_step_median_ms": 763.893394
+  },
+  {
+    "scenario": "resident",
+    "mode": "baseline",
+    "repetitions": 3,
+    "continuation_ttft_median_ms": 128.156139,
+    "agent_step_median_ms": 748.391944
+  },
+  {
+    "scenario": "resident",
+    "mode": "proactive",
+    "repetitions": 3,
+    "continuation_ttft_median_ms": 126.977102,
+    "agent_step_median_ms": 759.105607
+  }
+]

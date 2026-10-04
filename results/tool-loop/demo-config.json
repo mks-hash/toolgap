@@ -1,0 +1,21 @@
+{
+  "compatibility": {
+    "sglang_base": "80bb3fb6511ac421ed3b4309067681392203f3bd",
+    "lifecycle_commit": "37d07d69b62181ca8713b31441218b0591da36de",
+    "gpu_validated_feature_commit": "4a7c68d30913cb084c821ad044ae4ef037933c29",
+    "model": "Qwen/Qwen2.5-1.5B-Instruct",
+    "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+    "validated_image_digest": "sha256:4ae0bb2222247e51d146ff0cb9807240d5abbfe7d1b5d7eb1c9db0b072da07ec",
+    "release_source_commit": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+    "runtime_additions": 341
+  },
+  "model_path": "/opt/model",
+  "corpus_sha256": "69f69c697a5ffdc11621728252eba7886f4f58fdfd08a12e9ab9f610edca28b1",
+  "repetitions": 3,
+  "documents": 10000,
+  "os_page_cache": "Potentially warm: source payload verification happens before timing",
+  "temperature": 0,
+  "sampling_seed": 42,
+  "max_tool_call_tokens": 128,
+  "max_continuation_tokens": 64
+}
