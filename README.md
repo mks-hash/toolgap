@@ -116,6 +116,13 @@ python scripts/check_evidence.py
 python scripts/check_tool_loop_evidence.py
 ```
 
+## v0.3 development: bounded multi-caller admission
+
+A local development layer shares one proactive restore slot across callers,
+with immediate fallback, owned cancellation, and explicit unknown-usage accounting.
+It retains the v0.2 runtime contract; multi-agent GPU performance is not yet
+validated. See [policy, API and CPU checks](docs/MULTI_SESSION.md).
+
 ## Thin Python client and control API
 
 ```python

@@ -6,6 +6,17 @@ from typing import Callable, Optional
 import httpx
 
 
+def _validate_prefix(input_ids, cache_salt, ttl_ms):
+    if not input_ids or any(type(t) is not int or t < 0 for t in input_ids):
+        raise ValueError("Provide exact nonnegative integer token IDs")
+    if cache_salt is not None and (
+        not isinstance(cache_salt, str) or len(cache_salt) > 256
+    ):
+        raise ValueError("cache_salt must be a string of at most256 characters")
+    if type(ttl_ms) is not int or not 1 <= ttl_ms <= 60000:
+        raise ValueError("ttl_ms must be in1..60000")
+
+
 class PrefetchRejected(RuntimeError):
     """Server rejected admission or a control payload; generation may continue."""
 
@@ -69,14 +80,7 @@ class PrefetchClient:
             emit("receive_or_error")
 
     async def submit(self, operation_id, input_ids, *, cache_salt=None, ttl_ms=10000):
-        if not input_ids or any(type(t) is not int or t < 0 for t in input_ids):
-            raise ValueError("Provide exact nonnegative integer token IDs")
-        if cache_salt is not None and (
-            not isinstance(cache_salt, str) or len(cache_salt) > 256
-        ):
-            raise ValueError("cache_salt must be a string of at most256 characters")
-        if type(ttl_ms) is not int or not 1 <= ttl_ms <= 60000:
-            raise ValueError("ttl_ms must be in1..60000")
+        _validate_prefix(input_ids, cache_salt, ttl_ms)
         return await self._request(
             "submit",
             operation_id,

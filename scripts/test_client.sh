@@ -5,3 +5,4 @@ export PYTHONPATH="$root/src:$root/examples/tool_loop:${PYTHONPATH:-}"
 python -m unittest discover -s "$root/tests" -p 'test_client_policy.py' -v
 python -m unittest discover -s "$root/tests" -p 'test_tokens_tool.py' -v
 python -m unittest discover -s "$root/tests" -p 'test_tool_process.py' -v
+python -m unittest discover -s "$root/tests" -p 'test_admission.py' -v
