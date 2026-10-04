@@ -134,6 +134,10 @@ Optional [caller-hint admission](docs/ADMISSION_DESIGN.md) skips known-resident
 prefixes or small estimated overlaps before HTTP and records local decisions
 and slot timing. Estimates stay separate from restore/usage evidence.
 
+The next [research milestone](docs/RESEARCH_PLAN.md) evaluates multiple model
+families and useful agent workloads under cache pressure. It is a plan, not new
+measured model support or a cross-family performance claim.
+
 ## CLI and diagnostics
 
 Available in experimental `v0.3.0`. Install from the tagged checkout with

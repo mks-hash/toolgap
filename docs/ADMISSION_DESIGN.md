@@ -149,6 +149,11 @@ backend, GPU prefetch, SWA or runtime scheduler change is introduced.
 
 ## Next measurement
 
+This focused policy comparison is one part of the broader
+[cross-family agent-resume research plan](RESEARCH_PLAN.md). That milestone
+includes useful multi-round tools and workload-driven cache pressure; policy
+microbenchmarks alone do not establish application value.
+
 A future focused GPU comparison should vary **later caller arrival** relative
 to measured restoration: manual admission, reconciliation alone, then
 reconciliation plus hints. Keep verified L3-only prefixes, model, generation and
