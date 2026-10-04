@@ -1,0 +1,20 @@
+{
+  "release_source_commit": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+  "source_files": {
+    "python/sglang/srt/entrypoints/http_server.py": "124db6e1072c53f4ca725f1e0bbc225a61398c8bcc3fd464faf6e10ef7ce684c",
+    "python/sglang/srt/managers/cache_controller.py": "777f280f130e1a2587ac2bd3c8bf43614f95e62fec7df6ecf7c584c372a8302c",
+    "python/sglang/srt/managers/io_struct.py": "a5e3c0b8e123856bdc8056b971d95aca13db12072a9b22f9854c306143105741",
+    "python/sglang/srt/managers/scheduler.py": "5c925222d752d6a6a5fae94beb2e0529b36f092691d12987e88ae5d194ce2cd1",
+    "python/sglang/srt/managers/tokenizer_control_mixin.py": "32039d77e885546c27029ba3026cc2b845b2f5dd1b3062629a4fd749596bba77",
+    "python/sglang/srt/mem_cache/hybrid_cache/hybrid_cache_controller.py": "30313390d5f690d8eaa2968cb8029c049901ed1761d65d594ee825ce7e2323e3",
+    "python/sglang/srt/mem_cache/proactive_prefetch.py": "21d2cd07cf0d1a56a94b36b2a637507ef2b4553f89bce526a40136ba9e3fc867",
+    "python/sglang/srt/mem_cache/unified_radix_cache.py": "5529bd1a671816377f63f3cedadc76c6d3974d8e396f6b5b5f8d25759a86de1d"
+  },
+  "model_tokenizer_files": {
+    "tokenizer_config.json": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583",
+    "config.json": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+    "merges.txt": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+    "vocab.json": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+    "tokenizer.json": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+  }
+}

@@ -1,0 +1,2 @@
+[sglang.srt.plugins]
+toolgap_demo_trace = toolgap_demo_trace:install

@@ -125,3 +125,10 @@ ID for a new restore attempt after eviction.
 
 Next product step: a real tool-calling example using this control API.
 Apache-2.0; see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+
+## Real tool-loop development
+
+The v0.2 development branch adds a thin Python client and a real document-search
+tool loop with verified L3-only and resident-cache controls. GPU validation is
+pending; the performance numbers above remain exclusively the v0.1 benchmark.
+See [the tool-loop instructions](docs/TOOL_LOOP.md).
