@@ -136,6 +136,7 @@ async def execute(args):
 
     block_id = args.output.name
     unresolved = False
+    interrupted = None
     started = time.monotonic_ns()
 
     async with httpx.AsyncClient(base_url=args.server.rstrip("/"), timeout=180) as http:
@@ -235,12 +236,20 @@ async def execute(args):
                     with (args.output / "tasks.jsonl").open("a") as out:
                         out.write(json.dumps(row) + "\n")
 
-                block = await run_arrivals(
-                    packet["arrivals"],
-                    task,
-                    max_active=packet["max_active"],
-                    on_result=write,
-                )
+                try:
+                    block = await run_arrivals(
+                        packet["arrivals"],
+                        task,
+                        max_active=packet["max_active"],
+                        on_result=write,
+                    )
+                except BaseException as exc:
+                    block = getattr(exc, "block_evidence", None)
+                    if block is None:
+                        raise
+                    interrupted = exc
+                    # Retain the whole interrupted block before propagating timeout.
+                    # This never converts cancelled work into a successful block.
                 unresolved = policy.active is not None or any(
                     r.get("cleanup_confirmed") is False
                     for row in block["rows"]
@@ -250,18 +259,28 @@ async def execute(args):
     manifest_path = args.output / "manifest.json"
     manifest = json.loads(manifest_path.read_text())
     manifest["finalized_ns"] = time.monotonic_ns()
+    manifest["procedure_completed"] = interrupted is None
+    manifest["interruption_kind"] = type(interrupted).__name__ if interrupted else None
     manifest_path.write_text(json.dumps(manifest, indent=2))
     summary = summarize(block)
     summary.update(
         cleanup_unresolved=unresolved,
         gpu_opportunity_verdict="REQUIRES_SERVER_TRACE_ANALYSIS",
         performance_claim=False,
-        procedure_completed=True,
-        study_success=not unresolved and summary["successful"] == summary["tasks"],
+        procedure_completed=interrupted is None,
+        interruption_kind=type(interrupted).__name__ if interrupted else None,
+        study_success=interrupted is None
+        and not unresolved
+        and summary["successful"] == summary["tasks"],
     )
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary))
-    return not unresolved and summary["successful"] == summary["tasks"]
+    if interrupted is not None:
+        try:
+            raise interrupted
+        finally:
+            interrupted = None  # Do not retain this exception in its own traceback frame.
+    return summary["study_success"]
 
 
 def main():

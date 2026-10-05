@@ -357,3 +357,35 @@ GPU execution, push, PR or release was performed. TG-008 is blocked on external
 capacity; another paid attempt requires a new applicable authorization. The
 existing frozen local package remains available for review; do not imply that
 this one-attempt authorization covers future retries.
+
+
+## Post-capacity local review and resource audit (2026-10-05)
+
+Read-only resource inventory found no ToolGap VM, leftover boot disk, reserved
+external IP, snapshot, image, reservation, instance group or NAT/router. Cloud Run
+jobs/services are empty in the configured region; no ToolGap scheduler or local
+cleanup timer remains. Unrelated existing project workloads were left untouched.
+Retain the one validated registry image (~14.03 GiB compressed), 88 historical
+result objects (~6.98 MiB; no hidden versions found), and the existing narrow
+service account. No deletion, quota/IAM change or GPU execution was performed.
+
+Code review reproduced two measurement defects: cancelled block callers could
+disappear from the aggregate, and throughput omitted final cleanup/recording.
+The harness now preserves all declared outcomes and partial token evidence,
+censors cancelled latencies, finalizes interrupted evidence with failed study
+status, and measures throughput through caller finalization. The 5% descriptive
+gate includes client queue and cleanup and fails closed for incomplete blocks.
+Runtime and production SDK remain unchanged.
+
+The next fixed pilot begins with an observed ordinary baseline. Without useful
+quality/cleanup and a sampled L3 candidate, stop before more comparison blocks.
+Otherwise finish on/off/off/on calibration, then conditional B/C/B under the
+existing absolute budget. A sparse negative observation stays local to this
+block; no global absence or speedup claim follows.
+
+[Review checkpoint](../research/agent_resume/local-review-2026-10-05.json) contains
+checksums and final offline results. Old v1 provisioning readiness is superseded
+and its launcher flag disabled; its raw evidence/payload is preserved. Freeze a
+new bundle/packet and rebind cleanup/provisioning checks before any separately
+authorized paid retry. TG-007 live initialization/calibration remains NOT_RUN;
+TG-008 remains blocked on external capacity. No new release, push or PR.

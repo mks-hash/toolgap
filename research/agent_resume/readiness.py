@@ -331,14 +331,17 @@ def require_live(directory, profile):
 
 def measurement_contract():
     return dict(
-        schema_version=1,
+        schema_version=2,
         sampling=DEFAULT_SAMPLING,
         experimental_unit="WHOLE_SHARED_WORKER_BLOCK",
         trigger="ONCE_AT_TOOL_DISPATCH",
         primary_endpoint="SUCCESSFUL_TASKS_PER_BLOCK_SECOND",
+        block_elapsed_scope="ARRIVAL_EPOCH_THROUGH_ALL_CALLER_FINALIZATION_AND_RECORDING",
+        median_degradation_endpoint="ALL_CALLER_ARRIVAL_TO_FINALIZED_MS",
+        interrupted_callers="ALL_DECLARED_ROWS_RETAINED; CANCELLED_LATENCIES_CENSORED",
         quality_rule="ALL_DECLARED_CALLERS_PASS",
         max_competing_caller_median_degradation_fraction=0.05,
-        latency_secondary="ALL_CALLER_ARRIVAL_TO_COMPLETED; CONTINUATION_TTFT; TOOL_DISPATCH_TO_FIRST_TOKEN",
+        latency_secondary="ALL_CALLER_ARRIVAL_TO_COMPLETED; ALL_CALLER_ARRIVAL_TO_FINALIZED; CONTINUATION_TTFT; TOOL_DISPATCH_TO_FIRST_TOKEN",
         dispatch_state="UNKNOWN_WITH_BACKGROUND_SAMPLES",
         wasted_prefetch_bytes=None,
         opportunity_threshold_tokens="OBSERVED_CACHE_AND_CONTROLLER_MAXIMUM",
@@ -375,6 +378,8 @@ def require_baseline(directory, packet_hash, observation):
         or manifest.get("measurement_contract") != measurement_contract()
         or manifest.get("initial_state", {}).get("policy")
         != measurement_contract()["initial_state"]
+        or summary.get("procedure_completed") is not True
+        or summary.get("study_success") is not True
         or summary.get("cleanup_unresolved") is not False
         or not summary.get("tasks")
         or summary.get("successful") != summary["tasks"]

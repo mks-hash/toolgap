@@ -274,7 +274,15 @@ class TestReadiness(unittest.TestCase):
                 )
             )
             (root / "summary.json").write_text(
-                json.dumps(dict(tasks=12, successful=12, cleanup_unresolved=False))
+                json.dumps(
+                    dict(
+                        tasks=12,
+                        successful=12,
+                        cleanup_unresolved=False,
+                        procedure_completed=True,
+                        study_success=True,
+                    )
+                )
             )
             (root / "tasks.jsonl").write_text("fixture")
             (root / "server-trace.jsonl").write_text("fixture")
@@ -312,6 +320,24 @@ class TestReadiness(unittest.TestCase):
             self.assertFalse(result["performance_validated"])
             with self.assertRaises(ValueError):
                 readiness.require_baseline(root, "wrong-packet", "memory-and-stat")
+            # All successful rows do not authorize a comparison from an interrupted block.
+            (root / "summary.json").write_text(
+                json.dumps(
+                    dict(
+                        tasks=12,
+                        successful=12,
+                        cleanup_unresolved=False,
+                        procedure_completed=False,
+                        study_success=False,
+                    )
+                )
+            )
+            report["source_artifacts_sha256"]["summary.json"] = readiness.file_hash(
+                root / "summary.json"
+            )
+            (root / "trace-report.json").write_text(json.dumps(report))
+            with self.assertRaisesRegex(ValueError, "No matched"):
+                readiness.require_baseline(root, "same", "memory-and-stat")
             (root / "summary.json").write_text("{}")
             with self.assertRaisesRegex(ValueError, "artifact changed"):
                 readiness.require_baseline(root, "same", "memory-and-stat")

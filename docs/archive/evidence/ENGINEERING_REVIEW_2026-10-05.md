@@ -228,3 +228,29 @@ prove and what still requires model execution.
 `RUNTIME_REDESIGN_DEMONSTRATED_NECESSARY: NO`
 
 `NATURAL_OPPORTUNITIES_AND_ALL_CALLER_BENEFIT: NOT_EVALUATED`
+
+
+## Follow-up after capacity stop: accounting and residual resources
+
+A bounded local review reproduced dropped cancelled callers and an understated
+block duration before final cleanup. The research harness now retains every
+declared outcome, censors cancelled latency, rejects interrupted baselines and
+includes client queue/owned finalization in the descriptive competing-caller gate.
+The [checkpoint](../../../research/agent_resume/local-review-2026-10-05.json) binds
+the exact changed sources, private evidence and the regenerated v2 packet.
+
+Inside the existing image, without network/GPU: **125 tests + 77 subtests**,
+zero failures/errors/skips, including 12 actual CPU FULL/file fixtures. Native
+reference conformance and 12 scripted callers with 108 real CPU regression
+executions passed. Mocked orchestration checks cover useful-gate failure, safe
+reset failure and stopping after the first observed baseline has no candidate.
+Process-sandbox test stalls are retained as diagnostics; normal local/container
+runs passed. These are not live generation or performance results.
+
+Read-only inventory found no forgotten ToolGap compute/disk/address resources.
+The single needed validated image, small historical result bucket and narrow
+service account are retained; unrelated workloads were untouched. No cloud
+mutation occurred. The old provisioning readiness is superseded and disabled;
+a revised frozen package still needs binding before another paid attempt. No
+runtime redesign or production SDK change was needed. Historical reported
+benchmarks and Mistral 0/3 remain unchanged.

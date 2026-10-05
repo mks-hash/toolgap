@@ -10,7 +10,13 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from research.agent_resume.load import AUDITS, fixed_trace, run_arrivals, summarize
+from research.agent_resume.load import (
+    AUDITS,
+    fixed_trace,
+    run_arrivals,
+    summarize,
+    compare_complete_blocks,
+)
 from research.agent_resume.sampling import FileObserver
 from research.agent_resume.trace_report import analyze, saved_span
 from research.agent_resume.adapters import FamilyAdapter, ToolCall
@@ -78,6 +84,139 @@ class TestPressure(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(asyncio.CancelledError):
             await task
         self.assertFalse(active)
+
+    async def test_cancel_retains_running_queued_and_future_callers_once(self):
+        started = asyncio.Event()
+        saved = []
+        trace = fixed_trace(4)
+        trace[0]["offset_ms"] = trace[1]["offset_ms"] = 0
+        trace[2]["offset_ms"] = trace[3]["offset_ms"] = 60000
+        partial = dict(
+            status="FAILED",
+            task_success=False,
+            tools=[],
+            generations=[dict(input_ids=[7], output_ids=[9])],
+            prefetch=[],
+            completed_ns=0,
+        )
+
+        async def work(item):
+            started.set()
+            try:
+                await asyncio.Event().wait()
+            except asyncio.CancelledError as exc:
+                exc.task_evidence = partial
+                raise
+
+        task = asyncio.create_task(
+            run_arrivals(trace, work, max_active=1, on_result=saved.append)
+        )
+        await started.wait()
+        await asyncio.sleep(0)  # Allow the other fixed callers to wait at their gates.
+        task.cancel()
+        with self.assertRaises(asyncio.CancelledError) as raised:
+            await task
+        self.assertEqual(len(saved), 4)
+        self.assertEqual(len({r["trajectory_id"] for r in saved}), 4)
+        self.assertEqual(
+            {r["arrival_phase"] for r in saved},
+            {"RUNNING", "WAITING_CLIENT_GATE", "NOT_YET_ARRIVED"},
+        )
+        self.assertTrue(
+            all(r["status"] == "CANCELLED" and not r["task_success"] for r in saved)
+        )
+        self.assertTrue(
+            all(
+                r["arrival_to_completed_ms"] is None
+                and r["arrival_to_finalized_ms"] is None
+                for r in saved
+            )
+        )
+        self.assertEqual(
+            next(r for r in saved if r["trajectory_id"] == trace[0]["trajectory_id"])[
+                "generations"
+            ],
+            partial["generations"],
+        )
+        summary = summarize(raised.exception.block_evidence)
+        self.assertEqual(summary["tasks"], 4)
+        self.assertEqual(summary["cancelled"], 4)
+        self.assertEqual(summary["successful"], 0)
+
+    async def test_block_throughput_includes_last_cleanup_and_client_queue(self):
+        started = 1000000000
+        block = dict(
+            block_started_ns=started,
+            block_finalized_ns=started + 500000000,
+            max_active_observed=1,
+            rows=[
+                dict(
+                    status="COMPLETED",
+                    task_success=True,
+                    completed_ns=started + 100000000,
+                    full_task_ms=50,
+                    arrival_to_completed_ms=100,
+                    arrival_to_finalized_ms=500,
+                )
+            ],
+        )
+        summary = summarize(block)
+        self.assertEqual(summary["block_elapsed_seconds"], 0.5)
+        self.assertEqual(summary["successful_tasks_per_second"], 2.0)
+        self.assertEqual(summary["all_caller_arrival_to_finalized_ms"], [500])
+
+        # A real cleanup delay affects both last-slot throughput and next caller queue.
+        async def work(item):
+            completed = time.monotonic_ns()
+            await asyncio.sleep(0.02)  # Cleanup fixture, not workload tool delay.
+            return dict(
+                status="COMPLETED",
+                task_success=True,
+                completed_ns=completed,
+                finalized_ns=time.monotonic_ns(),
+                full_task_ms=0,
+            )
+
+        trace = fixed_trace(2)
+        for item in trace:
+            item["offset_ms"] = 0
+        actual = await run_arrivals(trace, work, max_active=1)
+        self.assertGreater(actual["rows"][1]["client_queue_ms"], 10)
+        self.assertGreater(
+            actual["rows"][1]["arrival_to_finalized_ms"],
+            actual["rows"][1]["arrival_to_completed_ms"] + 10,
+        )
+        self.assertGreater(summarize(actual)["block_elapsed_seconds"], 0.03)
+
+    async def test_comparison_includes_queue_and_rejects_incomplete_callers(self):
+        def row(latency=100, throughput=10):
+            return dict(
+                procedure_completed=True,
+                study_success=True,
+                cleanup_unresolved=False,
+                successful=2,
+                tasks=2,
+                latency_censored_callers=0,
+                all_caller_arrival_to_finalized_ms=[latency] * 2,
+                all_caller_full_task_ms=[10] * 2,
+                successful_tasks_per_second=throughput,
+            )
+
+        self.assertTrue(compare_complete_blocks(row(), row(104, 9.8))["acceptable"])
+        self.assertFalse(compare_complete_blocks(row(), row(106))["acceptable"])
+        self.assertFalse(compare_complete_blocks(row(), row(100, 9.4))["acceptable"])
+        for changes in (
+            dict(procedure_completed=False),
+            dict(study_success=False),
+            dict(cleanup_unresolved=True),
+            dict(latency_censored_callers=1),
+            dict(successful=1),
+            dict(all_caller_arrival_to_finalized_ms=[100, None]),
+            dict(all_caller_arrival_to_finalized_ms=[100, float("nan")]),
+            dict(successful_tasks_per_second=0),
+        ):
+            with self.subTest(changes=changes), self.assertRaises(ValueError):
+                compare_complete_blocks(row(), dict(row(), **changes))
 
     async def test_failed_quality_is_not_success_or_dropped(self):
         async def work(item):
@@ -312,7 +451,12 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                 json.dumps(dict(packet=packet, sha256=digest(packet)))
             )
             (root / "deployment.json").write_text(json.dumps(deployment))
-            for mode in ("request_time", "proactive"):
+            for case, mode in (
+                ("request_time", "request_time"),
+                ("proactive", "proactive"),
+                ("cancelled", "request_time"),
+            ):
+                generation_started = asyncio.Event()
                 turns = {}
 
                 def handler(request):
@@ -365,15 +509,29 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                         ),
                     )
 
+                class BlockedStream(httpx.AsyncByteStream):
+                    async def __aiter__(self):
+                        yield b'data: {"output_ids":[7],"meta_info":{}}\n\n'
+                        generation_started.set()
+                        await asyncio.Event().wait()
+
+                    async def aclose(self):
+                        pass
+
+                async def asynchronous_handler(request):
+                    if case == "cancelled" and request.url.path == "/generate":
+                        return httpx.Response(200, stream=BlockedStream())
+                    return handler(request)
+
                 def factory(*args, **kwargs):
-                    kwargs["transport"] = httpx.MockTransport(handler)
+                    kwargs["transport"] = httpx.MockTransport(asynchronous_handler)
                     return original_http(*args, **kwargs)
 
                 args = types.SimpleNamespace(
                     packet=root / "packet.json",
                     deployment=root / "deployment.json",
                     tokenizer=root,
-                    output=root / mode,
+                    output=root / case,
                     server="http://fixture",
                     mode=mode,
                     observation="off",
@@ -423,12 +581,39 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                         return_value={},
                     ),
                 ):
-                    self.assertTrue(await execute(args))
+                    if case == "cancelled":
+                        execution = asyncio.create_task(execute(args))
+                        try:
+                            await asyncio.wait_for(generation_started.wait(), 3)
+                        except TimeoutError:
+                            if execution.done():
+                                await (
+                                    execution
+                                )  # Surface setup errors, not an endless fixture wait.
+                            execution.cancel()
+                            await asyncio.gather(execution, return_exceptions=True)
+                            raise
+                        execution.cancel()
+                        with self.assertRaises(asyncio.CancelledError):
+                            await execution
+                    else:
+                        self.assertTrue(await execute(args))
                 rows = [
                     json.loads(line)
                     for line in (args.output / "tasks.jsonl").read_text().splitlines()
                 ]
                 self.assertEqual(len(rows), 2)
+                if case == "cancelled":
+                    self.assertTrue(all(row["status"] == "CANCELLED" for row in rows))
+                    summary = json.loads((args.output / "summary.json").read_text())
+                    manifest = json.loads((args.output / "manifest.json").read_text())
+                    self.assertFalse(summary["procedure_completed"])
+                    self.assertFalse(summary["study_success"])
+                    self.assertEqual(summary["cancelled"], 2)
+                    self.assertIn("finalized_ns", manifest)
+                    self.assertFalse(manifest["procedure_completed"])
+                    self.assertTrue(any(row["generations"] for row in rows))
+                    continue
                 self.assertTrue(all(row["task_success"] for row in rows))
                 self.assertTrue(
                     all(

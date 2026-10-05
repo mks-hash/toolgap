@@ -211,7 +211,12 @@ retains it as failed/cancelled and terminates the study. If the proposed sequenc
 cannot fit, report incomplete calibration/performance rather than exceed the
 ceiling or add a paid retry.
 
-Calibration uses four ordinary request-time blocks in fixed **off/on/on/off**
+The first observed ordinary block is an early feasibility gate. If its useful
+quality, cleanup, trace or natural-candidate gate fails, retain the block and
+stop before the remaining calibration. No candidate at the sampled instants is
+not proof of no possible window; report only this block/workload point.
+
+Calibration uses four ordinary request-time blocks in fixed **on/off/off/on**
 order, with this identical frozen packet. Each worker process starts with its
 own mailbox, owned storage directory, `HICACHE_BENCH_LABEL` matching its output
 basename and dedicated trace. Set `TOOLGAP_PRESSURE_MATCH_OBSERVATION=0` for off,
@@ -222,11 +227,12 @@ whole blocks, then repeat the identical fixed warmup/reset protocol. Keep the
 same persistent compiler-cache policy, no global OS cache drop, and retain
 residual warmup/order effects as limitations.
 
-Report all-caller quality, successful tasks/block-second, full task latency,
+Report all-caller quality, successful tasks/block-second, arrival-to-finalization
+latency (including client queue and owned cleanup), useful full task latency,
 continuation TTFT and tool-dispatch-to-first-token for every block, including
 failures. Also retain scheduler service time, sample completeness and natural
 L3 candidates in the on blocks. As a conservative feasibility stop, any quality
-loss or more than 5% median full-task-latency degradation / throughput loss in
+loss or more than 5% median arrival-to-finalization-latency degradation / throughput loss in
 either matched on-versus-off pair prevents a speedup interpretation. Two pairs
 are descriptive calibration, not a statistical non-inferiority claim.
 
@@ -311,3 +317,25 @@ deployment. A small calibration is descriptive feasibility evidence. Operation-s
 remain null when unproved. Primary endpoint: successful tasks per block second,
 subject to all-caller quality/cleanup and an explicit competing-caller degradation
 limit. Caller-level samples are not independent worker repetitions.
+
+## Accounting review after the capacity stop (2026-10-05)
+
+Measurement contract **v2** retains every declared caller on interruption, even
+those still queued or not yet arrived. Cancelled latencies are censored (`null`),
+not successful short executions. Partial generated token IDs remain evidence.
+An interrupted block records `procedure_completed=false` and
+`study_success=false`, finalizes its manifest and cannot serve as a baseline.
+
+Throughput uses the arrival epoch through the last caller's finalization and
+row recording, including owned cleanup. The descriptive 5% gate uses
+`all_caller_arrival_to_finalized_ms`; completed useful latency remains separately
+reported. Comparison rejects incomplete/censored/incorrect blocks or unresolved
+cleanup rather than filtering those callers. Server setup, warmup and teardown
+remain outside this endpoint and are separately bounded.
+
+The old provisioning packet/bundle implements v1 and is superseded. Its launch
+readiness flag is disabled; historical evidence is retained unchanged. A local
+reviewed runner uses the early on-baseline gate and the v2 comparator, without
+launching any server. Before another authorized paid attempt, freeze the revised
+clean source, regenerate the packet, run its offline checks and rebind the
+launch/package hashes. No GPU/live reset/calibration/pressure result is implied.

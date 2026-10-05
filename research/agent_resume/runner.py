@@ -345,8 +345,10 @@ async def run_task(
             )
             if window is not None:
                 window.continuation_boundary()
-    except asyncio.CancelledError:
+    except asyncio.CancelledError as exc:
         row["status"] = "CANCELLED"
+        row["task_success"] = False
+        exc.task_evidence = row  # Filled by finally before the block retains it.
         raise
     except Exception as exc:
         row["error"] = f"{type(exc).__name__}: {exc}"

@@ -133,3 +133,18 @@ initialization, matched kernel/model warmup and live net-instrumentation
 calibration. The
 [guide](../guides/AGENT_STUDY.md) supersedes archived CLI commands. This checkpoint
 does not change the 0/3 pilot result or authorize another GPU execution.
+
+### Interruption and finalization accounting (2026-10-05 follow-up)
+
+Contract v2 counts throughput from the arrival epoch through all caller
+finalization and outcome recording. Useful completion time, client queue and
+owned cleanup remain distinguishable. The competing-caller degradation check
+uses arrival-to-finalization latency. All declared cancelled callers survive in
+raw outcomes, with partial tokens when available and censored latency; a timeout
+cannot appear as a faster successful task or a completed baseline. Comparisons
+require complete quality/cleanup-safe blocks and finite positive endpoints.
+Existing datasets retain their original method and pins. The next pilot first
+checks one observed baseline, stopping cheaply if no usable sampled window is
+found; only eligible work proceeds to on/off/off/on calibration and conditional
+B/C/B. This is a fixed feasibility stop, not adaptive selection of successful
+treatment runs or proof that unsampled windows never occur.
