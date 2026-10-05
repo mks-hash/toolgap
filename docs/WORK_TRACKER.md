@@ -33,7 +33,7 @@ are [archived snapshots](archive/README.md); they do not introduce parallel task
 | TG-005 | P1 / DONE (local evidence enforcement) | Versioned capability/evidence report with independent statuses: transport, template contract, model fit, actual generation, useful tool loop, pressure opportunity, correctness and performance. Bind the profile to weights/revision, tokenizer/template, parser, dtype/quantization and resolved cache layout; distinguish declared identity from verified artifacts. Isolate file storage across incompatible profiles. Update software's preflight consumers, not just prose. CPU success cannot imply useful live model support. | TG-003, ADR-0002 |
 | TG-006 | P2 / DONE (local evidence scope) | Validate stream/finish reason and record explicit truncated/malformed/unsupported outcomes; keep generated IDs and client-observed first-token semantics. Identify run/code/package/config/schema hashes and preserve all failed outcomes. Procedure completion and study success must be separate. | TG-002, TG-005 |
 | TG-007 | P2 / IN PROGRESS | Close measurement design gaps: quantify observation delay/cost; specify bounded passive sampling at dispatch, during tool execution and before continuation, without delaying the tool or request. Separate L3 file availability, successful reads, publication and consumption. Report page-aligned spans and interval-censored transition times; unknown waste stays unknown. Freeze tool schema/executor, workload, grader, sampling budget and primary endpoints. | TG-004, TG-006 |
-| TG-008 | P1 / TODO; separate execution approval | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. | TG-002 through TG-007 |
+| TG-008 | P1 / BLOCKED by zone capacity; one approved attempt used | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. | TG-002 through TG-007 |
 | TG-009 | P1 / TODO; separate execution approval | Baseline useful competing-agent block with no forced target eviction. Count opportunities at dispatch versus those arising during the tool gap, the remaining window, unknown/resident/missing spans and all-caller quality/latency. An L3 hit at continuation alone does not prove a usable pre-arrival opportunity. No opportunity is a feasibility result for this workload/resource point; do not manufacture one. | TG-008 |
 | TG-010 | P1 / CONDITIONAL | Matched whole-worker baseline/prefetch comparisons if baseline supplies opportunities reachable by the specified trigger and quality/cleanup pass. Same model/config/arrivals/instrumentation; counterbalance treatment order and retain all callers/failures. Predeclare primary endpoint and acceptable competing-caller degradation. Report aggregate effects separately from conditional L3 effects, overhead/waste and uncertainty. No win is a valid outcome. Release/report decision follows evidence. | TG-009 |
 | TG-011 | P2 / CONDITIONAL | Reuse the same evidence contract for a larger FULL/GQA profile and an independent family, changing one axis at a time after one trustworthy study. Publish compatibility and negative outcomes as well as measured benefit. No model sweep or unsupported architecture is implied. | TG-008 through TG-010, or a documented TG-009 feasibility stop |
@@ -333,3 +333,27 @@ failure or absent natural opportunity prevents C; degraded all-caller outcomes
 are retained as a negative feasibility result. No second attempt or silent
 model/resource/runtime change is authorized. This remains a single-worker
 feasibility pilot rather than independent caller repetitions or a release claim.
+
+
+## Qwen7 approved attempt — capacity stop (2026-10-05)
+
+Maxim Yakimov approved one Qwen7 pressure pilot, up to 60 minutes / USD 1.50.
+The single VM creation request failed with
+`ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS`: the selected zone lacked the
+requested machine/L4 capacity. **No VM was created; no GPU workload ran.**
+This is a provisioning-capacity result, not a Qwen7 integration failure or a
+prefetch performance result. GPU fit, useful live tools, HTTP reset, observation
+calibration, pressure and treatment comparison remain NOT_RUN.
+
+[Sanitized attempt record](../research/agent_resume/qwen7-pilot-attempt-2026-10-05.json)
+binds the privately retained exact error and verification outputs by SHA256.
+Post-failure checks found zero named instances and zero named boot disks; the
+workstation backup timer is inactive. Estimated VM/GPU compute cost is USD 0
+(no VM was created; an invoice was not inspected). Runtime/image, historical
+report/datasets and Mistral 0/3 remain unchanged.
+
+Stopped as agreed. No second creation, zone/model/hardware change, quota request,
+GPU execution, push, PR or release was performed. TG-008 is blocked on external
+capacity; another paid attempt requires a new applicable authorization. The
+existing frozen local package remains available for review; do not imply that
+this one-attempt authorization covers future retries.

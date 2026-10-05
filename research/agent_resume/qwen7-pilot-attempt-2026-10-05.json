@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "validation_type": "APPROVED_SINGLE_PROVISIONING_ATTEMPT",
+  "approved_session_minutes": 60,
+  "approved_budget_usd": 1.5,
+  "creation_attempts": 1,
+  "request_started_utc": "2026-10-05T14:49:33+00:00",
+  "failure_observed_utc": "2026-10-05T14:49:55+00:00",
+  "vm_created": false,
+  "gpu_execution": false,
+  "stop_reason": "ZONE_RESOURCE_POOL_EXHAUSTED_WITH_DETAILS",
+  "resource": "g2-standard-8 / one NVIDIA L4",
+  "failure_class": "ZONE_PHYSICAL_CAPACITY; NOT_QUOTA_OR_MODEL_VALIDATION",
+  "new_zone_or_hardware_attempted": false,
+  "checks": {
+    "gpu_fit": "NOT_RUN",
+    "useful_live_tool_loop": "NOT_RUN",
+    "actual_http_reset": "NOT_RUN",
+    "live_observer_calibration": "NOT_RUN",
+    "natural_pressure": "NOT_RUN",
+    "proactive_comparison": "NOT_RUN"
+  },
+  "cleanup": {
+    "remaining_named_instances": 0,
+    "remaining_named_disks": 0,
+    "backup_timer": "INACTIVE_DEAD"
+  },
+  "estimated_vm_gpu_compute_cost_usd": 0.0,
+  "cost_note": "No VM was created; estimate, not a billing invoice.",
+  "runtime_changed": false,
+  "image_rebuilt": false,
+  "historical_outcomes_unchanged": true,
+  "private_evidence_access": "PRIVATE_WORKSTATION; raw cloud error excluded from Git",
+  "private_payload_sha256": "dd6a6dd8f98f61c1a16db7292d2351447d188b4a40be63050ce717fa56072f1e",
+  "raw_evidence_sha256": {
+    "create-stderr.log": "c1e5a5b85fbdfbb2ddd2a5afb64dfff6c0a53b05e6ad0885e22d35d3495bffd0",
+    "instances-after-capacity-failure.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "disks-after-capacity-failure.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  }
+}
