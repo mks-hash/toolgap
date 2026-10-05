@@ -37,18 +37,16 @@ def create_corpus(path, count=10000):
             f.write(json.dumps(dict(id=f"DOC-{i:05d}", text=text)) + "\n")
 
 
-def search(path, query):
+def rank_documents(documents, query):
+    """Shared exhaustive lexical scorer; no delay, answer lookup or persistent index."""
     query_terms = set(re.findall(r"[a-z0-9]+", query.lower()))
     if not query_terms:
         raise ValueError("No searchable query terms")
-    records, frequency, digest = [], collections.Counter(), hashlib.sha256()
-    with Path(path).open("rb") as f:
-        for line in f:
-            digest.update(line)
-            doc = json.loads(line)
-            terms = collections.Counter(re.findall(r"[a-z0-9]+", doc["text"].lower()))
-            frequency.update(terms.keys())
-            records.append((doc, terms))
+    records, frequency = [], collections.Counter()
+    for doc in documents:
+        terms = collections.Counter(re.findall(r"[a-z0-9]+", doc["text"].lower()))
+        frequency.update(terms.keys())
+        records.append((doc, terms))
     ranked = []
     for doc, terms in records:
         score = sum(
@@ -56,16 +54,28 @@ def search(path, query):
             for t in sorted(query_terms)
             if terms[t]
         )
-        ranked.append((score, doc["id"], doc["text"][:180]))
+        ranked.append((score, doc["id"], doc["text"]))
     ranked.sort(key=lambda r: (-r[0], r[1]))
+    return ranked
+
+
+def search(path, query):
+    if not re.findall(r"[a-z0-9]+", query.lower()):
+        raise ValueError("No searchable query terms")
+    documents, digest = [], hashlib.sha256()
+    with Path(path).open("rb") as f:
+        for line in f:
+            digest.update(line)
+            documents.append(json.loads(line))
+    ranked = rank_documents(documents, query)
     if not ranked or ranked[0][0] <= 0:
         raise ValueError("No matching document")
-    score, doc_id, excerpt = ranked[0]
+    score, doc_id, text = ranked[0]
     return dict(
         document_id=doc_id,
         score=round(score, 6),
-        excerpt=excerpt,
-        records_scanned=len(records),
+        excerpt=text[:180],
+        records_scanned=len(documents),
         corpus_sha256=digest.hexdigest(),
     )
 

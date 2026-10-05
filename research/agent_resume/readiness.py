@@ -1,6 +1,7 @@
 """Small evidence gates for this study; evidence is not weight attestation."""
 
 import argparse
+from collections import Counter
 import hashlib
 import json
 import platform
@@ -103,7 +104,7 @@ def provenance(profile):
     )
 
 
-def require_native(path, profile):
+def require_native(path, profile, *, workload=None):
     evidence = json.loads(Path(path).read_text())
     if (
         evidence.get("validation_type") != "OFFLINE_NATIVE_REFERENCE_CONFORMANCE"
@@ -125,6 +126,8 @@ def require_native(path, profile):
         )
     ):
         raise ValueError("Missing/current native reference conformance is required")
+    if workload is not None and evidence.get("workload_kind") != workload:
+        raise ValueError("Native evidence uses a different tool schema/workload")
     for name in NATIVE_SOURCES:
         if evidence.get("source_sha256", {}).get(name) != file_hash(
             Path(__file__).parent / name
@@ -209,7 +212,7 @@ def live_result(rows, expected_ids, unresolved):
     )
     useful = (
         len(rows) == len(expected_ids)
-        and {r["task_id"] for r in rows} == set(expected_ids)
+        and Counter(r.get("task_id") for r in rows) == Counter(expected_ids)
         and all(
             r.get("status") == "COMPLETED"
             and r.get("task_success") is True
@@ -254,6 +257,18 @@ def live_result(rows, expected_ids, unresolved):
         validation_type="LIVE_TOOL_LOOP",
         procedure_completed=True,
         study_success=passed,
+        diagnostic_ready=transport
+        and exact
+        and cleanup
+        and len(rows) == len(expected_ids)
+        and Counter(r.get("task_id") for r in rows) == Counter(expected_ids)
+        and all(
+            r.get("tools")
+            and len(r.get("generations", [])) > 1
+            and r.get("failure_kind")
+            not in ("InvalidOutput", "UnsupportedOutput", "UnsupportedContinuation")
+            for r in rows
+        ),
         tasks=len(rows),
         successful=sum(r.get("task_success") is True for r in rows),
         dimensions=dict(
@@ -317,7 +332,16 @@ def pressure_gate_workload(packet):
 
     if packet.get("measurement_contract") != measurement_contract():
         raise ValueError("Prepare a packet with the current measurement contract")
-    known = {t["id"] for t in AUDITS}
+    from .documents import TASKS as DOCUMENT_TASKS, validate_corpus
+
+    kind = packet.get("workload_kind", "repository-audit")
+    if kind == "document-search":
+        validate_corpus(packet["document_corpus"])
+        known = {t["id"] for t in DOCUMENT_TASKS}
+    elif kind == "repository-audit":
+        known = {t["id"] for t in AUDITS}
+    else:
+        raise ValueError("Unknown workload kind")
     representatives = {}
     for item in packet["arrivals"]:
         task = item["task"]
@@ -327,7 +351,7 @@ def pressure_gate_workload(packet):
             or not task.get("initial_input_ids")
             or not task.get("context_pack")
         ):
-            raise ValueError("Pressure gate requires prepared code-audit tasks")
+            raise ValueError("Pressure gate requires prepared workload tasks")
         representatives.setdefault(task["id"], item)
     if not representatives:
         raise ValueError("Empty pressure workload")
@@ -342,12 +366,20 @@ def pressure_gate_workload(packet):
     )
 
 
-def require_live(directory, profile, packet=None):
+def require_live(directory, profile, packet=None, *, purpose="evidence"):
+    if purpose not in ("evidence", "diagnostic"):
+        raise ValueError("Invalid study purpose")
     directory = Path(directory)
     record = json.loads((directory / "readiness.json").read_text())
     if (
         record.get("validation_type") != "LIVE_TOOL_LOOP"
-        or record.get("study_success") is not True
+        or (
+            purpose == "evidence"
+            and (
+                record.get("study_success") is not True
+                or record.get("purpose") == "diagnostic"
+            )
+        )
         or record.get("provenance") != provenance(profile)
     ):
         raise ValueError(
@@ -398,7 +430,8 @@ def require_live(directory, profile, packet=None):
             ):
                 raise ValueError("Live task inputs/limits differ from pressure packet")
     verified = live_result(rows, expected_ids, record.get("cleanup_unresolved", True))
-    if not verified["study_success"] or verified["dimensions"] != record["dimensions"]:
+    required = "study_success" if purpose == "evidence" else "diagnostic_ready"
+    if not verified[required] or verified["dimensions"] != record["dimensions"]:
         raise ValueError("Live evidence does not demonstrate a useful tool loop")
     return file_hash(directory / "readiness.json")
 
@@ -411,8 +444,17 @@ def measurement_contract():
         MAX_OBSERVER_RELATIVE_CHANGE_FRACTION,
     )
 
+    from .budget import MAX_TOOL_SUFFIX_TOKENS
+    from .documents import SCHEMA as DOCUMENT_SCHEMA
+
     return dict(
-        schema_version=3,
+        document_schema_sha256=digest(DOCUMENT_SCHEMA),
+        document_executor_sha256=file_hash(Path(__file__).with_name("documents.py")),
+        lexical_executor_sha256=file_hash(ROOT / "examples/tool_loop/search_tool.py"),
+        budget_executor_sha256=file_hash(Path(__file__).with_name("budget.py")),
+        schema_version=4,
+        max_tool_suffix_tokens=MAX_TOOL_SUFFIX_TOKENS,
+        diagnostic_policy="REQUEST_TIME_ONLY; TECHNICAL_SAFETY_INDEPENDENT_OF_ANSWER_QUALITY; NOT_COMPARISON_EVIDENCE",
         max_tool_rounds=6,
         generation=generation_contract(),
         repository_tools=tool_contract(),
@@ -458,7 +500,8 @@ def require_baseline(directory, packet_hash, observation):
     if manifest.get("provenance") != provenance(manifest["profile"]):
         raise ValueError("Baseline source/profile/packages are stale")
     if (
-        manifest.get("mode") != "request_time"
+        manifest.get("purpose", "evidence") != "evidence"
+        or manifest.get("mode") != "request_time"
         or manifest.get("packet_sha256") != packet_hash
         or manifest.get("observation") != observation
         or manifest.get("measurement_contract") != measurement_contract()

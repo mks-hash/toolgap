@@ -10,7 +10,9 @@ from .load import run_arrivals
 from .prepare import ROOT, ScriptedModel, call_text, tokenizer_manifest
 from .readiness import digest, measurement_contract, provenance
 from .runner import run_task
-from .workloads import RepositoryTools, snapshot
+from .workloads import snapshot
+from .workload import tools_factory
+from .documents import DocumentTools
 
 
 async def check(args):
@@ -32,13 +34,18 @@ async def check(args):
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
     adapter = FamilyAdapter.from_profile(profile)
-    corpus = snapshot(ROOT, profile["source_commit"])
+    factory = tools_factory(packet, ROOT)
+    corpus = (
+        snapshot(ROOT, profile["source_commit"])
+        if packet.get("workload_kind", "repository-audit") == "repository-audit"
+        else None
+    )
 
     async def run(item):
         task = item["task"]
         citations = []
         calls = []
-        for index, r in enumerate(task["evidence_requirements"]):
+        for index, r in enumerate(task.get("evidence_requirements", [])):
             line = next(
                 i
                 for i, text in enumerate(
@@ -54,16 +61,28 @@ async def check(args):
                     f"call{index:05d}" if adapter.family == "mistral" else None,
                 )
             )
-        calls.append(
-            ToolCall(
-                "run_regression",
-                dict(suite="admission_hints"),
-                "reg000000" if adapter.family == "mistral" else None,
+        tools = factory()
+        if isinstance(tools, DocumentTools):
+            # Oracle-guided fixture, deliberately NOT model navigation evidence.
+            call = ToolCall(
+                "search_documents",
+                dict(query=task["needle"]),
+                "doc000000" if adapter.family == "mistral" else None,
             )
-        )
+            raw = tools.search(**call.arguments)
+            match = next(r for r in raw["matches"] if task["needle"] in r["text"])
+            calls = [call]
+            citations = [dict(document_id=match["document_id"], quote=task["needle"])]
+        else:
+            calls.append(
+                ToolCall(
+                    "run_regression",
+                    dict(suite="admission_hints"),
+                    "reg000000" if adapter.family == "mistral" else None,
+                )
+            )
         texts = [call_text(adapter.family, call) for call in calls]
         texts.append(json.dumps(dict(answer=task["answer"], evidence=citations)))
-        tools = RepositoryTools(corpus, ROOT)
         row = await run_task(
             adapter,
             tokenizer,
@@ -98,6 +117,8 @@ async def check(args):
         packet_sha256=envelope["sha256"],
         passed=passed,
         validation_type="SCRIPTED_CPU_FIXTURE",
+        navigation="ORACLE_GUIDED_NOT_LIVE_EVIDENCE",
+        workload_kind=packet.get("workload_kind", "repository-audit"),
         model_generation=False,
         generation_contract=packet["measurement_contract"]["generation"],
         gpu_execution=False,

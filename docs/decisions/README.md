@@ -5,6 +5,7 @@
 | [ADR-0001](0001-agent-integration-contract.md) | 2026-10-05 | Accepted; local contract implemented | Separate model formatting, agent execution, and exact-prefix cache control |
 | [ADR-0002](0002-evidence-and-experiment-readiness.md) | 2026-10-05 | Accepted; local gates implemented | Separate local conformance, live behavior, and performance evidence |
 | [ADR-0003](0003-repository-tool-evidence-contract.md) | 2026-10-05 | Accepted; local tools implemented | Bounded repository discovery and source-backed tool evidence |
+| [ADR-0005](0005-bounded-tools-and-diagnostic-study.md) | 2026-10-06 | Accepted; local implementation in progress | Bound tool evidence and separate diagnostic observation from useful-performance claims |
 | [ADR-0004](0004-hypothesis-aligned-measurement.md) | 2026-10-05 | Accepted; local measurement contract | Bind useful-live readiness and cache traces to actual pressure continuations |
 
 Existing decisions about local admission and cleanup remain in

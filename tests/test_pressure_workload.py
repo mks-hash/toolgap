@@ -567,6 +567,7 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                 ("request_time", "request_time"),
                 ("proactive", "proactive"),
                 ("cancelled", "request_time"),
+                ("diagnostic-quality", "request_time"),
             ):
                 generation_started = asyncio.Event()
                 turns = {}
@@ -591,7 +592,9 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                             if turn == 0
                             else json.dumps(
                                 dict(
-                                    answer=task["answer"],
+                                    answer="wrong"
+                                    if case == "diagnostic-quality"
+                                    else task["answer"],
                                     evidence=[dict(path=task["path"], line=1)],
                                 )
                             )
@@ -651,7 +654,12 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                     reconcile_ms=50,
                     native_evidence=root / "native.json",
                     live_evidence=root / "live",
-                    baseline=root / "baseline",
+                    baseline=None
+                    if case == "diagnostic-quality"
+                    else root / "baseline",
+                    purpose="diagnostic"
+                    if case == "diagnostic-quality"
+                    else "evidence",
                 )
                 fake_transformers = types.SimpleNamespace(
                     AutoTokenizer=types.SimpleNamespace(
@@ -665,7 +673,7 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                         return_value=dict(tokenizer_files={}),
                     ),
                     patch(
-                        "research.agent_resume.pressure.snapshot", return_value=corpus
+                        "research.agent_resume.workload.snapshot", return_value=corpus
                     ),
                     patch("httpx.AsyncClient", side_effect=factory),
                     # Synthetic HTTP plumbing; readiness is tested separately.
@@ -715,6 +723,12 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                     for line in (args.output / "tasks.jsonl").read_text().splitlines()
                 ]
                 self.assertEqual(len(rows), 2)
+                if case == "diagnostic-quality":
+                    summary = json.loads((args.output / "summary.json").read_text())
+                    self.assertTrue(summary["diagnostic_completed"])
+                    self.assertFalse(summary["study_success"])
+                    self.assertEqual(summary["successful"], 0)
+                    self.assertTrue(summary["declared_callers_retained"])
                 if case == "cancelled":
                     self.assertTrue(all(row["status"] == "CANCELLED" for row in rows))
                     summary = json.loads((args.output / "summary.json").read_text())
@@ -726,7 +740,10 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                     self.assertFalse(manifest["procedure_completed"])
                     self.assertTrue(any(row["generations"] for row in rows))
                     continue
-                self.assertTrue(all(row["task_success"] for row in rows))
+                self.assertEqual(
+                    all(row["task_success"] for row in rows),
+                    case != "diagnostic-quality",
+                )
                 self.assertTrue(
                     all(
                         g["rid"].startswith("tgp-")

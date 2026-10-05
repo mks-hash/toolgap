@@ -17,7 +17,9 @@ from .load import AUDITS, context_task, fixed_trace, run_arrivals, summarize
 from .prepare import ROOT, tokenizer_manifest
 from .runner import GenerationTransport, run_task
 from .sampling import FileObserver, clock_domain
-from .workloads import RepositoryTools, snapshot
+from .workloads import snapshot
+from .workload import tools_factory
+from . import documents
 from .readiness import (
     digest,
     measurement_contract,
@@ -48,11 +50,25 @@ def prepare(args):
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
     adapter = FamilyAdapter.from_profile(profile)
-    corpus = snapshot(ROOT, profile["source_commit"])
+    kind = getattr(args, "workload", "repository-audit")
+    if kind == "document-search" and getattr(args, "corpus", None) is None:
+        raise ValueError("Document search requires a pinned --corpus")
+    corpus = (
+        documents.validate_corpus(json.loads(args.corpus.read_text()))
+        if kind == "document-search"
+        else snapshot(ROOT, profile["source_commit"])
+    )
     trace = fixed_trace(args.count)
     audits = {task["id"]: task for task in AUDITS}
+    if kind == "document-search":
+        audits = {task["id"]: task for task in documents.TASKS}
+        for index, item in enumerate(trace):
+            item["audit_id"] = documents.TASKS[index % len(documents.TASKS)]["id"]
     for item in trace:
-        item["task"] = context_task(
+        build_context = (
+            documents.context_task if kind == "document-search" else context_task
+        )
+        item["task"] = build_context(
             adapter,
             tokenizer,
             audits[item["audit_id"]],
@@ -61,10 +77,14 @@ def prepare(args):
             variant=item["context_variant"],
         )
     packet = dict(
+        workload_kind=kind,
+        document_corpus=corpus if kind == "document-search" else None,
         profile=profile,
         arrivals=trace,
         max_active=8,
-        useful_tool="pinned repository audit and admission_hints CPU regression",
+        useful_tool="pinned public-document lexical retrieval"
+        if kind == "document-search"
+        else "pinned repository audit and admission_hints CPU regression",
         artificial_tool_delay=False,
         gpu_validated=False,
         measurement_contract=measurement_contract(),
@@ -87,6 +107,14 @@ def prepare(args):
 async def execute(args):
     from transformers import AutoTokenizer
 
+    purpose = getattr(args, "purpose", "evidence")
+    if purpose not in ("diagnostic", "evidence") or (
+        purpose == "diagnostic"
+        and (args.mode != "request_time" or args.baseline is not None)
+    ):
+        raise ValueError(
+            "Diagnostic observation is request-time only, never proactive comparison"
+        )
     envelope = json.loads(args.packet.read_text())
     packet = envelope["packet"]
     if digest(packet) != envelope["sha256"]:
@@ -96,8 +124,12 @@ async def execute(args):
         raise ValueError("Prepare a new workload with the current measurement contract")
     if args.reconcile_ms != packet["measurement_contract"]["reconcile_interval_ms"]:
         raise ValueError("Reconciliation differs from the frozen study contract")
-    native_hash = require_native(args.native_evidence, profile)
-    live_hash = require_live(args.live_evidence, profile, packet)
+    native_hash = (
+        require_native(args.native_evidence, profile, workload="document-search")
+        if packet.get("workload_kind") == "document-search"
+        else require_native(args.native_evidence, profile)
+    )
+    live_hash = require_live(args.live_evidence, profile, packet, purpose=purpose)
     baseline_binding = None
     if args.mode == "proactive":
         baseline_binding = require_baseline(
@@ -114,7 +146,7 @@ async def execute(args):
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
     adapter = FamilyAdapter.from_profile(profile)
-    corpus = snapshot(ROOT, profile["source_commit"])
+    factory = tools_factory(packet, ROOT)
     observer = (
         None
         if args.observation == "off"
@@ -164,6 +196,7 @@ async def execute(args):
             json.dumps(
                 dict(
                     validation_type="LIVE_PRESSURE_BLOCK",
+                    purpose=purpose,
                     packet_sha256=envelope["sha256"],
                     profile=profile,
                     deployment=deployment,
@@ -200,7 +233,7 @@ async def execute(args):
             ) as policy:
 
                 async def task(item):
-                    tools = RepositoryTools(corpus, ROOT)
+                    tools = factory()
                     model = GenerationTransport(http)
                     model.request_id_prefix = "tgp-"
 
@@ -271,6 +304,26 @@ async def execute(args):
         and not unresolved
         and summary["successful"] == summary["tasks"],
     )
+    from .readiness import live_result
+
+    declared = {i["trajectory_id"]: i for i in packet["arrivals"]}
+    coverage = (
+        len(block["rows"]) == len(declared)
+        and {r.get("trajectory_id") for r in block["rows"]} == set(declared)
+        and all(
+            r.get("task_id") == declared[r["trajectory_id"]]["task"]["id"]
+            for r in block["rows"]
+        )
+    )
+    technical = live_result(
+        block["rows"], [i["task"]["id"] for i in packet["arrivals"]], unresolved
+    )
+    summary["declared_callers_retained"] = coverage
+    summary["study_success"] &= coverage
+    summary["purpose"] = purpose
+    summary["diagnostic_completed"] = (
+        interrupted is None and coverage and technical["diagnostic_ready"]
+    )
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary))
     if interrupted is not None:
@@ -280,7 +333,11 @@ async def execute(args):
             interrupted = (
                 None  # Do not retain this exception in its own traceback frame.
             )
-    return summary["study_success"]
+    return (
+        summary["diagnostic_completed"]
+        if purpose == "diagnostic"
+        else summary["study_success"]
+    )
 
 
 def main():
@@ -289,6 +346,12 @@ def main():
     prep = sub.add_parser("prepare")
     prep.add_argument("--profile", required=True, type=Path)
     prep.add_argument("--tokenizer", required=True, type=Path)
+    prep.add_argument(
+        "--workload",
+        choices=("repository-audit", "document-search"),
+        default="repository-audit",
+    )
+    prep.add_argument("--corpus", type=Path)
     prep.add_argument("--count", type=int, default=12)
     prep.add_argument("--target-tokens", type=int, default=4000)
     prep.add_argument("--output", required=True, type=Path)
@@ -300,6 +363,9 @@ def main():
     run.add_argument("--live-evidence", required=True, type=Path)
     run.add_argument("--baseline", type=Path)
     run.add_argument("--server", required=True)
+    run.add_argument(
+        "--purpose", choices=("evidence", "diagnostic"), default="evidence"
+    )
     run.add_argument("--mode", choices=("request_time", "proactive"), required=True)
     run.add_argument(
         "--observation", choices=("memory", "memory-and-stat", "off"), default="memory"

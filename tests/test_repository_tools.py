@@ -172,7 +172,7 @@ class TestRepositoryRetrieval(unittest.IsolatedAsyncioTestCase):
 
     def test_frozen_study_binds_tool_schema_executor_and_prompt(self):
         contract = measurement_contract()["repository_tools"]
-        self.assertEqual(contract["version"], 2)
+        self.assertEqual(contract["version"], 3)
         for key in ("schema_sha256", "executor_sha256", "runner_sha256"):
             self.assertEqual(len(contract[key]), 64)
         self.assertNotEqual(

@@ -423,6 +423,21 @@ class TestReadiness(unittest.TestCase):
             self.assertFalse(result["performance_validated"])
             with self.assertRaises(ValueError):
                 readiness.require_baseline(root, "wrong-packet", "memory-and-stat")
+            manifest = json.loads((root / "manifest.json").read_text())
+            manifest["purpose"] = "diagnostic"
+            (root / "manifest.json").write_text(json.dumps(manifest))
+            report["source_artifacts_sha256"]["manifest.json"] = readiness.file_hash(
+                root / "manifest.json"
+            )
+            (root / "trace-report.json").write_text(json.dumps(report))
+            with self.assertRaisesRegex(ValueError, "No matched"):
+                readiness.require_baseline(root, "same", "memory-and-stat")
+            manifest["purpose"] = "evidence"
+            (root / "manifest.json").write_text(json.dumps(manifest))
+            report["source_artifacts_sha256"]["manifest.json"] = readiness.file_hash(
+                root / "manifest.json"
+            )
+            (root / "trace-report.json").write_text(json.dumps(report))
             # All successful rows do not authorize a comparison from an interrupted block.
             (root / "summary.json").write_text(
                 json.dumps(

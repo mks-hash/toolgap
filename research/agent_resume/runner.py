@@ -6,6 +6,7 @@ import json
 import time
 import uuid
 
+from .budget import ToolResultBudget, InsufficientEvidence
 from .adapters import aligned_prefix
 from .contracts import (
     ExecutedTurn,
@@ -159,6 +160,24 @@ async def settle_owned(policy, submissions, *, session_id, abandoned, timeout=3)
 
 
 def initial_messages(adapter, task):
+    if task.get("workload") == "document-search":
+        return adapter.normalize_messages(
+            [
+                dict(
+                    role="system",
+                    content='Verify facts with search_documents. Call one tool at a time. Return final JSON only: {"answer":"value","evidence":[{"document_id":"returned ID","quote":"exact returned text"}]}. Never invent evidence. A partial result has next_cursor arguments for another page.',
+                ),
+                dict(
+                    role="user",
+                    content=task["question"]
+                    + (
+                        "\n\nPinned source context:\n" + task["context_pack"]
+                        if task.get("context_pack")
+                        else ""
+                    ),
+                ),
+            ]
+        )
     return adapter.normalize_messages(
         [
             dict(
@@ -234,8 +253,9 @@ async def run_task(
     try:
         if on_boundary is not None:
             sampling_config = sampling_budget(sampling_config)
+        schema = getattr(tools, "schema", SCHEMA)
         messages = initial_messages(adapter, task)
-        ids = adapter.prompt(tokenizer, messages, SCHEMA)
+        ids = adapter.prompt(tokenizer, messages, schema)
         if (
             task.get("initial_input_ids") is not None
             and ids != task["initial_input_ids"]
@@ -278,7 +298,7 @@ async def run_task(
             raw = tokenizer.decode(generation["output_ids"], skip_special_tokens=False)
             finish = generation.get("meta_info", {}).get("finish_reason")
             outcome = adapter.classify(
-                raw, {s["function"]["name"] for s in SCHEMA}, finish
+                raw, {s["function"]["name"] for s in schema}, finish
             )
             executed = ExecutedTurn(
                 adapter.profile_id,
@@ -312,7 +332,7 @@ async def run_task(
             tools.validate_call(call)
             try:
                 plan = adapter.prepare_continuation(
-                    tokenizer, messages, SCHEMA, ids, generation["output_ids"], call
+                    tokenizer, messages, schema, ids, generation["output_ids"], call
                 )
                 # Minimum envelope fit is checkable now; actual output is not.
                 plan.append(
@@ -324,6 +344,12 @@ async def run_task(
             except ValueError:
                 row["failure_kind"] = "UnsupportedContinuation"
                 raise
+            budget = None
+            if getattr(tools, "bounded_results", False):
+                budget = ToolResultBudget(
+                    plan, tokenizer, context_limit - getattr(model, "max_new_tokens", 0)
+                )
+                budget.preflight()
             saved = ids + generation["output_ids"]
             prefix = aligned_prefix(saved)
             step = dict(
@@ -356,8 +382,19 @@ async def run_task(
                     tool_task.cancel()
                 await asyncio.gather(tool_task, return_exceptions=True)
                 step["completed_ns"] = time.monotonic_ns()
-            step["result"] = result
             step["duration_ms"] = (step["completed_ns"] - step["dispatched_ns"]) / 1e6
+            if budget is not None:
+                step["raw_result"] = result
+                result, step["result_budget"] = budget.deliver(tools, call, result)
+            step["serialization_completed_ns"] = time.monotonic_ns()
+            step["result"] = result
+            if result.get("result_status") == "INSUFFICIENT_EVIDENCE":
+                raise InsufficientEvidence(
+                    "No complete evidence row fits the remaining budget"
+                )
+            step["result_serialization_ms"] = (
+                step["serialization_completed_ns"] - step["completed_ns"]
+            ) / 1e6
             # Ordinary continuation never waits for the control submission.
             ids, messages = plan.append(
                 tokenizer,
@@ -371,6 +408,10 @@ async def run_task(
         row["task_success"] = False
         exc.task_evidence = row  # Filled by finally before the block retains it.
         raise
+    except InsufficientEvidence as exc:
+        row["status"] = "INSUFFICIENT_EVIDENCE"
+        row["failure_kind"] = "InsufficientEvidence"
+        row["error"] = f"{type(exc).__name__}: {exc}"
     except Exception as exc:
         row["error"] = f"{type(exc).__name__}: {exc}"
     finally:

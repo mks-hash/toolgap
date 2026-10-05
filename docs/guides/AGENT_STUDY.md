@@ -1,16 +1,60 @@
-# Agent study: local readiness and evidence gates
+# Agent study: bounded tools and pressure evidence
 
 The active plan is [WORK_TRACKER](../WORK_TRACKER.md). This guide describes
 commands; it does not authorize a GPU session, launch a server or select a new
 model. The Mistral live pilot remains 0/3. The later
 [Qwen7 pilot](../../research/agent_resume/qwen7-live-pilot-2026-10-05.json)
 also remains 0/3 useful tasks despite real tool execution and eight preserved
-continuation prefixes. Pressure has not run; review repository retrieval and
-source-evidence discoverability locally before another paid session.
+continuation prefixes. Pressure has not run. The later packet-bound pilot also remains 0/3;
+ADR-0005 addresses its result-budget failures without revising those outcomes.
 
 Use a reviewed pinned profile and its cached tokenizer. Commands below run from
 the repository root. Every output path must be new. Keep raw runs in ignored
 `work/`; sanitize summaries before public inclusion.
+
+## Workload and budget contract
+
+Primary: document search over real SGLang documents extracted at a pinned Git
+SHA. Repository audit remains a secondary stress workload. Both use the same
+512-token **actual native suffix** ceiling and reserve 256 generation tokens
+within the existing 8192-token context. This is not a 512-token content allowance:
+JSON, tool metadata, cursor and template closure count too. Never trim saved IDs.
+
+Results retain whole source evidence units (paragraphs or Markdown/MDX table rows
+for documents; numbered lines for repository tools). The runner delivers the
+largest fitting leading page and records raw/delivered hashes, row counts,
+`COMPLETE | PARTIAL | INSUFFICIENT_EVIDENCE`, continuation/suffix token counts and
+`next_cursor` call arguments. A classified minimum response is checked before
+observer/control/tool effects. An oversized first unit or exhausted context
+ends the caller as `INSUFFICIENT_EVIDENCE`; it is retained, not a successful tool
+loop. Empty retrieval remains an honest empty result. Regression execution
+is not repeated by an invented cached-execution cursor.
+
+Tool duration excludes budget serialization; `result_serialization_ms` records
+that cost, while full task latency and tool-dispatch-to-first-token include it.
+The cap, six-round limit and output reservation apply equally in both arms.
+Useful correctness still requires authentic **returned** evidence, not just a
+correct answer value. See [ADR-0005](../decisions/0005-bounded-tools-and-diagnostic-study.md).
+The v0.2 executor performs real retrieval, but its default corpus is synthetic;
+new public-document results must not inherit a real-corpus claim from v0.2.
+
+## Recorded real-output replay
+
+```bash
+python -m research.agent_resume.replay \
+  --qwen-tokenizer "$TOKENIZER_DIR" --output work/study/recorded-replay.json
+```
+
+The portable corpus contains 27 actual model outputs from three retained failed
+pilots. Classification checks preserve complete raw text and actual output IDs.
+Faithful official-tokenizer replay of the last Qwen7 pilot checks ten submitted
+continuations, two expected budget failures (8236/8058 required tokens versus
+7936 available) and invalid final source evidence. Later recorded outputs belong
+to the **original** inputs. The separate bounded-page counterfactual never feeds
+those later outputs to changed inputs and cannot establish useful live success.
+Mistral and the older Qwen pilot currently have parser replay, not full native
+continuation replay. Private raw files are identified by SHA256; timings, cloud
+metadata, process paths and credentials are excluded from public fixtures.
 
 ## Repository tool contract
 
@@ -18,15 +62,15 @@ The research tools operate on the same pinned Git source snapshot:
 
 | Tool | Result and limit |
 |---|---|
-| `search_repository(query)` | Literal-first ranked word/identifier matches; at most 20 numbered source lines. Lexical search, without semantic/synonym expansion. |
+| `search_repository(query, offset=0)` | Literal-first ranked word/identifier matches; at most 20 numbered source lines. Lexical search, without semantic/synonym expansion. |
 | `list_repository(prefix, offset)` | At most 40 paths/line counts/hashes; start with `prefix=""`, `offset=0`, then use `next_offset`. Metadata alone cannot justify a citation. |
 | `read_source(path, start, end)` | 1–80 numbered lines from an existing pinned file. |
 | `run_regression("admission_hints")` | Actual CPU test status/count and bounded numbered test-class source lines. A successful exit does not authorize an invented source citation. |
 
 Call one tool at a time and cite only returned source lines. Legacy diagnostics
 retain four tool rounds; the pressure packet and its representative live gate
-share the existing six-round limit, frozen in measurement contract v3. Strict
-grading remains. Tool contract v2 binds schema/executor/runner hashes
+share the existing six-round limit, frozen in measurement contract v4. Strict
+grading remains. Tool contract v3 binds schema/executor/runner hashes
 to the packet; prepare new packet/native/live evidence after tool or prompt
 changes. Old readiness does not establish useful behavior for the new workload.
 See [ADR-0003](../decisions/0003-repository-tool-evidence-contract.md).
@@ -37,8 +81,13 @@ The workload/measurement corrections are recorded in
 
 ```bash
 export PYTHONPATH="$PWD/src:$PWD"
+python -m research.agent_resume.documents \
+  --repository "$SGLANG_CHECKOUT" \
+  --revision 3e60ad803c6b01832b527f4a1dcbeb7a5449964b \
+  --output work/study/documents.json
 python -m research.agent_resume.pressure prepare \
   --profile "$PROFILE_FILE" --tokenizer "$TOKENIZER_DIR" \
+  --workload document-search --corpus work/study/documents.json \
   --output work/study/packet.json
 python - <<'PY'
 import json
@@ -48,7 +97,7 @@ Path('work/study/profile.json').write_text(json.dumps(p, indent=2))
 PY
 python -m research.agent_resume.native_conformance \
   --profile work/study/profile.json --tokenizer "$TOKENIZER_DIR" \
-  --output work/study/native.json
+  --workload document-search --output work/study/native.json
 python -m research.agent_resume.check_pressure \
   --packet work/study/packet.json --tokenizer "$TOKENIZER_DIR" \
   --output work/study/scripted.json
@@ -57,8 +106,10 @@ python -m research.agent_resume.check_pressure \
 The packet uses 4 maximum running server requests, 1 GB configured host pool,
 12 fixed arrivals by default and at most 8 active clients. It includes exact
 initial token IDs over pinned public source, not artificial filler or a tool
-sleep. The scripted check runs real fixed repository tools with fabricated
-model decisions. It cannot satisfy the useful-live gate.
+sleep. The scripted check runs actual declared tools with fabricated, oracle-guided
+model decisions. It tests formatting/budget/execution only, not navigation or
+useful live choices. Repository stress packets use `--workload repository-audit`
+and native evidence for that same workload. Old packets are stale after changes.
 
 Generate native evidence for the **packet profile**, not the original diagnostic
 profile: changed resource settings change its fingerprint. Native reference
@@ -235,9 +286,9 @@ independent renewable budgets:
 | Stage | Maximum allocated time | Stop rule |
 |---|---:|---|
 | Existing image/runtime setup and model load | 15 min | Setup/fit fails or needs architecture/image changes |
-| Useful live gate, 3 declared tasks | 10 min | Any task fails, lacks actual tools/continuation, or cleanup is ambiguous |
+| Live representatives, 3 declared task types | 10 min | Evidence purpose: any quality failure. Diagnostic purpose: protocol/transport/exact-ID/cleanup failure; retain answer failures. |
 | Fixed warmup and actual reset check | 5 min | Idle/auth/reset/namespace guard fails |
-| Observation calibration and baseline | 20 min | Quality fails, instrumentation perturbs outcomes, or no usable observed window |
+| Observation calibration and baseline | 20 min | Evidence purpose: quality/overhead/no-window stop. Diagnostic purpose: retain quality failures and sampled cache outcome; no treatment. |
 | Conditional proactive feasibility | 5 min | No time remains, quality/cleanup fails, or aggregate outcome degrades |
 | Result archival and VM cleanup | 5 min reserved | Always execute, including earlier failures |
 
@@ -287,6 +338,32 @@ observed eligibility can be unreachable by the once-at-dispatch trigger;
 `dispatch_state=UNKNOWN` stays explicit. No adaptive resubmission, favorable-run
 selection or manufactured target eviction. The comparison remains exploratory:
 no confidence/p95 claim, no release claim, and no automatic second session.
+
+## Diagnostic baseline and evidence baseline
+
+Two explicit purposes are available; the default is `evidence`.
+
+- `--purpose diagnostic`: request-time only. Requires genuine completed transport,
+  exact-token continuation, retained declared callers and resolved cleanup, but
+  keeps wrong answers/invalid citations as quality failures. Safety/protocol
+  failures stop. Reports diagnostic cache observations and all-caller quality;
+  it cannot produce proactive comparison or useful-agent speedup evidence.
+- `--purpose evidence`: additionally requires all declared representative tasks
+  and all baseline callers to pass the original quality rules. Only this
+  baseline can qualify a conditional proactive block, together with trace-bound
+  opportunities, symmetric resources/reset and instrumentation checks.
+
+Both modes recompute readiness from hash-bound raw rows; a forged diagnostic
+flag cannot bypass exact IDs or cleanup. Caller identity/coverage includes the
+actual declared trajectories, even when task types repeat. A diagnostic result
+cannot be relabeled as evidence even if all of its answers happen to pass.
+
+For a separately authorized diagnostic campaign, add `--purpose diagnostic`
+to **both** live and request-time pressure commands below. Continue from live
+only when `diagnostic_ready=true`; exit 0 then denotes technical diagnostic
+completion, not `study_success`. Keep the same frozen packet and reset rules.
+Do not pass `--baseline` or run proactive mode. For useful evidence, use the
+commands as written and require `study_success=true`.
 
 ## Live gate, then baseline — only with applicable execution approval
 
@@ -363,7 +440,7 @@ limit. Caller-level samples are not independent worker repetitions.
 
 ## Accounting review after the capacity stop (2026-10-05)
 
-Measurement contract **v2** retains every declared caller on interruption, even
+Measurement contract **v4** retains every declared caller on interruption, even
 those still queued or not yet arrived. Cancelled latencies are censored (`null`),
 not successful short executions. Partial generated token IDs remain evidence.
 An interrupted block records `procedure_completed=false` and
@@ -378,7 +455,7 @@ remain outside this endpoint and are separately bounded.
 
 The old provisioning packet/bundle implements v1 and is superseded. Its launch
 readiness flag is disabled; historical evidence is retained unchanged. A local
-reviewed runner uses the early on-baseline gate and the v2 comparator, without
+reviewed runner uses the early on-baseline gate and the current comparator, without
 launching any server. Before another authorized paid attempt, freeze the revised
 clean source, regenerate the packet, run its offline checks and rebind the
 launch/package hashes. No GPU/live reset/calibration/pressure result is implied.

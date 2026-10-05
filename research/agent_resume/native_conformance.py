@@ -12,7 +12,15 @@ from .prepare import tokenizer_manifest
 from .workloads import SCHEMA
 
 
-def check(profile, directory):
+def check(profile, directory, *, workload="repository-audit"):
+    schema = SCHEMA
+    tool_name = "search_repository"
+    if workload == "document-search":
+        from .documents import SCHEMA as schema
+
+        tool_name = "search_documents"
+    elif workload != "repository-audit":
+        raise ValueError("Unknown native workload")
     from transformers import AutoTokenizer
     import transformers
 
@@ -35,25 +43,25 @@ def check(profile, directory):
         # no production call_text/parser serialization generates the input.
         native_call = dict(
             type="function",
-            function=dict(name="search_repository", arguments=dict(query="KV")),
+            function=dict(name=tool_name, arguments=dict(query="KV")),
         )
         if adapter.family == "mistral":
             native_call["id"] = "abc123XYZ" if number == 0 else "def456XYZ"
         assistant = dict(role="assistant", tool_calls=[native_call])
-        initial = adapter.render(tokenizer, messages, SCHEMA, generate=True)
+        initial = adapter.render(tokenizer, messages, schema, generate=True)
         closed = adapter.render(
-            tokenizer, messages + [assistant], SCHEMA, generate=False
+            tokenizer, messages + [assistant], schema, generate=False
         )
         if not closed.startswith(initial):
             raise UnsupportedTemplate("Native reference is not append-compatible")
         raw = closed[len(initial) :]
-        parsed = adapter.classify(raw, {"search_repository"}, "stop")
+        parsed = adapter.classify(raw, {tool_name}, "stop")
         if not isinstance(parsed, ToolCalls) or len(parsed.calls) != 1:
             raise AssertionError("Native generated-form reference not classified")
-        prompt = adapter.prompt(tokenizer, messages, SCHEMA)
+        prompt = adapter.prompt(tokenizer, messages, schema)
         native_prompt = tokenizer.apply_chat_template(
             messages,
-            tools=SCHEMA,
+            tools=schema,
             tokenize=True,
             return_dict=False,
             add_generation_prompt=True,
@@ -65,11 +73,11 @@ def check(profile, directory):
             )
         decision = tokenizer.encode(raw, add_special_tokens=False)
         plan = adapter.prepare_continuation(
-            tokenizer, messages, SCHEMA, prompt, decision, parsed.calls[0]
+            tokenizer, messages, schema, prompt, decision, parsed.calls[0]
         )
         ids, next_messages = plan.append(tokenizer, dict(matches=[]))
         # Independent full native reference; saved IDs are still checked separately.
-        reference_full = adapter.render(tokenizer, next_messages, SCHEMA, generate=True)
+        reference_full = adapter.render(tokenizer, next_messages, schema, generate=True)
         actual_text = tokenizer.decode(ids, skip_special_tokens=False)
         if actual_text != reference_full:
             raise AssertionError(
@@ -98,14 +106,10 @@ def check(profile, directory):
         # not a substitute for this checkpoint's HF tokenizer stack.
         native = object.__new__(InstructTokenizerV3)
         body = native._prepare_function_call(
-            ToolCall(
-                function=FunctionCall(
-                    name="search_repository", arguments='{"query":"KV"}'
-                )
-            )
+            ToolCall(function=FunctionCall(name=tool_name, arguments='{"query":"KV"}'))
         )
         raw = "[TOOL_CALLS] " + json.dumps([body])
-        result = adapter.classify(raw, {"search_repository"}, "stop")
+        result = adapter.classify(raw, {tool_name}, "stop")
         if (
             not isinstance(result, ToolCalls)
             or result.calls[0].model_call_id is not None
@@ -117,8 +121,8 @@ def check(profile, directory):
             adapter.prepare_continuation(
                 tokenizer,
                 messages,
-                SCHEMA,
-                adapter.prompt(tokenizer, messages, SCHEMA),
+                schema,
+                adapter.prompt(tokenizer, messages, schema),
                 tokenizer.encode(raw, add_special_tokens=False),
                 result.calls[0],
             )
@@ -139,6 +143,7 @@ def check(profile, directory):
         )
     return dict(
         schema_version=1,
+        workload_kind=workload,
         validation_type="OFFLINE_NATIVE_REFERENCE_CONFORMANCE",
         profile_id=adapter.profile_id,
         model=profile["model"],
@@ -163,10 +168,17 @@ def main():
     parser.add_argument("--profile", type=Path, required=True)
     parser.add_argument("--tokenizer", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--workload",
+        choices=("repository-audit", "document-search"),
+        default="repository-audit",
+    )
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Use a new evidence file")
-    result = check(json.loads(args.profile.read_text()), args.tokenizer)
+    result = check(
+        json.loads(args.profile.read_text()), args.tokenizer, workload=args.workload
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2))
     print(

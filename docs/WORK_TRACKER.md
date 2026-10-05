@@ -1,6 +1,6 @@
 # Current work tracker
 
-Updated: 2026-10-05. Owner for the work below: the coding agent in this project.
+Updated: 2026-10-06. Owner for the work below: the coding agent in this project.
 Reviewer/approval authority: Maxim Yakimov. Work is local on
 `feat/passive-pressure-workload`. Maxim Yakimov authorized committing and
 pushing this branch on 2026-10-05. Both explicitly authorized single Qwen7 GPU
@@ -9,10 +9,12 @@ paid session, release or upstream PR is authorized by this checkpoint.
 
 ## Outcome and current state
 
-The current local audit is [ADR-0004](decisions/0004-hypothesis-aligned-measurement.md).
+The current local work is [ADR-0005](decisions/0005-bounded-tools-and-diagnostic-study.md),
+building on [ADR-0004](decisions/0004-hypothesis-aligned-measurement.md).
 Its purpose is to measure the original L3 → L2 → ordinary continuation hypothesis,
 not to expand the SDK or agent framework. Runtime and published benchmarks stay
-at their existing pins. Full-image CPU verification passed. The latest packet-bound live gate failed
+at their existing pins. The previous full-image CPU verification passed; it is not
+validation of the current uncommitted changes. The latest packet-bound live gate failed
 0/3; pressure and performance remain NOT_RUN.
 
 Answer whether useful competing agent trajectories naturally create L3 restore
@@ -59,8 +61,8 @@ are [archived snapshots](archive/README.md); they do not introduce parallel task
 | TG-005 | P1 / DONE (local evidence enforcement) | Versioned capability/evidence report with independent statuses: transport, template contract, model fit, actual generation, useful tool loop, pressure opportunity, correctness and performance. Bind the profile to weights/revision, tokenizer/template, parser, dtype/quantization and resolved cache layout; distinguish declared identity from verified artifacts. Isolate file storage across incompatible profiles. Update software's preflight consumers, not just prose. CPU success cannot imply useful live model support. | TG-003, ADR-0002 |
 | TG-006 | P2 / DONE (local evidence scope) | Validate stream/finish reason and record explicit truncated/malformed/unsupported outcomes; keep generated IDs and client-observed first-token semantics. Identify run/code/package/config/schema hashes and preserve all failed outcomes. Procedure completion and study success must be separate. | TG-002, TG-005 |
 | TG-007 | P2 / IN PROGRESS | Close measurement design gaps: quantify observation delay/cost; specify bounded passive sampling at dispatch, during tool execution and before continuation, without delaying the tool or request. Separate L3 file availability, successful reads, publication and consumption. Report page-aligned spans and interval-censored transition times; unknown waste stays unknown. Freeze tool schema/executor, workload, grader, sampling budget and primary endpoints. | TG-004, TG-006 |
-| TG-008 | P1 / BLOCKED pending new useful live gate; Qwen7 history 0/3 | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. Generic repository discovery/search and citation contract v2 now passed local/native/scripted checks; any new paid gate needs applicable approval and a new frozen package. | TG-002 through TG-007 |
-| TG-009 | P1 / BLOCKED by TG-008; NOT_RUN | Baseline useful competing-agent block with no forced target eviction. Count opportunities at dispatch versus those arising during the tool gap, the remaining window, unknown/resident/missing spans and all-caller quality/latency. An L3 hit at continuation alone does not prove a usable pre-arrival opportunity. No opportunity is a feasibility result for this workload/resource point; do not manufacture one. Another paid session requires applicable approval. | TG-008 |
+| TG-008 | P1 / LOCAL REWORK; useful live NOT_RUN; Qwen7 history 0/3 | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. ADR-0005 adds bounded whole evidence pages and document search. Recorded failures remain failed; scripted checks cannot prove new model choices. Any new paid gate needs applicable approval and a new frozen package. | TG-002 through TG-007 |
+| TG-009 | P1 / NOT_RUN; diagnostic/evidence separated | Baseline useful competing-agent block with no forced target eviction. Count opportunities at dispatch versus those arising during the tool gap, the remaining window, unknown/resident/missing spans and all-caller quality/latency. An L3 hit at continuation alone does not prove a usable pre-arrival opportunity. No opportunity is a feasibility result for this workload/resource point; do not manufacture one. Explicit diagnostic request-time observation may proceed on technical readiness even with failed final grading; it cannot qualify treatment or useful performance. Paid execution still needs approval. | TG-008 technical readiness for diagnostic; useful readiness for evidence |
 | TG-010 | P1 / CONDITIONAL | Matched whole-worker baseline/prefetch comparisons if baseline supplies opportunities reachable by the specified trigger and quality/cleanup pass. Same model/config/arrivals/instrumentation; counterbalance treatment order and retain all callers/failures. Predeclare primary endpoint and acceptable competing-caller degradation. Report aggregate effects separately from conditional L3 effects, overhead/waste and uncertainty. No win is a valid outcome. Release/report decision follows evidence. | TG-009 |
 | TG-011 | P2 / CONDITIONAL | Reuse the same evidence contract for a larger FULL/GQA profile and an independent family, changing one axis at a time after one trustworthy study. Publish compatibility and negative outcomes as well as measured benefit. No model sweep or unsupported architecture is implied. | TG-008 through TG-010, or a documented TG-009 feasibility stop |
 
@@ -74,7 +76,8 @@ useful milestone remains TG-009/TG-010; contract corrections enable its validity
   model/tokenizer/runtime and exact saved tokens/salt. Add size and family axes
   separately after useful live integration succeeds; do not infer support from
   a family name or silently change precision/backend to fit.
-- Workload: actual model-selected repository tools over pinned public source,
+- Workload: primary document search over pinned real public documents; repository
+  audit remains the secondary stress workload. Actual model-selected tools,
   fixed exogenous competing arrivals and bounded useful tool rounds. No artificial
   tool sleep, per-target flush or restart during measured pressure.
 - Trigger: the existing treatment submits once at tool dispatch. A terminal
@@ -183,17 +186,24 @@ unvalidated.
 2. DONE: frozen committed packet and one separately approved live attempt,
    terminal failed useful gate, result collection, confirmed VM/disk deletion
    and offline replay of actual outputs. No automatic rerun.
-3. LOCAL NEXT: close the tool-result budget gap using retained actual trajectories.
+3. IN PROGRESS locally under ADR-0005: close the tool-result budget gap using retained actual trajectories.
    Specify budget-aware, paginated evidence responses separately from exact-prefix
    serialization. The pre-dispatch empty envelope and ideal scripted sequence
    did not bound cumulative real result sizes. Exercise near-limit actual suffixes,
    repeated searches and reads without executing a model, trimming saved IDs,
    changing model/context/round limits or weakening source grading. Diagnose the
    cited-versus-retrieved lines independently of answer-value correctness.
-4. Only after that bounded correction and a new separately approved live gate:
-   useful quality, first natural-pressure baseline, symmetric observation
-   calibration and conditional B/C/B. Stop on quality/cleanup/setup failure or
-   no observed candidate; preserve all callers, failures and unknown usage.
+4. IN PROGRESS locally: prepare real-document search and an explicit diagnostic
+   request-time observation mode. Quality failures remain data; they do not by
+   themselves forbid valid diagnostic observations. This mode cannot authorize
+   proactive comparison or useful-agent performance claims. Evidence mode remains
+   strict; its quality/opportunity conditions are separate from diagnostic safety.
+5. Only after local preparation and a new separately approved GPU campaign:
+   choose purpose before execution. Diagnostic request-time observation retains
+   answer failures but stops unsafe/protocol/setup/cleanup failures and never
+   runs treatment. Evidence campaign requires useful quality, baseline
+   opportunities and symmetric calibration before conditional B/C/B. Preserve
+   all callers, failures and unknown usage; no-window is an honest result.
 
 Local fixes and the completed session do not authorize another paid run.
 The fresh single-session package is consumed. Any proposed session must again

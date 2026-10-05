@@ -13,6 +13,7 @@ from toolgap import PrefetchAdmission, PrefetchClient
 from .adapters import FamilyAdapter
 from .prepare import ROOT, tokenizer_manifest
 from .runner import GenerationTransport, run_task
+from .workload import tools_factory
 from .workloads import RepositoryTools, TASKS, snapshot
 from .readiness import (
     file_hash,
@@ -83,6 +84,11 @@ def validate_server(info, deployment, profile):
 async def execute(args):
     from transformers import AutoTokenizer
 
+    purpose = getattr(args, "purpose", "evidence")
+    if purpose not in ("evidence", "diagnostic") or (
+        purpose == "diagnostic" and args.mode != "request_time"
+    ):
+        raise ValueError("Diagnostic live observation is request-time only")
     profile = json.loads(args.profile.read_text())
     task_contract = dict(kind="LEGACY_DIAGNOSTIC", max_tool_rounds=4)
     items = [dict(task=t) for t in TASKS]
@@ -92,7 +98,12 @@ async def execute(args):
         if digest(packet) != envelope["sha256"] or packet["profile"] != profile:
             raise ValueError("Packet hash/profile differs from live gate")
         items, task_contract = pressure_gate_workload(packet)
-    native_hash = require_native(args.native_evidence, profile)
+    native_hash = (
+        require_native(args.native_evidence, profile, workload="document-search")
+        if getattr(args, "packet", None) is not None
+        and packet.get("workload_kind") == "document-search"
+        else require_native(args.native_evidence, profile)
+    )
     actual = tokenizer_manifest(args.tokenizer, profile["profile_id"])
     if actual["tokenizer_files"] != profile["tokenizer_files"]:
         raise ValueError("Local tokenizer files differ from pinned profile")
@@ -104,7 +115,16 @@ async def execute(args):
     tokenizer = AutoTokenizer.from_pretrained(
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
-    corpus = snapshot(ROOT, profile["source_commit"])
+    legacy_corpus = (
+        snapshot(ROOT, profile["source_commit"])
+        if getattr(args, "packet", None) is None
+        else None
+    )
+    factory = (
+        tools_factory(packet, ROOT)
+        if getattr(args, "packet", None) is not None
+        else lambda: RepositoryTools(legacy_corpus, ROOT)
+    )
     args.output.mkdir(parents=True, exist_ok=False)
 
     # Retain failed tasks and raw IDs. Never silently retry generation.
@@ -135,6 +155,7 @@ async def execute(args):
                     deployment=deployment,
                     server_info=retained_server_info(info),
                     mode=args.mode,
+                    purpose=purpose,
                     validation_type="LIVE_DIAGNOSTIC",
                     cache_state="UNMEASURED",
                     physical_io="UNMEASURED",
@@ -160,7 +181,7 @@ async def execute(args):
             ) as policy:
                 for item in items:
                     task = item["task"]
-                    tools = RepositoryTools(corpus, ROOT)
+                    tools = factory()
                     row = await run_task(
                         FamilyAdapter.from_profile(profile),
                         tokenizer,
@@ -186,6 +207,7 @@ async def execute(args):
         )
     result = live_result(rows, [i["task"]["id"] for i in items], unresolved_cleanup)
     result.update(
+        purpose=purpose,
         provenance=provenance(profile),
         cleanup_unresolved=unresolved_cleanup,
         task_contract=task_contract,
@@ -200,11 +222,17 @@ async def execute(args):
             dict(
                 procedure_completed=True,
                 study_success=result["study_success"],
+                diagnostic_ready=result["diagnostic_ready"],
+                purpose=purpose,
                 dimensions=result["dimensions"],
             )
         )
     )
-    return result["study_success"]
+    return (
+        result["diagnostic_ready"]
+        if purpose == "diagnostic"
+        else result["study_success"]
+    )
 
 
 def main():
@@ -221,6 +249,9 @@ def main():
     parser.add_argument("--probe-dir", required=True, type=Path)
     parser.add_argument("--server", required=True)
     parser.add_argument("--mode", choices=("request_time", "proactive"), required=True)
+    parser.add_argument(
+        "--purpose", choices=("evidence", "diagnostic"), default="evidence"
+    )
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--reconcile-ms", type=int)
     args = parser.parse_args()

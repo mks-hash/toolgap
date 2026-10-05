@@ -55,6 +55,12 @@ SCHEMA = [
     )
 ]
 
+# Optional search pagination. Existing query-only calls remain supported.
+SCHEMA[0]["function"]["parameters"]["properties"]["offset"] = dict(
+    type="integer", minimum=0
+)
+SCHEMA[0]["function"]["description"] += " Use next_cursor arguments for another page."
+
 TASKS = [
     dict(
         id="physical-cleanup",
@@ -84,7 +90,7 @@ TASKS = [
 def tool_contract():
     """Bind prepared work to the schema, executor and initial prompt actually used."""
     return dict(
-        version=2,
+        version=3,
         search="LITERAL_FIRST_IDF_WORD_OVERLAP; NO_SEMANTIC_OR_SYNONYM_EXPANSION",
         search_limit=20,
         listing_limit=40,
@@ -162,14 +168,17 @@ def snapshot(repo, revision):
 
 
 class RepositoryTools:
+    schema = SCHEMA
+    bounded_results = True
+
     def __init__(self, corpus, repo=None):
         self.corpus = corpus
         self.repo = Path(repo).resolve() if repo is not None else None
         self.artifacts = []
         self._search_lines = None
 
-    def search(self, query):
-        self._validate_search(query)
+    def search(self, query, offset=0):
+        self._validate_search(query, offset)
         if self._search_lines is None:
             # Build inside the first measured search, not in an unreported warmup.
             self._search_lines = [
@@ -205,22 +214,26 @@ class RepositoryTools:
                 )
         hits.sort(key=lambda row: row[0])
         return dict(
-            matches=[row[1] for row in hits[:20]],
+            matches=[row[1] for row in hits[offset : offset + 20]],
+            offset=offset,
+            next_offset=offset + 20 if offset + 20 < len(hits) else None,
             total_matches=len(hits),
-            truncated=len(hits) > 20,
+            truncated=len(hits) > offset + 20,
             query_terms=sorted(terms),
             method="literal-first-word-overlap-v2",
             commit=self.corpus["commit"],
         )
 
     @staticmethod
-    def _validate_search(query):
+    def _validate_search(query, offset=0):
         if (
             not isinstance(query, str)
             or not query.strip()
             or not 1 <= len(query) <= 128
         ):
             raise ValueError("query must contain 1..128 nonblank characters")
+        if type(offset) is not int or offset < 0:
+            raise ValueError("offset must be a nonnegative integer")
 
     @staticmethod
     def _validate_listing(prefix, offset):
@@ -363,7 +376,12 @@ class RepositoryTools:
             "read_source": {"path", "start", "end"},
             "run_regression": {"suite"},
         }
-        if call.name not in expected or set(args) != expected[call.name]:
+        optional = {"offset"} if call.name == "search_repository" else set()
+        if (
+            call.name not in expected
+            or not expected[call.name] <= set(args)
+            or set(args) - expected[call.name] - optional
+        ):
             raise ValueError("Tool arguments differ from the declared schema")
         if call.name == "search_repository":
             self._validate_search(**args)
@@ -373,6 +391,25 @@ class RepositoryTools:
             self._validate_read(**args)
         elif args["suite"] != "admission_hints" or self.repo is None:
             raise ValueError("Unknown/unavailable regression suite")
+
+    def resume_arguments(self, call, result, count):
+        args = dict(call.arguments)
+        if call.name in ("search_repository", "list_repository"):
+            key = "matches" if call.name == "search_repository" else "files"
+            total = result["total_matches" if key == "matches" else "total_files"]
+            offset = args.get("offset", 0) + count
+            if offset < total:
+                args["offset"] = offset
+                return dict(name=call.name, arguments=args)
+        elif call.name == "read_source":
+            start = args["start"] + count
+            if start <= args["end"]:
+                args["start"] = start
+                return dict(name=call.name, arguments=args)
+        elif count < len(result.get("matches", [])):
+            # Regression executes once; a repeat cursor must not invent a cached run.
+            return None
+        return None
 
     async def __call__(self, call):
         self.validate_call(call)
