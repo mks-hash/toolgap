@@ -1,13 +1,21 @@
 """Native-template suffixes appended to actual saved IDs; no model execution."""
 
 import copy
+import hashlib
 import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
+
+from .contracts import FinalAnswer, InvalidOutput, ToolCalls, UnsupportedOutput
 
 
 class UnsupportedTemplate(ValueError):
     """Appending would change saved conversation or use an unverified boundary."""
+
+
+class UnsupportedResponse(ValueError):
+    """A native response shape outside this adapter's declared subset."""
 
 
 @dataclass(frozen=True)
@@ -15,6 +23,10 @@ class ToolCall:
     name: str
     arguments: dict
     call_id: str | None = None
+
+    @property
+    def model_call_id(self):
+        return self.call_id
 
     def message(self):
         call = dict(
@@ -31,11 +43,50 @@ class FamilyAdapter:
         if family not in {"qwen", "mistral", "llama"}:
             raise ValueError("Unsupported family")
         self.family = family
+        # This constructor names a format, not validated model support.
+        self.profile_id = "unbound-format:" + family
         self.markers = {
             "qwen": ("<|im_end|>",),
             "mistral": ("</s>",),
             "llama": ("<|eom_id|>", "<|eot_id|>"),
         }[family]
+
+    @classmethod
+    def from_profile(cls, profile):
+        """Bind records to the declared experiment; no claim of weight attestation."""
+        adapter = cls(profile["family"])
+        identity = dict(
+            schema_version=1,
+            family=profile["family"],
+            model=profile["model"],
+            revision=profile["revision"],
+            tokenizer_files=profile["tokenizer_files"],
+            runtime=profile["runtime_candidate_sha"],
+            settings=profile["server_settings"],
+            date_string=profile.get("date_string", "04 Oct 2026"),
+            adapter_source_sha256=hashlib.sha256(
+                Path(__file__).read_bytes()
+            ).hexdigest(),
+        )
+        adapter.profile_id = hashlib.sha256(
+            json.dumps(identity, sort_keys=True).encode()
+        ).hexdigest()
+        adapter.date_string = identity["date_string"]
+        return adapter
+
+    def capabilities(self):
+        return dict(
+            schema_version=1,
+            profile_id=self.profile_id,
+            supported_responses=["single_native_tool_call", "final_text"],
+            mixed_text_and_calls="UNSUPPORTED",
+            multiple_calls="UNSUPPORTED_BY_RUNNER",
+            missing_model_call_id=(
+                "UNSUPPORTED_HF_HISTORY" if self.family == "mistral" else "OPTIONAL"
+            ),
+            model_generation="NOT_RUN",
+            useful_live_loop="NOT_RUN",
+        )
 
     def normalize_messages(self, messages):
         messages = copy.deepcopy(messages)
@@ -48,14 +99,13 @@ class FamilyAdapter:
             messages[0]["content"] = system + "\n\n" + messages[0]["content"]
         return messages
 
-    @staticmethod
-    def render(tokenizer, messages, tools, *, generate):
+    def render(self, tokenizer, messages, tools, *, generate):
         return tokenizer.apply_chat_template(
             messages,
             tools=tools,
             tokenize=False,
             add_generation_prompt=generate,
-            date_string="04 Oct 2026",
+            date_string=getattr(self, "date_string", "04 Oct 2026"),
         )
 
     def prompt(self, tokenizer, messages, tools):
@@ -69,27 +119,74 @@ class FamilyAdapter:
                 return text[: -len(marker)].strip()
         return text
 
+    def classify(self, raw, allowed_tools, finish_reason):
+        """Classify the whole completed response without repairing any tokens."""
+        reason = (
+            finish_reason.get("type")
+            if isinstance(finish_reason, dict)
+            else finish_reason
+        )
+        if reason == "length":
+            return InvalidOutput("TRUNCATED_GENERATION")
+        if reason == "abort":
+            return InvalidOutput("ABORTED_GENERATION")
+        if reason != "stop":
+            return UnsupportedOutput("UNVERIFIED_FINISH_REASON")
+        try:
+            return self._classify_complete(raw, allowed_tools)
+        except UnsupportedResponse as exc:
+            return UnsupportedOutput(str(exc))
+        except (ValueError, TypeError) as exc:
+            return InvalidOutput(str(exc))
+
     def parse(self, raw, allowed_tools):
-        """None means final text; malformed/unsupported tool calls raise."""
+        """Legacy format-only helper; never establishes turn completion."""
+        outcome = self.classify(raw, allowed_tools, "stop")
+        if isinstance(outcome, FinalAnswer):
+            return None
+        if isinstance(outcome, ToolCalls) and len(outcome.calls) == 1:
+            return outcome.calls[0]
+        raise ValueError(getattr(outcome, "reason", "Only one tool call is supported"))
+
+    def _classify_complete(self, raw, allowed_tools):
         text = self.strip_end(raw)
         if self.family == "qwen":
             if "<tool_call>" not in text and "</tool_call>" not in text:
-                return None
-            match = re.fullmatch(r"<tool_call>\s*(.*?)\s*</tool_call>", text, re.S)
-            if not match:
+                return FinalAnswer(text)
+            matches = list(
+                re.finditer(r"<tool_call>\s*(.*?)\s*</tool_call>", text, re.S)
+            )
+            if not matches:
                 raise ValueError("Expected one complete Qwen tool call")
-            body = json.loads(match[1])
-            argument_key = "arguments"
+            calls = tuple(
+                self._call(json.loads(m[1]), "arguments", allowed_tools)
+                for m in matches
+            )
+            residue = re.sub(
+                r"<tool_call>\s*.*?\s*</tool_call>", "", text, flags=re.S
+            ).strip()
+            if "<tool_call>" in residue or "</tool_call>" in residue:
+                raise ValueError("Incomplete Qwen tool envelope")
+            if residue:
+                return UnsupportedOutput("MIXED_TEXT_AND_TOOL_CALLS")
+            return ToolCalls(calls)
         elif self.family == "mistral":
             if "[TOOL_CALLS]" not in text:
-                return None
+                return FinalAnswer(text)
             if not text.startswith("[TOOL_CALLS]"):
-                raise ValueError("Unexpected text before Mistral tool call")
-            calls = json.loads(text[len("[TOOL_CALLS]") :])
-            if not isinstance(calls, list) or len(calls) != 1:
-                raise ValueError("Only one tool call per turn is supported")
-            body = calls[0]
-            argument_key = "arguments"
+                return UnsupportedOutput("MIXED_TEXT_AND_TOOL_CALLS")
+            payload = text[len("[TOOL_CALLS]") :].lstrip()
+            if "[ARGS]" in payload and not payload.startswith("["):
+                return UnsupportedOutput("MISTRAL_COMPACT_FORMAT")
+            calls, end = json.JSONDecoder().raw_decode(payload)
+            if not isinstance(calls, list) or not calls:
+                raise ValueError("Expected a nonempty tool-call array")
+            parsed = tuple(
+                self._call(body, "arguments", allowed_tools) for body in calls
+            )
+            if payload[end:].strip():
+                return UnsupportedOutput("MIXED_TEXT_AND_TOOL_CALLS")
+            return ToolCalls(parsed)
         else:
             tagged = text.startswith("<|python_tag|>")
             if tagged:
@@ -98,16 +195,20 @@ class FamilyAdapter:
                 body = json.loads(text)
             except json.JSONDecodeError:
                 if tagged:
-                    raise ValueError("Only JSON custom-tool Llama calls are supported")
-                return None
+                    return UnsupportedOutput("LLAMA_NON_JSON_TOOL_FORMAT")
+                return FinalAnswer(text)
             if not tagged and (not isinstance(body, dict) or "name" not in body):
-                return None
+                return FinalAnswer(text)
             argument_key = "parameters"
-        expected = {"name", argument_key} | (
-            {"id"} if self.family == "mistral" else set()
-        )
-        if not isinstance(body, dict) or set(body) != expected:
-            raise ValueError("Tool call has missing or unsupported fields")
+        return ToolCalls((self._call(body, argument_key, allowed_tools),))
+
+    def _call(self, body, argument_key, allowed_tools):
+        required = {"name", argument_key}
+        optional = {"id"} if self.family == "mistral" else set()
+        if not isinstance(body, dict) or not required <= set(body):
+            raise ValueError("Tool call has missing fields")
+        if set(body) - required - optional:
+            raise UnsupportedResponse("UNSUPPORTED_CALL_FIELDS")
         name, arguments = body["name"], body[argument_key]
         if (
             not isinstance(name, str)
@@ -116,20 +217,36 @@ class FamilyAdapter:
         ):
             raise ValueError("Unknown tool or invalid arguments")
         call_id = body.get("id")
-        if self.family == "mistral" and (
-            not isinstance(call_id, str) or not re.fullmatch(r"[A-Za-z0-9]{9}", call_id)
+        if (
+            self.family == "mistral"
+            and "id" in body
+            and (
+                not isinstance(call_id, str)
+                or not re.fullmatch(r"[A-Za-z0-9]{9}", call_id)
+            )
         ):
-            raise ValueError("Mistral needs the model's nine-character tool call ID")
+            raise ValueError("Malformed Mistral call ID")
         return ToolCall(name, arguments, call_id)
 
     def continuation(
         self, tokenizer, messages, tools, prompt_ids, decision_ids, call, result
     ):
-        """Canonical history derives suffix only, never replaces generated IDs."""
-        assistant = call.message()
-        tool = dict(
-            role="tool", name=call.name, content=json.dumps(result, sort_keys=True)
+        """Compatibility wrapper for format-only CPU checks."""
+        plan = self.prepare_continuation(
+            tokenizer, messages, tools, prompt_ids, decision_ids, call
         )
+        return plan.append(tokenizer, result)
+
+    def prepare_continuation(
+        self, tokenizer, messages, tools, prompt_ids, decision_ids, call
+    ):
+        """Pure pre-dispatch history/ending check; result does not exist yet."""
+        if self.family == "mistral" and call.model_call_id is None:
+            raise UnsupportedTemplate(
+                "MISSING_HISTORY_ID: pinned HF template requires an ID"
+            )
+        assistant = call.message()
+        tool = dict(role="tool", name=call.name, content="{}")
         if call.call_id is not None:
             tool["tool_call_id"] = call.call_id
         closed = self.render(tokenizer, messages + [assistant], tools, generate=False)
@@ -149,7 +266,6 @@ class FamilyAdapter:
             )
         ):
             raise ValueError("Supply actual nonnegative prompt and generated token IDs")
-        suffix = full[len(closed) :]
         ending = next(
             (
                 marker + closed[len(closed.rstrip()) :]
@@ -175,10 +291,40 @@ class FamilyAdapter:
             closing = ending[len(seen) :]
         else:
             raise UnsupportedTemplate("Generated ending differs from native template")
-        saved = list(prompt_ids) + list(decision_ids)
-        return saved + tokenizer.encode(
-            closing + suffix, add_special_tokens=False
-        ), next_messages
+        return ContinuationPlan(
+            self,
+            tuple(prompt_ids) + tuple(decision_ids),
+            json.dumps(next_messages),
+            json.dumps(tools),
+            closed,
+            closing,
+        )
+
+
+@dataclass(frozen=True)
+class ContinuationPlan:
+    adapter: FamilyAdapter
+    saved_ids: tuple[int, ...]
+    messages_json: str
+    tools_json: str
+    closed: str
+    closing: str
+
+    def append(self, tokenizer, result, *, max_input_tokens=None):
+        messages = json.loads(self.messages_json)
+        messages[-1]["content"] = json.dumps(result, sort_keys=True, allow_nan=False)
+        full = self.adapter.render(
+            tokenizer, messages, json.loads(self.tools_json), generate=True
+        )
+        if not full.startswith(self.closed):
+            raise UnsupportedTemplate("Actual tool result changes saved history")
+        suffix_ids = tokenizer.encode(
+            self.closing + full[len(self.closed) :], add_special_tokens=False
+        )
+        ids = list(self.saved_ids) + suffix_ids
+        if max_input_tokens is not None and len(ids) > max_input_tokens:
+            raise ValueError("Tool result exceeds continuation token budget")
+        return ids, messages
 
 
 def aligned_prefix(ids, page_size=16, threshold=64):

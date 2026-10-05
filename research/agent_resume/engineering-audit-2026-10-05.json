@@ -1,0 +1,46 @@
+{
+  "validation_type": "OFFLINE_CODE_AUDIT",
+  "gpu_execution": false,
+  "model_generation": false,
+  "continuation_guard": {
+    "executed_tools_before_rejection": 1,
+    "status": "FAILED",
+    "error": "UnsupportedTemplate: Native template changes an earlier conversation span"
+  },
+  "missing_model_id": {
+    "current_parser_rejects": true,
+    "error": "Tool call has missing or unsupported fields"
+  },
+  "schema_version": 1,
+  "reviewed_code_commit": "1a5e34c8374d641becf9dc63975a7b62382cfa0a",
+  "review_scope": "RESEARCH_INTEGRATION_AND_EVIDENCE_READINESS",
+  "review_type": "ONE_AGENT_EIGHT_ENGINEERING_PERSPECTIVES",
+  "independent_external_review": false,
+  "targeted_cpu_tests": {
+    "status": "PASS",
+    "passed": 29,
+    "duration_seconds": 0.56,
+    "environment": "OUTSIDE_FILESYSTEM_SANDBOX",
+    "command": "PYTHONPATH=src python -m pytest tests/test_research_harness.py tests/test_pressure_workload.py -q -p no:cacheprovider"
+  },
+  "sandbox_probe": {
+    "simple_asyncio_to_thread": "VALUE_RETURNED_SHUTDOWN_TIMED_OUT",
+    "outside_sandbox": "CLEAN_EXIT"
+  },
+  "proposed_contract_implemented": false,
+  "new_gpu_execution": false,
+  "public_push": false,
+  "documentation_validation": {
+    "files_checked": 14,
+    "local_links_checked": 101,
+    "missing_links": 0,
+    "invalid_source_line_anchors": 0,
+    "personal_paths_found": 0
+  },
+  "historical_evidence_replay": {
+    "synthetic_v01_trials": 45,
+    "tool_loop_v02_runs": 12,
+    "status": "PASS",
+    "new_gpu_execution": false
+  }
+}

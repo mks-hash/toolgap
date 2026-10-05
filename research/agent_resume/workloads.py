@@ -26,15 +26,15 @@ SCHEMA = [
         (
             "search_repository",
             "Find source/documentation evidence by literal text.",
-            {"query": {"type": "string"}},
+            {"query": {"type": "string", "minLength": 1, "maxLength": 128}},
         ),
         (
             "read_source",
-            "Read numbered source lines from a known repository file.",
+            "Read 1..80 numbered lines from a known pinned repository file; start <= end <= start + 79 and end must exist.",
             {
-                "path": {"type": "string"},
-                "start": {"type": "integer"},
-                "end": {"type": "integer"},
+                "path": {"type": "string", "minLength": 1},
+                "start": {"type": "integer", "minimum": 1},
+                "end": {"type": "integer", "minimum": 1},
             },
         ),
         (
@@ -113,8 +113,7 @@ class RepositoryTools:
         self.artifacts = []
 
     def search(self, query):
-        if not isinstance(query, str) or not 1 <= len(query) <= 128:
-            raise ValueError("query must contain 1..128 characters")
+        self._validate_search(query)
         hits = []
         for path, data in sorted(self.corpus["files"].items()):
             for index, text in enumerate(data["text"].splitlines(), 1):
@@ -124,7 +123,22 @@ class RepositoryTools:
             matches=hits[:20], total_matches=len(hits), commit=self.corpus["commit"]
         )
 
+    @staticmethod
+    def _validate_search(query):
+        if not isinstance(query, str) or not 1 <= len(query) <= 128:
+            raise ValueError("query must contain 1..128 characters")
+
     def read(self, path, start, end):
+        self._validate_read(path, start, end)
+        lines = self.corpus["files"][path]["text"].splitlines()
+        return dict(
+            path=path,
+            lines=[dict(line=i, text=lines[i - 1]) for i in range(start, end + 1)],
+            sha256=self.corpus["files"][path]["sha256"],
+            commit=self.corpus["commit"],
+        )
+
+    def _validate_read(self, path, start, end):
         if not isinstance(path, str) or path not in self.corpus["files"]:
             raise ValueError("Path is not in the pinned source snapshot")
         if (
@@ -136,12 +150,6 @@ class RepositoryTools:
         lines = self.corpus["files"][path]["text"].splitlines()
         if end > len(lines):
             raise ValueError("Source range exceeds file")
-        return dict(
-            path=path,
-            lines=[dict(line=i, text=lines[i - 1]) for i in range(start, end + 1)],
-            sha256=self.corpus["files"][path]["sha256"],
-            commit=self.corpus["commit"],
-        )
 
     async def regression(self, suite):
         if suite != "admission_hints" or self.repo is None:
@@ -204,7 +212,8 @@ class RepositoryTools:
             passed=process.returncode == 0 and ran is not None,
         )
 
-    async def __call__(self, call):
+    def validate_call(self, call):
+        """Pure argument/corpus validation shared by admission and execution."""
         args = call.arguments
         expected = {
             "search_repository": {"query"},
@@ -213,6 +222,16 @@ class RepositoryTools:
         }
         if call.name not in expected or set(args) != expected[call.name]:
             raise ValueError("Tool arguments differ from the declared schema")
+        if call.name == "search_repository":
+            self._validate_search(**args)
+        elif call.name == "read_source":
+            self._validate_read(**args)
+        elif args["suite"] != "admission_hints" or self.repo is None:
+            raise ValueError("Unknown/unavailable regression suite")
+
+    async def __call__(self, call):
+        self.validate_call(call)
+        args = call.arguments
         if call.name == "search_repository":
             return await asyncio.to_thread(self.search, **args)
         if call.name == "read_source":

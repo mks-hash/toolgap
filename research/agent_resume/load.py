@@ -232,7 +232,7 @@ def summarize(block):
         all_caller_full_task_ms=[r.get("full_task_ms") for r in rows],
         dispatch_residency_counts=dict(
             Counter(
-                s.get("cache_before_dispatch", {}).get("residency", "UNMEASURED")
+                s.get("cache_window_summary", {}).get("dispatch_state", "UNKNOWN")
                 for r in rows
                 for s in r.get("tools", [])
             )
@@ -244,8 +244,20 @@ def summarize(block):
                 for s in r.get("tools", [])
             )
         ),
-        observation_wait_ms=[
-            s.get("observation_wait_ms") for r in rows for s in r.get("tools", [])
+        cache_window_summaries=[
+            s.get("cache_window_summary") for r in rows for s in r.get("tools", [])
+        ],
+        background_observer_wait_ms=[
+            sample.get("client_wait_ms")
+            for r in rows
+            for s in r.get("tools", [])
+            for sample in s.get("cache_samples", [])
+        ],
+        scheduler_observer_cost_ns=[
+            sample.get("state", {}).get("scheduler_observation_overhead_ns")
+            for r in rows
+            for s in r.get("tools", [])
+            for sample in s.get("cache_samples", [])
         ],
         experimental_unit="WHOLE_SHARED_WORKER_BLOCK",
         p95_claim=False,

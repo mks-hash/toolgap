@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "validation_type": "LOCAL_CONTRACT_CHECKPOINT",
+  "harness_base_sha": "1a5e34c8374d641becf9dc63975a7b62382cfa0a",
+  "working_tree": "DIRTY_LOCAL_CHANGES_IDENTIFIED_BY_FILE_HASHES",
+  "source_sha256": {
+    "research/agent_resume/adapters.py": "aa2d860c8e5a18f3cd2b4bafe9f72143237d4ccc06184f34b915984e7181938b",
+    "research/agent_resume/contracts.py": "e588fa200291dd4469c86039fe71ddcaa5d82fc0f6191ad8bab2e982bef91cf1",
+    "research/agent_resume/runner.py": "c834671ffb6c49c074f8a3e5eca822ffce5ccb3b8f11b209e854afcb0e66837f",
+    "research/agent_resume/prepare.py": "e24a772b61f5ceecfb98328b2266e5cc6c7a03503ec51a15f024d91465322a03",
+    "research/agent_resume/workloads.py": "0cad006c32c697032551e352e23bdec8edcc3f80ffdc22eb8d7d06abc2afc1c5",
+    "research/agent_resume/native_conformance.py": "3d73895f935ead66b188816fb32a5e9f72a34564cd796644ef779eca98f10fd5",
+    "research/agent_resume/live.py": "197881c06673fa9fceecd90bf4fb9551875a1dcc62ab7644414c0829253a7204",
+    "research/agent_resume/pressure.py": "2c7ca494d79c0a13429638730dd2078730021aa8d3f139ed809370b2fce41856",
+    "tests/test_agent_contract.py": "caa9c0fc539f08117302b11f91ecb12f92abeecc078cafcaa4b2e878859f6f6b",
+    "tests/test_research_harness.py": "8a820f301a59d5065ba606608fa32d246dee4bff13b4d64fd2fbaf96e9603409",
+    "tests/test_pressure_workload.py": "942fad7adfaf68d11b38e89d7bea95e1eb941cd23e6be331e8f261988381df75"
+  },
+  "regressions": {
+    "passed": 97,
+    "failed": 0,
+    "skipped": 0,
+    "subtests_passed": 41,
+    "scope": [
+      "adapter and runner",
+      "stream completion",
+      "SDK ownership and cancellation",
+      "pressure harness fixtures"
+    ],
+    "raw_output_sha256": "3becf6ef4b51219706bc446a0eda33f0f20cd171bd4bcd65dc50011019f06b42",
+    "raw_access": "PRIVATE_LOCAL"
+  },
+  "native_conformance": [
+    {
+      "schema_version": 1,
+      "validation_type": "OFFLINE_NATIVE_REFERENCE_CONFORMANCE",
+      "profile_id": "a7b6eec150aa61f6200a6283e063b0759c27c24c5c9f18c9769442472e03d025",
+      "model": "Qwen/Qwen2.5-1.5B-Instruct",
+      "revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+      "tokenizer_files": {
+        "config.json": {
+          "bytes": 660,
+          "sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670"
+        },
+        "merges.txt": {
+          "bytes": 1671839,
+          "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+        },
+        "tokenizer.json": {
+          "bytes": 7031645,
+          "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+        },
+        "tokenizer_config.json": {
+          "bytes": 7305,
+          "sha256": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+        },
+        "vocab.json": {
+          "bytes": 2776833,
+          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+        }
+      },
+      "transformers": "5.17.0",
+      "checks": [
+        {
+          "round": 1,
+          "render_tokenize_agreement": true,
+          "native_full_text_agreement": true,
+          "exact_saved_ids": true
+        },
+        {
+          "round": 2,
+          "render_tokenize_agreement": true,
+          "native_full_text_agreement": true,
+          "exact_saved_ids": true
+        }
+      ],
+      "missing_id": "NOT_APPLICABLE",
+      "native_reference": null,
+      "source_sha256": {
+        "__init__.py": "bce551d7a066fc9ffd16b021a537284ba9b01d03981166c2ac2ed547c84318db",
+        "adapters.py": "aa2d860c8e5a18f3cd2b4bafe9f72143237d4ccc06184f34b915984e7181938b",
+        "check_pressure.py": "c5c51fffe85b3f10de97e55222c7cd91558e72cf1773df593a97a8ea26f8b580",
+        "contracts.py": "e588fa200291dd4469c86039fe71ddcaa5d82fc0f6191ad8bab2e982bef91cf1",
+        "fetch.py": "bb6c06c5f72090ada346d315e56503a6fbf7110ab8acb0a33b5535b77b668d12",
+        "live.py": "197881c06673fa9fceecd90bf4fb9551875a1dcc62ab7644414c0829253a7204",
+        "load.py": "c83547345c1578a33937452b7415487c508a5b8ea09328d2d63a39e1b2667934",
+        "native_conformance.py": "3d73895f935ead66b188816fb32a5e9f72a34564cd796644ef779eca98f10fd5",
+        "observer.py": "12cb3344fe75de353626f820a11966c926aaa072c905fdd33a1944350a905d1b",
+        "prepare.py": "e24a772b61f5ceecfb98328b2266e5cc6c7a03503ec51a15f024d91465322a03",
+        "pressure.py": "2c7ca494d79c0a13429638730dd2078730021aa8d3f139ed809370b2fce41856",
+        "runner.py": "c834671ffb6c49c074f8a3e5eca822ffce5ccb3b8f11b209e854afcb0e66837f",
+        "sampling.py": "cfea82b7a0442cdbc890aaf3031c2caab2aee6bb3d57874739c28425f6c4f94a",
+        "trace_report.py": "5c8a6718ccdbae495112d39b5caec5467d0c79edac0e9ec6eb673acec388915b",
+        "workloads.py": "0cad006c32c697032551e352e23bdec8edcc3f80ffdc22eb8d7d06abc2afc1c5"
+      },
+      "model_generation": false,
+      "gpu_execution": false,
+      "passed": true
+    },
+    {
+      "schema_version": 1,
+      "validation_type": "OFFLINE_NATIVE_REFERENCE_CONFORMANCE",
+      "profile_id": "6362992be881b0b17583313a5e2dcf11624f618625dd16a2277c8d45c3a53162",
+      "model": "Qwen/Qwen2.5-7B-Instruct",
+      "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+      "tokenizer_files": {
+        "config.json": {
+          "bytes": 663,
+          "sha256": "7463bb0ea78315365e6c6b74de4e73bbcc8359dfb0c5a737584e077d42c0b03c"
+        },
+        "merges.txt": {
+          "bytes": 1671839,
+          "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+        },
+        "tokenizer.json": {
+          "bytes": 7031645,
+          "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+        },
+        "tokenizer_config.json": {
+          "bytes": 7305,
+          "sha256": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+        },
+        "vocab.json": {
+          "bytes": 2776833,
+          "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+        }
+      },
+      "transformers": "5.17.0",
+      "checks": [
+        {
+          "round": 1,
+          "render_tokenize_agreement": true,
+          "native_full_text_agreement": true,
+          "exact_saved_ids": true
+        },
+        {
+          "round": 2,
+          "render_tokenize_agreement": true,
+          "native_full_text_agreement": true,
+          "exact_saved_ids": true
+        }
+      ],
+      "missing_id": "NOT_APPLICABLE",
+      "native_reference": null,
+      "source_sha256": {
+        "__init__.py": "bce551d7a066fc9ffd16b021a537284ba9b01d03981166c2ac2ed547c84318db",
+        "adapters.py": "aa2d860c8e5a18f3cd2b4bafe9f72143237d4ccc06184f34b915984e7181938b",
+        "check_pressure.py": "c5c51fffe85b3f10de97e55222c7cd91558e72cf1773df593a97a8ea26f8b580",
+        "contracts.py": "e588fa200291dd4469c86039fe71ddcaa5d82fc0f6191ad8bab2e982bef91cf1",
+        "fetch.py": "bb6c06c5f72090ada346d315e56503a6fbf7110ab8acb0a33b5535b77b668d12",
+        "live.py": "197881c06673fa9fceecd90bf4fb9551875a1dcc62ab7644414c0829253a7204",
+        "load.py": "c83547345c1578a33937452b7415487c508a5b8ea09328d2d63a39e1b2667934",
+        "native_conformance.py": "3d73895f935ead66b188816fb32a5e9f72a34564cd796644ef779eca98f10fd5",
+        "observer.py": "12cb3344fe75de353626f820a11966c926aaa072c905fdd33a1944350a905d1b",
+        "prepare.py": "e24a772b61f5ceecfb98328b2266e5cc6c7a03503ec51a15f024d91465322a03",
+        "pressure.py": "2c7ca494d79c0a13429638730dd2078730021aa8d3f139ed809370b2fce41856",
+        "runner.py": "c834671ffb6c49c074f8a3e5eca822ffce5ccb3b8f11b209e854afcb0e66837f",
+        "sampling.py": "cfea82b7a0442cdbc890aaf3031c2caab2aee6bb3d57874739c28425f6c4f94a",
+        "trace_report.py": "5c8a6718ccdbae495112d39b5caec5467d0c79edac0e9ec6eb673acec388915b",
+        "workloads.py": "0cad006c32c697032551e352e23bdec8edcc3f80ffdc22eb8d7d06abc2afc1c5"
+      },
+      "model_generation": false,
+      "gpu_execution": false,
+      "passed": true
+    },
+    {
+      "schema_version": 1,
+      "validation_type": "OFFLINE_NATIVE_REFERENCE_CONFORMANCE",
+      "profile_id": "fc9c2895f6ad01e620d311e61e4635be8f286ccc9916c212325927158508ea98",
+      "model": "mistralai/Mistral-7B-Instruct-v0.3",
+      "revision": "c170c708c41dac9275d15a8fff4eca08d52bab71",
+      "tokenizer_files": {
+        "config.json": {
+          "bytes": 601,
+          "sha256": "affafc6478ec0fd07a32f0ca57aa2fc57743f4d17d6730f86a96ac24d1507f99"
+        },
+        "special_tokens_map.json": {
+          "bytes": 414,
+          "sha256": "6fa06efa2785e450051989a6f8fb4416b10149ded485ddd3f127a40734f5cfd0"
+        },
+        "tokenizer.json": {
+          "bytes": 1961548,
+          "sha256": "e553af6fff7d7ad76e830608b218c5c0b0822998d5a1a96099a74cd3c1cb1a49"
+        },
+        "tokenizer_config.json": {
+          "bytes": 140874,
+          "sha256": "0533dec9cfe319163801b6618d0f3ec9cfa126b6288e3df5deca6e32acb09cd2"
+        }
+      },
+      "transformers": "5.17.0",
+      "checks": [
+        {
+          "round": 1,
+          "render_tokenize_agreement": true,
+          "native_full_text_agreement": true,
+          "exact_saved_ids": true
+        },
+        {
+          "round": 2,
+          "render_tokenize_agreement": true,
+          "native_full_text_agreement": true,
+          "exact_saved_ids": true
+        }
+      ],
+      "missing_id": "UNSUPPORTED_HF_HISTORY_WITHOUT_REWRITING",
+      "native_reference": {
+        "package": "mistral_common",
+        "version": "1.12.0",
+        "method": "InstructTokenizerV3._prepare_function_call",
+        "source_sha256": "54908375abfb5aa887cee5edb3bc63b3b31ec9ec140a5b987fc4ce489cf622ab",
+        "body": {
+          "name": "search_repository",
+          "arguments": {
+            "query": "KV"
+          }
+        }
+      },
+      "source_sha256": {
+        "__init__.py": "bce551d7a066fc9ffd16b021a537284ba9b01d03981166c2ac2ed547c84318db",
+        "adapters.py": "aa2d860c8e5a18f3cd2b4bafe9f72143237d4ccc06184f34b915984e7181938b",
+        "check_pressure.py": "c5c51fffe85b3f10de97e55222c7cd91558e72cf1773df593a97a8ea26f8b580",
+        "contracts.py": "e588fa200291dd4469c86039fe71ddcaa5d82fc0f6191ad8bab2e982bef91cf1",
+        "fetch.py": "bb6c06c5f72090ada346d315e56503a6fbf7110ab8acb0a33b5535b77b668d12",
+        "live.py": "197881c06673fa9fceecd90bf4fb9551875a1dcc62ab7644414c0829253a7204",
+        "load.py": "c83547345c1578a33937452b7415487c508a5b8ea09328d2d63a39e1b2667934",
+        "native_conformance.py": "3d73895f935ead66b188816fb32a5e9f72a34564cd796644ef779eca98f10fd5",
+        "observer.py": "12cb3344fe75de353626f820a11966c926aaa072c905fdd33a1944350a905d1b",
+        "prepare.py": "e24a772b61f5ceecfb98328b2266e5cc6c7a03503ec51a15f024d91465322a03",
+        "pressure.py": "2c7ca494d79c0a13429638730dd2078730021aa8d3f139ed809370b2fce41856",
+        "runner.py": "c834671ffb6c49c074f8a3e5eca822ffce5ccb3b8f11b209e854afcb0e66837f",
+        "sampling.py": "cfea82b7a0442cdbc890aaf3031c2caab2aee6bb3d57874739c28425f6c4f94a",
+        "trace_report.py": "5c8a6718ccdbae495112d39b5caec5467d0c79edac0e9ec6eb673acec388915b",
+        "workloads.py": "0cad006c32c697032551e352e23bdec8edcc3f80ffdc22eb8d7d06abc2afc1c5"
+      },
+      "model_generation": false,
+      "gpu_execution": false,
+      "passed": true
+    }
+  ],
+  "evidence_dimensions": {
+    "response_contract": "PASS",
+    "pre_dispatch_effect_gate": "PASS",
+    "offline_exact_append": "PASS",
+    "live_useful_model_loop": "NOT_RUN",
+    "natural_pressure_opportunities": "NOT_RUN",
+    "whole_worker_performance": "NOT_RUN",
+    "weight_identity_attestation": "UNKNOWN",
+    "time_dependent_passive_sampling": "NOT_IMPLEMENTED"
+  },
+  "ready_for_new_gpu_pressure_run": false,
+  "gpu_execution": false,
+  "runtime_cache_changes": false,
+  "limitations": [
+    "Mistral missing-ID raw call is recognized; pinned HF history remains unsupported without rewriting.",
+    "Llama has only illustrative format fixtures, no pinned profile/reference validation in this checkpoint.",
+    "Missing or unknown finish reason cannot authorize tool/control effects.",
+    "Profile fingerprint is declared experiment provenance, not weight attestation.",
+    "No new model capability or performance evidence."
+  ]
+}

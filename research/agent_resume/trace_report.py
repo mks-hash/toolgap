@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 import json
 from pathlib import Path
+from .readiness import file_hash
 
 
 def saved_span(state, length):
@@ -61,6 +62,8 @@ def analyze(rows, events, domain):
                     trajectory_id=row["trajectory_id"],
                     tool_index=index,
                     before_dispatch=step.get("cache_before_dispatch"),
+                    cache_samples=step.get("cache_samples", []),
+                    cache_window_summary=step.get("cache_window_summary"),
                     continuation_match_samples=[e["state"] for e in matches],
                     saved_prefix_match_samples=[
                         saved_span(e["state"], len(step["prefix_ids"])) for e in matches
@@ -107,6 +110,12 @@ def analyze(rows, events, domain):
         wasted_prefetch_bytes=None,
         usage_note="Publication and matching do not prove operation-specific consumption; waste remains unknown",
         observation_errors=[e for e in events if e["kind"] == "observation_error"],
+        scheduler_observer_service_ns=[
+            e["service_completed_ns"] - e["service_started_ns"]
+            for e in events
+            if e["kind"] == "observer_service_complete"
+        ],
+        overhead_note="Service includes mailbox response write, excludes its trace event; client wait is not active CPU cost. Net perturbation needs matched observation-on/off live calibration.",
         performance_claim=False,
     )
 
@@ -119,6 +128,8 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Never overwrite evidence")
+    if args.trace.resolve() != (args.block / "server-trace.jsonl").resolve():
+        parser.error("Retain the dedicated raw trace as BLOCK/server-trace.jsonl")
     rows = [
         json.loads(line)
         for line in (args.block / "tasks.jsonl").read_text().splitlines()
@@ -137,6 +148,15 @@ def main():
     if not events:
         raise ValueError("No events in the measured block")
     report = analyze(rows, events, manifest["clock_domain"])
+    report["source_artifacts_sha256"] = {
+        name: file_hash(args.block / name)
+        for name in (
+            "manifest.json",
+            "tasks.jsonl",
+            "summary.json",
+            "server-trace.jsonl",
+        )
+    }
     args.output.write_text(json.dumps(report, indent=2))
 
 

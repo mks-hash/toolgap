@@ -124,6 +124,20 @@ class TestPassiveObserver(unittest.TestCase):
         wrong = self.check_unchanged(self.f.tokens, salt="another", storage=True)
         self.assertEqual(wrong["residency"], "COLD")
 
+    def test_observed_backend_layout_and_imported_runtime_identity_are_real(self):
+        from research.agent_resume.readiness import runtime_provenance
+
+        state = self.check_unchanged(self.f.tokens)
+        identity = state["storage_identity"]
+        self.assertEqual(identity["page_size"], self.f.cache.page_size)
+        self.assertEqual(identity["layout"], "page_first")
+        self.assertEqual(identity["kv_dtype"], "bfloat16")
+        self.assertGreater(identity["bytes_per_token"], 0)
+        runtime = runtime_provenance(type(self.f.cache))
+        self.assertEqual(runtime["status"], "OBSERVED_CHECKOUT")
+        self.assertTrue(runtime["tracked_runtime_clean"])
+        self.assertEqual(len(runtime["head"]), 40)
+
     def test_default_observation_performs_no_filesystem_query(self):
         with mock.patch(
             "research.agent_resume.observer.os.stat", side_effect=AssertionError("stat")

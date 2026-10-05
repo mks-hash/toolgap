@@ -9,6 +9,7 @@ from .adapters import FamilyAdapter, ToolCall
 from .load import run_arrivals
 from .prepare import ROOT, ScriptedModel, call_text, tokenizer_manifest
 from .pressure import digest
+from .readiness import measurement_contract, provenance
 from .runner import run_task
 from .workloads import RepositoryTools, snapshot
 
@@ -21,6 +22,8 @@ async def check(args):
     if digest(packet) != envelope["sha256"]:
         raise ValueError("Packet changed")
     profile = packet["profile"]
+    if packet.get("measurement_contract") != measurement_contract():
+        raise ValueError("Prepare a current measurement packet")
     if (
         tokenizer_manifest(args.tokenizer, profile["profile_id"])["tokenizer_files"]
         != profile["tokenizer_files"]
@@ -29,7 +32,7 @@ async def check(args):
     tokenizer = AutoTokenizer.from_pretrained(
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
-    adapter = FamilyAdapter(profile["family"])
+    adapter = FamilyAdapter.from_profile(profile)
     corpus = snapshot(ROOT, profile["source_commit"])
 
     async def run(item):
@@ -90,6 +93,11 @@ async def check(args):
         validation_type="SCRIPTED_CPU_FIXTURE",
         model_generation=False,
         gpu_execution=False,
+        provenance=provenance(profile),
+        procedure_completed=True,
+        useful_live_tool_loop="NOT_RUN",
+        pressure_opportunity="NOT_RUN",
+        performance="NOT_RUN",
         real_regression_tests=sum(
             s["result"].get("tests", 0) for r in block["rows"] for s in r["tools"]
         ),

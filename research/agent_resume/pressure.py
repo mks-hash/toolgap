@@ -19,6 +19,15 @@ from .prepare import ROOT, tokenizer_manifest
 from .runner import GenerationTransport, run_task
 from .sampling import FileObserver, clock_domain
 from .workloads import RepositoryTools, snapshot
+from .readiness import (
+    measurement_contract,
+    provenance,
+    require_baseline,
+    require_live,
+    require_native,
+    verify_storage,
+    verify_initial_state,
+)
 
 
 def digest(value):
@@ -42,7 +51,7 @@ def prepare(args):
     tokenizer = AutoTokenizer.from_pretrained(
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
-    adapter = FamilyAdapter(profile["family"])
+    adapter = FamilyAdapter.from_profile(profile)
     corpus = snapshot(ROOT, profile["source_commit"])
     trace = fixed_trace(args.count)
     audits = {task["id"]: task for task in AUDITS}
@@ -62,6 +71,7 @@ def prepare(args):
         useful_tool="pinned repository audit and admission_hints CPU regression",
         artificial_tool_delay=False,
         gpu_validated=False,
+        measurement_contract=measurement_contract(),
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(
@@ -86,6 +96,17 @@ async def execute(args):
     if digest(packet) != envelope["sha256"]:
         raise ValueError("Prepared workload packet changed")
     profile = packet["profile"]
+    if packet.get("measurement_contract") != measurement_contract():
+        raise ValueError("Prepare a new workload with the current measurement contract")
+    if args.reconcile_ms != packet["measurement_contract"]["reconcile_interval_ms"]:
+        raise ValueError("Reconciliation differs from the frozen study contract")
+    native_hash = require_native(args.native_evidence, profile)
+    live_hash = require_live(args.live_evidence, profile)
+    baseline_binding = None
+    if args.mode == "proactive":
+        baseline_binding = require_baseline(
+            args.baseline, envelope["sha256"], args.observation
+        )
     if (
         tokenizer_manifest(args.tokenizer, profile["profile_id"])["tokenizer_files"]
         != profile["tokenizer_files"]
@@ -95,7 +116,7 @@ async def execute(args):
     tokenizer = AutoTokenizer.from_pretrained(
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
-    adapter = FamilyAdapter(profile["family"])
+    adapter = FamilyAdapter.from_profile(profile)
     corpus = snapshot(ROOT, profile["source_commit"])
     observer = (
         None
@@ -121,6 +142,19 @@ async def execute(args):
         response.raise_for_status()
         info = response.json()
         validate_server(info, deployment, profile)
+        identity_observer = FileObserver(args.probe_dir)
+        identity_state = await identity_observer.snapshot([0], None)
+        observed_storage = verify_storage(profile, deployment, identity_state)
+        initial_state = verify_initial_state(deployment, identity_state)
+        if baseline_binding:
+            resources = {**observed_storage, **initial_state}
+            if any(
+                resources.get(k) != v
+                for k, v in baseline_binding["resolved_resources"].items()
+            ):
+                raise ValueError(
+                    "Resolved cache resources/layout differ from the baseline"
+                )
         if deployment.get("clock_domain") != clock_domain():
             raise ValueError("Run client and server on the same Linux boot")
         expected_match = args.observation != "off"
@@ -147,6 +181,13 @@ async def execute(args):
                     weight_revision="OPERATOR_DECLARED",
                     reconcile_interval_ms=args.reconcile_ms,
                     experimental_unit="WHOLE_SHARED_WORKER_BLOCK",
+                    provenance=provenance(profile),
+                    native_evidence_sha256=native_hash,
+                    live_evidence_sha256=live_hash,
+                    observed_storage=observed_storage,
+                    initial_state=initial_state,
+                    measurement_contract=packet["measurement_contract"],
+                    baseline_binding=baseline_binding,
                 ),
                 indent=2,
             )
@@ -181,6 +222,7 @@ async def execute(args):
                         context_limit=profile["server_settings"]["context_length"],
                         cache_salt=item["cache_salt"],
                         on_boundary=observer.snapshot if observer else None,
+                        sampling_config=packet["measurement_contract"]["sampling"],
                         on_record=record_outcome,
                     )
                     row["tool_artifacts"] = tools.artifacts
@@ -211,6 +253,8 @@ async def execute(args):
         cleanup_unresolved=unresolved,
         gpu_opportunity_verdict="REQUIRES_SERVER_TRACE_ANALYSIS",
         performance_claim=False,
+        procedure_completed=True,
+        study_success=not unresolved and summary["successful"] == summary["tasks"],
     )
     (args.output / "summary.json").write_text(json.dumps(summary, indent=2))
     print(json.dumps(summary))
@@ -230,12 +274,15 @@ def main():
     run.add_argument("--packet", required=True, type=Path)
     run.add_argument("--deployment", required=True, type=Path)
     run.add_argument("--tokenizer", required=True, type=Path)
+    run.add_argument("--native-evidence", required=True, type=Path)
+    run.add_argument("--live-evidence", required=True, type=Path)
+    run.add_argument("--baseline", type=Path)
     run.add_argument("--server", required=True)
     run.add_argument("--mode", choices=("request_time", "proactive"), required=True)
     run.add_argument(
         "--observation", choices=("memory", "memory-and-stat", "off"), default="memory"
     )
-    run.add_argument("--probe-dir", type=Path)
+    run.add_argument("--probe-dir", required=True, type=Path)
     run.add_argument("--reconcile-ms", type=int, default=50)
     run.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
@@ -244,8 +291,8 @@ def main():
     if args.command == "prepare":
         prepare(args)
     else:
-        if args.observation != "off" and args.probe_dir is None:
-            parser.error("--probe-dir is required when observing")
+        if args.mode == "proactive" and args.baseline is None:
+            parser.error("--baseline is required for a comparison")
         raise SystemExit(0 if asyncio.run(execute(args)) else 1)
 
 

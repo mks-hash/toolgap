@@ -10,6 +10,7 @@ from pathlib import Path
 
 from research.agent_resume.observer import probe_prefix
 from research.agent_resume.sampling import clock_domain
+from research.agent_resume.readiness import runtime_provenance
 
 
 def install():
@@ -26,6 +27,7 @@ def install():
         return
     Scheduler._toolgap_pressure_probe_installed = True
     domain = clock_domain()
+    runtime_identity = runtime_provenance(UnifiedRadixCache)
     original_event = hicache_trace.event
     io_context = threading.local()
 
@@ -144,13 +146,23 @@ def install():
                 except Exception as exc:
                     value = dict(error=type(exc).__name__)
                 value["clock_domain"] = domain
+                value["runtime_identity"] = runtime_identity
                 value["scheduler_observation_overhead_ns"] = (
                     time.monotonic_ns() - started
+                )
+                value["scheduler_cost_scope"] = (
+                    "REQUEST_READ_AND_PROBE; EXCLUDES_RESPONSE_WRITE_AND_TRACE"
                 )
                 temporary = response.with_suffix(".tmp")
                 temporary.write_text(json.dumps(value))
                 temporary.replace(response)
                 request.unlink(missing_ok=True)
+                hicache_trace.event(
+                    "observer_service_complete",
+                    nonce=nonce,
+                    service_started_ns=started,
+                    service_completed_ns=time.monotonic_ns(),
+                )
         return result
 
     Scheduler._process_hicache_events = tick

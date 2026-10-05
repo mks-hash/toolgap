@@ -98,9 +98,8 @@ class TestFamilyFormats(unittest.TestCase):
             with self.assertRaises(ValueError):
                 adapter.parse(call_text(family, call), {"other"})
 
-    def test_mistral_requires_model_id(self):
+    def test_mistral_rejects_malformed_model_id(self):
         for body in [
-            dict(name="t", arguments={}),
             dict(name="t", arguments={}, id="short"),
             dict(name="t", arguments={}, id="12345678!"),
         ]:
@@ -204,6 +203,8 @@ class TestUsefulTools(unittest.IsolatedAsyncioTestCase):
 
 class TestRunner(unittest.IsolatedAsyncioTestCase):
     async def test_live_diagnostic_cli_records_rows_and_controls_with_mock_model(self):
+        from research.agent_resume.sampling import clock_domain
+
         tokenizer = FormatFixture()
         profile = dict(
             model="model",
@@ -221,6 +222,7 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
             model_path="/model",
             runtime_sha="a" * 40,
             resolved_cache_mode="FULL",
+            clock_domain=clock_domain(),
         )
         original_http = httpx.AsyncClient
         with tempfile.TemporaryDirectory() as directory:
@@ -237,7 +239,10 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                         )
                     body = json.loads(request.content)
                     if request.url.path == "/generate":
-                        result = dict(output_ids=tokenizer.encode(next(texts)))
+                        result = dict(
+                            output_ids=tokenizer.encode(next(texts)),
+                            meta_info=dict(finish_reason=dict(type="stop")),
+                        )
                         return httpx.Response(
                             200,
                             text="data: " + json.dumps(result) + "\n\ndata: [DONE]\n\n",
@@ -268,6 +273,8 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                     server="http://fixture",
                     mode=mode,
                     reconcile_ms=None,
+                    native_evidence=root / "native.json",
+                    probe_dir=root,
                 )
                 fake_transformers = types.SimpleNamespace(
                     AutoTokenizer=types.SimpleNamespace(
@@ -283,6 +290,16 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                     patch("research.agent_resume.live.snapshot", return_value=corpus()),
                     patch("research.agent_resume.live.TASKS", [TASKS[0]]),
                     patch("httpx.AsyncClient", side_effect=http_factory),
+                    # Synthetic transport fixtures do not supply live proof.
+                    patch(
+                        "research.agent_resume.live.require_native",
+                        return_value="fixture",
+                    ),
+                    patch("research.agent_resume.live.verify_storage", return_value={}),
+                    patch(
+                        "research.agent_resume.live.FileObserver.snapshot",
+                        return_value={},
+                    ),
                 ):
                     self.assertTrue(await execute(args))
                 row = json.loads((args.output / "tasks.jsonl").read_text())
@@ -487,7 +504,7 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(payload["sampling_params"]["temperature"], 0)
             return httpx.Response(
                 200,
-                text='data: {"output_ids":[8]}\n\ndata: {"output_ids":[8,9],"meta_info":{"cache":2}}\n\ndata: [DONE]\n\n',
+                text='data: {"output_ids":[8]}\n\ndata: {"output_ids":[8,9],"meta_info":{"cache":2,"finish_reason":{"type":"stop"}}}\n\ndata: [DONE]\n\n',
             )
 
         async with httpx.AsyncClient(

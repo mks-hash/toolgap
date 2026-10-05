@@ -5,6 +5,7 @@ OS metadata-cache effects and scheduler time remain instrumentation overhead.
 """
 
 import os
+import hashlib
 import stat
 import time
 from array import array
@@ -113,19 +114,37 @@ def probe_prefix(cache, input_ids, cache_salt=None, *, include_storage=False):
     started = time.monotonic_ns()
     state = walk_residency(core, key, cache.page_size)
     pool = cache.cache_controller.mem_pool_host
+    physical = pool.anchor_entry.host_pool
+    threshold = max(cache.prefetch_threshold, cache.cache_controller.prefetch_threshold)
+    # Lexical normalization only: memory-only samples must not stat the root.
+    root = Path(os.path.abspath(backend.file_path))
     state.update(
+        page_size=cache.page_size,
+        prefetch_threshold=threshold,
         prefix_tokens=len(key),
         cache_read_started_ns=started,
         cache_read_completed_ns=time.monotonic_ns(),
         host_used_tokens=pool.anchor_entry.host_pool.size - pool.available_size(),
         host_available_tokens=pool.available_size(),
         device_available_tokens=cache.token_to_kv_pool_allocator.available_size(),
+        device_capacity_tokens=cache.token_to_kv_pool_allocator.size,
         inflight_tokens=cache.cache_controller.prefetch_tokens_occupied,
         ongoing_prefetch_count=len(cache.ongoing_prefetch),
         storage_available_tokens=None,
         storage_file_bytes=None,
         observation="PASSIVE_PYTHON_FULL",
         storage_check="NOT_REQUESTED",
+        storage_identity=dict(
+            namespace=root.name,
+            root_sha256=hashlib.sha256(str(root).encode()).hexdigest(),
+            page_size=cache.page_size,
+            prefetch_threshold=threshold,
+            layout=getattr(physical, "layout", None),
+            kv_dtype=str(
+                getattr(getattr(physical, "device_pool", None), "store_dtype", None)
+            ).removeprefix("torch."),
+            bytes_per_token=getattr(physical, "size_per_token", None),
+        ),
     )
     if include_storage:
         state["storage_check_started_ns"] = time.monotonic_ns()

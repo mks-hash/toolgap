@@ -112,6 +112,7 @@ class ScriptedModel:
             first_token_ns=now,
             completed_ns=now,
             validation_type="SCRIPTED_CPU_FIXTURE",
+            meta_info=dict(finish_reason=dict(type="stop")),
         )
 
 

@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "validation_type": "LOCAL_READINESS_AND_MEASUREMENT_CHECKPOINT",
+  "scope": "Harness/SDK gates and observation; runtime cache algorithms unchanged",
+  "branch": "feat/passive-pressure-workload",
+  "harness": {
+    "schema_version": 1,
+    "profile_sha256": "3967c1f847b9782a1959a5d6369ff7960e036c667765f9ae09cbb4d13ee91aa9",
+    "adapter_profile_id": "a7b6eec150aa61f6200a6283e063b0759c27c24c5c9f18c9769442472e03d025",
+    "source_sha256": {
+      "research/agent_resume/__init__.py": "bce551d7a066fc9ffd16b021a537284ba9b01d03981166c2ac2ed547c84318db",
+      "research/agent_resume/adapters.py": "aa2d860c8e5a18f3cd2b4bafe9f72143237d4ccc06184f34b915984e7181938b",
+      "research/agent_resume/check_pressure.py": "cced5a9a825ab343cb0f2c9b8a0d812912d9ba414e5fc4d0d02ec0b365aceeb1",
+      "research/agent_resume/contracts.py": "e588fa200291dd4469c86039fe71ddcaa5d82fc0f6191ad8bab2e982bef91cf1",
+      "research/agent_resume/fetch.py": "bb6c06c5f72090ada346d315e56503a6fbf7110ab8acb0a33b5535b77b668d12",
+      "research/agent_resume/live.py": "7742b21e8bed6b8bcc0936d83664cbea200a1c44c5f008cabb18758d0c7eb0ff",
+      "research/agent_resume/load.py": "431f9e0485ef4e61ee10e87fd78c1047b934e33861deb80aa5b39ff52965844a",
+      "research/agent_resume/native_conformance.py": "3d73895f935ead66b188816fb32a5e9f72a34564cd796644ef779eca98f10fd5",
+      "research/agent_resume/observer.py": "d09214ec40e7b76fcb9d92a4005bf7d5d088b93686bbea61b79ed001d9c69397",
+      "research/agent_resume/plugin/toolgap_pressure_probe.py": "621bff458f371be5f6e1d9d1a42a3e703971e91db8dfc3ad186dff1d107ef92a",
+      "research/agent_resume/prepare.py": "e24a772b61f5ceecfb98328b2266e5cc6c7a03503ec51a15f024d91465322a03",
+      "research/agent_resume/pressure.py": "0c81601c07df4f87c2d0c7022e073c9210d3147685bbf4fbdcd830998e34444e",
+      "research/agent_resume/readiness.py": "cfe7f4ecc0b4e30a05b7844bf195a2cbbd7d1297f69c535ec5d9a3e20345bbd9",
+      "research/agent_resume/runner.py": "675e38e5f192f54192600cb066ce13417ac2aaa5c819ae6438672cc6403a3d6f",
+      "research/agent_resume/sampling.py": "af5517b1ca5e055a27e5e6e15eeb17c5abaa1960ea0b3721d692b0ceadfaa8a7",
+      "research/agent_resume/trace_report.py": "6861b26a6020209febe8e55a4ddb55bd0226ebcca72a5126258b44b674a4ee1f",
+      "research/agent_resume/workloads.py": "ecbda9b9fd031cbb51d73c9153b8d693a9ad367e2bee336c2840586d878d16c0",
+      "src/toolgap/__init__.py": "82a4cbed43eb4b6de2d70d7531cbae70945dd0a4f1c17242476acf8ad218655c",
+      "src/toolgap/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "src/toolgap/admission.py": "fb5b57ffdfe203b4fabf296546a35cbfffc452fd230f66fcf516e70f1369e424",
+      "src/toolgap/cli.py": "ebacc40492eb35107d27df57c8068bda91e34f99e1fe301dd131fa05b0be5f21",
+      "src/toolgap/client.py": "3ac2f040909975f35ac341c9e380cab65ac2a2320ba1e20be25c78b28694b496",
+      "src/toolgap/diagnostics.py": "46512e16d705398958765e8ba6c2ecd2db388c55b15e2aec6faa82e46e62d24b"
+    },
+    "harness_head": "1a5e34c8374d641becf9dc63975a7b62382cfa0a",
+    "python": "3.12.14",
+    "packages": {
+      "transformers": "5.17.0",
+      "tokenizers": "0.23.2",
+      "httpx": "0.28.1",
+      "mistral_common": "1.12.0",
+      "torch": "2.13.0+cu130"
+    }
+  },
+  "dirty_checkout": true,
+  "tests": {
+    "passed": 119,
+    "subtests_passed": 69,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 19,
+    "real_cpu_full_file_observer_tests": 10
+  },
+  "native_profiles": {
+    "qwen": "PASS_TWO_REFERENCE_ROUNDS",
+    "qwen7": "PASS_TWO_REFERENCE_ROUNDS",
+    "mistral": "PASS_TWO_REFERENCE_ROUNDS; NO_ID_HF_HISTORY_UNSUPPORTED",
+    "qwen_pressure": "PASS_TWO_REFERENCE_ROUNDS"
+  },
+  "scripted_workload": {
+    "callers": 12,
+    "successful": 12,
+    "real_cpu_regressions": 108,
+    "validation_type": "SCRIPTED_CPU_FIXTURE",
+    "actual_model_generation": false
+  },
+  "dimensions": {
+    "native_contract": "PASS",
+    "local_readiness_gates": "PASS",
+    "observer_purity_real_cpu_cache": "PASS",
+    "nonblocking_sampling_contract": "PASS",
+    "cold_block_guards": "PASS_LOCAL_FIXTURES",
+    "actual_model_generation": "NOT_RUN",
+    "useful_live_tool_loop": "NOT_RUN",
+    "new_gpu_fit": "NOT_RUN",
+    "natural_pressure_opportunity": "NOT_RUN",
+    "net_live_instrumentation_overhead": "NOT_RUN",
+    "performance": "NOT_RUN",
+    "weights_attestation": "UNKNOWN"
+  },
+  "consumed_restore_tokens": null,
+  "wasted_prefetch_bytes": null,
+  "current_mistral_pilot": {
+    "successful": 0,
+    "tasks": 3,
+    "tools": 0,
+    "pressure": "NOT_RUN",
+    "outcome_unchanged": true
+  },
+  "initial_test_invocations": [
+    {
+      "failed": 9,
+      "cause": "CPU engine flag omitted; fixture setup only"
+    },
+    {
+      "passed": 8,
+      "failed": 1,
+      "cause": "Installed ninja was absent from PATH; fixture setup only"
+    }
+  ],
+  "remaining": [
+    "Verify cold-block reset/startup on actual runtime and freeze equal kernel/model warmup",
+    "Live observation-on/off calibration with retained quality failures",
+    "Bounded approved useful-model pilot before pressure; no new GPU authorized by this checkpoint"
+  ],
+  "artifacts": [
+    {
+      "relative_private_path": "work/readiness-check/regressions-package.txt",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "832298d5fa3f27b9b590d49ee06eb83ec9415f23144da28331827b16d7fe4ae8"
+    },
+    {
+      "relative_private_path": "work/readiness-check/regressions-package.xml",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "d838f8a4bd2555f592294bea2a2320dc598049e623457df1751e4b846c71eaf2"
+    },
+    {
+      "relative_private_path": "work/readiness-check/qwen-native-package.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "3b896098118fd52edab4575c5bc1fde932953feaa2b94a842d3840829188d426"
+    },
+    {
+      "relative_private_path": "work/readiness-check/qwen7-native-package.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "e68f5ebc0dbd6a48b6bee64502c3af6e992843061f248fbc03716c75454b35c4"
+    },
+    {
+      "relative_private_path": "work/readiness-check/mistral-native-package.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "aaae92e818b21375e33ad6dab0539403c9c3071d5640672aeddbe73aaedc167f"
+    },
+    {
+      "relative_private_path": "work/readiness-check/qwen-pressure-native-package.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "6fd1d5637ae5e5ceec11751010b297f09f951e345811746cb53bf5a802cee968"
+    },
+    {
+      "relative_private_path": "work/readiness-check/qwen-pressure-packet-package.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "32bd2ea51a005680e3ffcc3124a60740873e9f40faa093d0064447f9eebb7eef"
+    },
+    {
+      "relative_private_path": "work/readiness-check/qwen-scripted-pressure-package.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "26c1f6d86e08fdd8d652b86821ef75c130f123d6c2cc0e43aa5b25996101fbe7"
+    },
+    {
+      "relative_private_path": "work/readiness-check/source-snapshot.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "749b8b6010cd29451aadfdc08bb1d05686f6ae36ed380000c5504cd0f1163d59"
+    }
+  ],
+  "gpu_execution": false,
+  "network_fetch": false,
+  "runtime_algorithm_changes": false,
+  "public_push": false,
+  "publication": false,
+  "ready_for_new_gpu_pressure_run": false,
+  "test_source_sha256": {
+    "tests/test_readiness_sampling.py": "49a7918b9a46b0ce66d4cf5b9e0c5cafdf31116d13f956b4fd16559e10a5d190",
+    "tests/test_passive_observer_real_cache.py": "4ae12ee36d1725fe1bf21fffbf947fa6393a3b95a348c8c5318cf4e684a2ceda",
+    "tests/test_agent_contract.py": "caa9c0fc539f08117302b11f91ecb12f92abeecc078cafcaa4b2e878859f6f6b",
+    "tests/test_research_harness.py": "5503559cc0c7a03646d36ad61e50cf2c84499985fc51aea26fa6ed36887d8b64",
+    "tests/test_pressure_workload.py": "9c270f09eb8bba21bc01290db1792cb1e745b54324d4a78a6c387343c937f5ff",
+    "tests/test_admission.py": "d566c567178bbe6ed228652537db0c294e73377748726b644862934f323c1336",
+    "tests/test_admission_hints.py": "a036cdcc8e09022fe082e2eb4bdd22f30b4072bb1a067f3f4899d4fedec1bd58",
+    "tests/test_reconciliation.py": "8e038183f0c0358dabe969d07968f86744302792f2a2be513d6d55bdafc4c495",
+    "tests/test_client_policy.py": "cb87d5b13893f5a07575f548f3a04d9aa14e2605ba581a4320957bd2142165bc",
+    "tests/test_multi_session_workflow.py": "bd4deb08232cad97c1ab1d4398b050eb8349ff0b2ade97a5ac468886d582782c"
+  }
+}

@@ -109,7 +109,7 @@ class TestPressure(unittest.IsolatedAsyncioTestCase):
         )
         self.assertFalse(tools.grade(task, json.dumps(final), records[:-1]))
 
-    async def test_observe_before_dispatch_not_before_continuation(self):
+    async def test_background_samples_are_not_dispatch_state(self):
         task = AUDITS[0]
         files = {
             r["path"]: dict(text=r["needle"], sha256="fixture")
@@ -138,11 +138,12 @@ class TestPressure(unittest.IsolatedAsyncioTestCase):
             on_boundary=observe,
             cache_salt="fixed",
         )
-        self.assertEqual(len(observations), 2)
+        self.assertTrue(observations)
         self.assertEqual(row["cache_salt"], "fixed")
         self.assertFalse(row["task_success"])  # missing actual regression remains wrong
-        for step, at in zip(row["tools"], observations):
-            self.assertLess(at, step["dispatched_ns"])
+        for step in row["tools"]:
+            self.assertTrue(step["observer_cleanup_confirmed"])
+            self.assertEqual(step["cache_window_summary"]["dispatch_state"], "UNKNOWN")
             self.assertLess(step["completed_ns"], step["continuation_submitted_ns"])
 
     async def test_mailbox_concurrency_mismatch_timeout_and_cancellation(self):
@@ -266,6 +267,7 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
         import types
         import httpx
         from research.agent_resume.pressure import execute, digest
+        from research.agent_resume.readiness import measurement_contract
         from research.agent_resume.workloads import TASKS
         from research.agent_resume.sampling import clock_domain
 
@@ -297,7 +299,12 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
         trace = fixed_trace(2)
         for item in trace:
             item.update(offset_ms=0, task=task)
-        packet = dict(profile=profile, arrivals=trace, max_active=2)
+        packet = dict(
+            profile=profile,
+            arrivals=trace,
+            max_active=2,
+            measurement_contract=measurement_contract(),
+        )
         original_http = httpx.AsyncClient
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -336,7 +343,12 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                         return httpx.Response(
                             200,
                             text="data: "
-                            + json.dumps(dict(output_ids=tokenizer.encode(text)))
+                            + json.dumps(
+                                dict(
+                                    output_ids=tokenizer.encode(text),
+                                    meta_info=dict(finish_reason=dict(type="stop")),
+                                )
+                            )
                             + "\n\ndata: [DONE]\n\n",
                         )
                     return httpx.Response(
@@ -365,8 +377,11 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                     server="http://fixture",
                     mode=mode,
                     observation="off",
-                    probe_dir=None,
+                    probe_dir=root,
                     reconcile_ms=50,
+                    native_evidence=root / "native.json",
+                    live_evidence=root / "live",
+                    baseline=root / "baseline",
                 )
                 fake_transformers = types.SimpleNamespace(
                     AutoTokenizer=types.SimpleNamespace(
@@ -383,6 +398,30 @@ class TestPressureCLI(unittest.IsolatedAsyncioTestCase):
                         "research.agent_resume.pressure.snapshot", return_value=corpus
                     ),
                     patch("httpx.AsyncClient", side_effect=factory),
+                    # Synthetic HTTP plumbing; readiness is tested separately.
+                    patch(
+                        "research.agent_resume.pressure.require_native",
+                        return_value="fixture",
+                    ),
+                    patch(
+                        "research.agent_resume.pressure.require_live",
+                        return_value="fixture",
+                    ),
+                    patch(
+                        "research.agent_resume.pressure.require_baseline",
+                        return_value=None,
+                    ),
+                    patch(
+                        "research.agent_resume.pressure.verify_storage", return_value={}
+                    ),
+                    patch(
+                        "research.agent_resume.pressure.verify_initial_state",
+                        return_value={},
+                    ),
+                    patch(
+                        "research.agent_resume.pressure.FileObserver.snapshot",
+                        return_value={},
+                    ),
                 ):
                     self.assertTrue(await execute(args))
                 rows = [

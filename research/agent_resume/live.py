@@ -13,6 +13,14 @@ from .adapters import FamilyAdapter
 from .prepare import ROOT, tokenizer_manifest
 from .runner import GenerationTransport, run_task
 from .workloads import RepositoryTools, TASKS, snapshot
+from .readiness import (
+    file_hash,
+    live_result,
+    provenance,
+    require_native,
+    verify_storage,
+)
+from .sampling import FileObserver, clock_domain
 
 
 def validate_server(info, deployment, profile):
@@ -29,6 +37,15 @@ def validate_server(info, deployment, profile):
     for key, value in expected.items():
         if config.get(key) != value:
             raise ValueError(f"Server setting differs: {key}")
+    for key in (
+        "quantization",
+        "kv_cache_dtype",
+        "hicache_storage_backend_extra_config",
+    ):
+        if config.get(key) not in (None, "auto") and config.get(key) != profile[
+            "server_settings"
+        ].get(key):
+            raise ValueError(f"Unexpected precision setting: {key}")
     if len(deployment["runtime_sha"]) != 40 or any(
         c not in "0123456789abcdef" for c in deployment["runtime_sha"]
     ):
@@ -41,15 +58,19 @@ async def execute(args):
     from transformers import AutoTokenizer
 
     profile = json.loads(args.profile.read_text())
+    native_hash = require_native(args.native_evidence, profile)
     actual = tokenizer_manifest(args.tokenizer, profile["profile_id"])
     if actual["tokenizer_files"] != profile["tokenizer_files"]:
         raise ValueError("Local tokenizer files differ from pinned profile")
     deployment = json.loads(args.deployment.read_text())
+    if deployment.get("clock_domain") != clock_domain():
+        raise ValueError("Live diagnostic and server must share a Linux boot")
+    observer = FileObserver(args.probe_dir)
     tokenizer = AutoTokenizer.from_pretrained(
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
     corpus = snapshot(ROOT, profile["source_commit"])
-    args.output.mkdir(parents=True, exist_ok=True)
+    args.output.mkdir(parents=True, exist_ok=False)
 
     # Retain failed tasks and raw IDs. Never silently retry generation.
     def write(row):
@@ -69,6 +90,9 @@ async def execute(args):
         response.raise_for_status()
         info = response.json()
         validate_server(info, deployment, profile)
+        observed_storage = verify_storage(
+            profile, deployment, await observer.snapshot([0], None)
+        )
         (args.output / "manifest.json").write_text(
             json.dumps(
                 dict(
@@ -80,6 +104,9 @@ async def execute(args):
                     cache_state="UNMEASURED",
                     physical_io="UNMEASURED",
                     weight_revision="OPERATOR_DECLARED",
+                    provenance=provenance(profile),
+                    native_evidence_sha256=native_hash,
+                    observed_storage=observed_storage,
                 ),
                 indent=2,
             )
@@ -98,7 +125,7 @@ async def execute(args):
                 for task in TASKS:
                     tools = RepositoryTools(corpus, ROOT)
                     row = await run_task(
-                        FamilyAdapter(profile["family"]),
+                        FamilyAdapter.from_profile(profile),
                         tokenizer,
                         GenerationTransport(http),
                         tools,
@@ -118,11 +145,26 @@ async def execute(args):
         (args.output / "control-events.json").write_text(
             json.dumps(control_events, indent=2)
         )
-    return (
-        not unresolved_cleanup
-        and all(r["task_success"] for r in rows)
-        and len(rows) == len(TASKS)
+    result = live_result(rows, [t["id"] for t in TASKS], unresolved_cleanup)
+    result.update(
+        provenance=provenance(profile),
+        cleanup_unresolved=unresolved_cleanup,
+        artifacts_sha256={
+            name: file_hash(args.output / name)
+            for name in ("manifest.json", "tasks.jsonl", "control-events.json")
+        },
     )
+    (args.output / "readiness.json").write_text(json.dumps(result, indent=2))
+    print(
+        json.dumps(
+            dict(
+                procedure_completed=True,
+                study_success=result["study_success"],
+                dimensions=result["dimensions"],
+            )
+        )
+    )
+    return result["study_success"]
 
 
 def main():
@@ -130,6 +172,8 @@ def main():
     parser.add_argument("--profile", required=True, type=Path)
     parser.add_argument("--deployment", required=True, type=Path)
     parser.add_argument("--tokenizer", required=True, type=Path)
+    parser.add_argument("--native-evidence", required=True, type=Path)
+    parser.add_argument("--probe-dir", required=True, type=Path)
     parser.add_argument("--server", required=True)
     parser.add_argument("--mode", choices=("request_time", "proactive"), required=True)
     parser.add_argument("--output", required=True, type=Path)
