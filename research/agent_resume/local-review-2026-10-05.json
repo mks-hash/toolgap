@@ -241,5 +241,131 @@
       "final-image/regressions.xml.first-attempt": "dc21c3cd529e9d658b84c1e3ac702b7e0cd2e421aa32d5fcb98ad72b78d8e6be"
     },
     "next_acceptance": "New frozen workload and useful live gate are required before pressure; no paid execution is authorized by these local checks"
+  },
+  "hypothesis_alignment_review": {
+    "validation_type": "LOCAL_CPU_CODE_LIFECYCLE_AND_MEASUREMENT_AUDIT",
+    "code_commit_sha": "e6e99b2b368465db8fc2a0b32eea3abd00cbefdb",
+    "runtime_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+    "source_sha256": {
+      "research/agent_resume/check_pressure.py": "a6db847c6ab8f752a7dfc7b4e6882d21609d29c65d2d8a933743f0011ff77090",
+      "research/agent_resume/live.py": "289ffff24254da762aac20e827d6d79bf695394642eb5c1537864b6f8b3e3e9a",
+      "research/agent_resume/plugin/toolgap_pressure_probe.py": "c6f90584656425329222fc5298fa37b7680c1893ce7972f359ea8645998dcd9e",
+      "research/agent_resume/pressure.py": "a0a442e5ae6d32956a2428fb99c84c904b5434860ae52a55a98a3f6f06310a1a",
+      "research/agent_resume/readiness.py": "690987fc24a74b21588fa4d109d0986b0c8f89eacd1157be240229dc1a2b3303",
+      "research/agent_resume/runner.py": "c1bc5157244079ab6711e13f39593eef060d8bea59cbed7a7b58ae98ffd31c69",
+      "research/agent_resume/trace_report.py": "6cf84c78f63ddcea6c38fe7e27e944e13a23c4d9eadbb6e2f610596bf956643a",
+      "tests/test_passive_observer_real_cache.py": "7140888722c6b9d8e13986a16157c1b038ae1fe541946b290321b6d449c1b531",
+      "tests/test_pressure_workload.py": "f994b3750ecfafb13d9d45c02d9ab0e17604e4b07a19bf82a8b8fc0a4bb437d7",
+      "tests/test_readiness_sampling.py": "5dab68b518a28587327f71d72c65a833de0114df5ca70ac5c7a7ffff800be6fc",
+      "tests/test_research_harness.py": "f74b8c2ab75f7ec1e3f37973990046ff956acd76fa2913013385318962794e90"
+    },
+    "scope": [
+      "exact-prefix identity and ordinary continuation/H2D paths",
+      "finite I/O terminal cleanup, cancellation, TTL, replacement and early join",
+      "SDK lease ownership and operation usage",
+      "useful-live gate versus actual pressure tasks and limits",
+      "request-ID correlated physical reads, publication and cache tier counters",
+      "passive sampling trigger applicability and evidence boundaries"
+    ],
+    "findings": [
+      {
+        "id": "EXACT_PREFIX_INDEPENDENCE",
+        "before": "Wrong final answer marked correct saved IDs FAIL; missing IDs could raise; no transitions vacuously passed the prefix predicate",
+        "after": "Independent actual transition classification; missing transitions NOT_RUN; malformed/changed IDs FAIL; answer quality remains mandatory"
+      },
+      {
+        "id": "ABANDONED_TRAJECTORY_USAGE",
+        "before": "Late trajectory failure finalized all earlier published restores with used_tokens=0",
+        "after": "Owned cancellation/cleanup retained; operation-specific consumption remains unknown"
+      },
+      {
+        "id": "WORKLOAD_GATE_MISMATCH",
+        "before": "Four-round small diagnostic tasks gated six-round long-context pressure audits",
+        "after": "Contract v3 freezes existing six-round pressure limit; pressure requires exact packet-bound representative live tasks; legacy diagnostics remain separate"
+      },
+      {
+        "id": "ORDINARY_CONTINUATION_ATTRIBUTION",
+        "before": "Proactive read/publication only; baseline request reads and H2D/tier counters not correlated",
+        "after": "Actual continuation RID links request-time reads, CPU H2D enqueue, validated whole-prompt server tier counts and timeline; operation-specific usage/waste stay unknown"
+      },
+      {
+        "id": "FIXED_DISPATCH_TRIGGER",
+        "status": "EXISTING_LIMITATION_RECORDED",
+        "detail": "Terminal CACHED does not observe later eviction; measure dispatch-reachable versus later windows before changing policy"
+      }
+    ],
+    "local_checks": {
+      "toolgap_tests": 173,
+      "toolgap_subtests": 124,
+      "runtime_tests": 57,
+      "runtime_subtests": 14,
+      "xml": {
+        "harness.xml": {
+          "tests": 297,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "runtime.xml": {
+          "tests": 71,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "official_qwen7_native_reference": "PASS_TWO_ROUNDS",
+      "scripted_callers": 12,
+      "scripted_successful": 12,
+      "actual_cpu_regression_executions": 108,
+      "network": "DISABLED",
+      "gpu": "DISABLED",
+      "ruff": "PASS",
+      "diff_check": "PASS"
+    },
+    "setup_attempts_retained": [
+      {
+        "attempt": "IMAGE_ENTRYPOINT",
+        "result": "STOPPED_BEFORE_TESTS; CPU_NO_GPU_NO_NETWORK",
+        "error": "Explicit CPU entrypoint was missing; image GPU entrypoint exited because no driver was available"
+      },
+      {
+        "attempt": "ALL_TEST_COLLECTION",
+        "result": "COLLECTION_ERROR_BEFORE_TESTS",
+        "error": "Missing demo plugin import path; corrected CPU validation PYTHONPATH; no test skipped or weakened"
+      }
+    ],
+    "raw_evidence": {
+      "access": "PRIVATE_IGNORED_WORK_DIRECTORY",
+      "sha256": {
+        "before-fix.log": "09554ee15e25f90fee0a558d4b403564785c2c9c488cbb57c9a47fc37fc57110",
+        "before-fix-usage.json": "74d1bdd83a76ce939fc19239723e610744f3142fd27a5646625c64b2285e2169",
+        "host-check.log": "b0140a921e0d8870c5bebb1940448f44ff8fff526af889da7b327301f0bceb78",
+        "first-check.log": "21829e40477548c770d448363b77c9f73dd9981a85dacfb192cedcaf74847c42",
+        "final-image.entrypoint-attempt.log": "65db583efad37cb6e55e998dcb50d707cfda6685f0303274177849e8b7d00e40",
+        "final-image.collection-attempt.log": "36dee372362650cc419c205a42740a2c98c14078449e13f66818355d1e6d2c26",
+        "final-image.log": "a3a659093b082869f1e7e688e2816e67fd6ca313c8e025db4745e98cde00400f",
+        "final_image_cpu.sh": "c4b218c0ecc0e22389882bd0d609a4e5b87bc01f002f4d807342c836d8af7462",
+        "final-image/native.json": "e8bb9375229dc59b4abb368b850e9379fcb8955303cbbb7e2b00e50da2139c80",
+        "final-image/harness.xml": "797e5e9d14ca15adc8ba0a2bbf55658e216c8bd2efdbcbdfab9b2b8583100470",
+        "final-image/runtime.xml": "361179a25282a312b07cbee82b8835daaf269eb45f1264a0fef8fe56fb7790a9",
+        "final-image/packet.json": "5b86ad6a40e81000aca2567e4a6fa28b8c705f2207b6d8a2a42cc39fc1ef46ba",
+        "final-image/scripted.json": "acfb7cae5afab575c73dab9b2eda1ddb79941af57ba30cbbbdd40e1b4f866838"
+      }
+    },
+    "runtime_changed": false,
+    "production_sdk_changed": false,
+    "historical_evidence_changed": false,
+    "new_gpu_execution": false,
+    "outstanding": {
+      "new_packet_useful_live": "NOT_RUN",
+      "natural_pressure_opportunities": "NOT_RUN",
+      "observer_live_calibration": "NOT_RUN",
+      "matched_whole_worker_benefit": "NOT_RUN",
+      "operation_specific_consumption": "UNKNOWN",
+      "wasted_prefetch_bytes": null,
+      "gpu_h2d_validation": "NO_NEW_RUN; HISTORICAL_EVIDENCE_ONLY",
+      "distributed_exception_recovery": "OUT_OF_SCOPE"
+    },
+    "next_action": "Freeze this code and same representative pressure packet for a separately authorized useful live gate; then calibration/baseline; compare only if quality and natural opportunities pass"
   }
 }

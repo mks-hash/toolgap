@@ -12,8 +12,8 @@ or upstream PR is authorized by this checkpoint.
 The current local audit is [ADR-0004](decisions/0004-hypothesis-aligned-measurement.md).
 Its purpose is to measure the original L3 → L2 → ordinary continuation hypothesis,
 not to expand the SDK or agent framework. Runtime and published benchmarks stay
-at their existing pins. Full-image verification of the new measurement contract
-is in progress; no new useful-live or pressure claim follows from these edits.
+at their existing pins. Full-image CPU verification passed; the results below
+do not establish a new useful-live or pressure result.
 
 Answer whether useful competing agent trajectories naturally create L3 restore
 opportunities, and whether prefetch improves all-caller outcomes without lowering
@@ -502,3 +502,45 @@ another separately authorized live gate, freeze the new code/packet/evidence
 and verify the launch/collection guards. Do not run pressure or claim cache
 benefit until useful quality passes. No GPU, runtime/image change, new release
 or upstream PR was performed at this local checkpoint.
+
+## Hypothesis-alignment audit (2026-10-05)
+
+[ADR-0004](decisions/0004-hypothesis-aligned-measurement.md) records the code and
+measurement corrections. Exact saved IDs are now assessed independently of
+final-answer quality; no continuation is `NOT_RUN`. A late task failure cannot
+finalize earlier restores as unused without operation-specific proof. The useful
+live gate must execute representatives from the actual pressure packet, with
+the same context/initial IDs/salt and the existing six-round limit. Legacy
+four-round diagnostics cannot satisfy it. Strict parsing and grading remain.
+
+Physical traces now link ordinary request-time reads and H2D enqueue attempts
+to continuation RIDs, alongside proactive publication, tool overlap and actual
+whole-prompt device/host/storage counters. Missing/invalid counters are not zero;
+enqueue is not GPU completion; operation-specific consumption/waste remain
+unknown. Runtime `CACHED` does not monitor subsequent eviction, so distinguish
+dispatch-reachable opportunities from those arising later before changing the
+trigger. No new admission policy or runtime/SDK change was made.
+
+Full local image verification passed **173 ToolGap tests + 124 subtests** and
+**57 runtime tests + 14 subtests**, zero failures/errors/skips. The runtime suite
+includes inherited finite-I/O fixtures and an existing two-rank lifecycle
+regression; it does not validate distributed exception recovery. The official
+Qwen7 tokenizer passed two native rounds. A newly frozen packet passed 12/12
+scripted callers with 108 real CPU regression executions; actual model generation
+is false. All checks used CPU, with container networking/GPU disabled. Setup
+errors (image entrypoint and demo plugin import path) are retained; the corrected
+command ran all selected tests without weakening/skipping them.
+
+Evidence: `hypothesis_alignment_review` in the existing
+[local review](../research/agent_resume/local-review-2026-10-05.json). Source/raw
+artifact hashes and exact validation dimensions are retained there; raw traces
+stay private. Historical 0/3 pilot outcomes and published v0.1/v0.2 data are
+unchanged. TG-007 still needs live overhead/usage evidence; TG-008 still needs
+useful live quality for this actual packet. TG-009/TG-010 remain `NOT_RUN`.
+
+The next substantive experiment is still natural opportunity prevalence and
+all-caller benefit at fixed resources. Before a separately authorized paid run,
+freeze a fresh launch package/native proof for the committed code and bind the
+useful gate to its pressure packet. Then calibrate and run baseline; a matched
+comparison is conditional on useful quality and natural windows, with a no-win
+or no-opportunity outcome retained. No new GPU session, release or PR occurred.
