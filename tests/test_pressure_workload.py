@@ -205,6 +205,23 @@ class TestPressure(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(compare_complete_blocks(row(), row(104, 9.8))["acceptable"])
         self.assertFalse(compare_complete_blocks(row(), row(106))["acceptable"])
         self.assertFalse(compare_complete_blocks(row(), row(100, 9.4))["acceptable"])
+        # Observer sensitivity is symmetric; true prefetch improvement is allowed.
+        self.assertTrue(compare_complete_blocks(row(), row(80, 12))["acceptable"])
+        for latency, throughput, expected in (
+            (104, 9.8, True),
+            (80, 12, False),
+            (100, 10.6, False),
+            (106, 10, False),
+        ):
+            with self.subTest(latency=latency, throughput=throughput):
+                self.assertEqual(
+                    compare_complete_blocks(
+                        row(), row(latency, throughput), comparison="observation"
+                    )["acceptable"],
+                    expected,
+                )
+        with self.assertRaises(ValueError):
+            compare_complete_blocks(row(), row(), comparison="unknown")
         for changes in (
             dict(procedure_completed=False),
             dict(study_success=False),
@@ -343,6 +360,10 @@ class TestTrace(unittest.TestCase):
             dict(status="REPORTED", device=8, host=16, storage=0),
         )
         self.assertEqual(request_cache_usage({})["status"], "UNKNOWN")
+        self.assertEqual(request_cache_usage(dict(meta_info=None))["status"], "UNKNOWN")
+        self.assertEqual(
+            request_cache_usage(dict(generation, input_ids=None))["status"], "UNKNOWN"
+        )
         for details in (
             {"device": 8, "host": 16},
             {"device": 8, "host": 16, "storage": -1},

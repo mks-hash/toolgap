@@ -19,10 +19,19 @@ from .workloads import SCHEMA
 from .sampling import ToolWindowSamples, sampling_budget, window_summary
 
 
+DEFAULT_MAX_NEW_TOKENS = 256
+
+
+def generation_contract():
+    return dict(temperature=0, max_new_tokens=DEFAULT_MAX_NEW_TOKENS, sampling_seed=42)
+
+
 class GenerationTransport:
     """Borrow an explicitly configured server. Never launch, flush or provision."""
 
-    def __init__(self, http, *, max_new_tokens=256):
+    def __init__(self, http, *, max_new_tokens=DEFAULT_MAX_NEW_TOKENS):
+        if type(max_new_tokens) is not int or max_new_tokens <= 0:
+            raise ValueError("max_new_tokens must be a positive integer")
         self.http = http
         self.max_new_tokens = max_new_tokens
         self.request_id_prefix = "tg-"
@@ -49,9 +58,10 @@ class GenerationTransport:
             stream=True,
             return_logprob=True,
             sampling_params=dict(
-                temperature=0, max_new_tokens=self.max_new_tokens, sampling_seed=42
+                generation_contract(), max_new_tokens=self.max_new_tokens
             ),
         )
+        evidence["sampling_params"] = dict(payload["sampling_params"])
         async with self.http.stream("POST", "/generate", json=payload) as response:
             response.raise_for_status()
             async for line in response.aiter_lines():
@@ -75,6 +85,8 @@ class GenerationTransport:
                 evidence.update(
                     output_ids=list(output), meta_info=event.get("meta_info", {})
                 )
+                if not isinstance(evidence["meta_info"], dict):
+                    raise ValueError("Invalid streamed generation metadata")
                 if output and first is None:
                     first = time.monotonic_ns()
                     evidence["first_token_ns"] = first
@@ -96,6 +108,7 @@ class GenerationTransport:
             completed_ns=time.monotonic_ns(),
             meta_info=last.get("meta_info", {}),
             rid=rid,
+            sampling_params=dict(payload["sampling_params"]),
         )
 
 

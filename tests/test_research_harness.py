@@ -491,6 +491,39 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
         row = await self.run_fixture(self.model(self.texts()), max_tool_rounds=0)
         self.assertEqual(row["status"], "FAILED")
 
+    async def test_scripted_and_live_reserve_the_same_output_budget(self):
+        from research.agent_resume.runner import generation_contract, initial_messages
+        from research.agent_resume.workloads import SCHEMA
+
+        model = self.model(self.texts())
+        self.assertEqual(model.max_new_tokens, GenerationTransport(None).max_new_tokens)
+        self.assertEqual(model.max_new_tokens, generation_contract()["max_new_tokens"])
+        adapter = FamilyAdapter("qwen")
+        tokenizer = FormatFixture()
+        # Enough space for a scripted call + empty result, but no 256-token
+        # output reservation. Reject before executing real tools in both modes.
+        prompt = adapter.prompt(tokenizer, initial_messages(adapter, TASKS[0]), SCHEMA)
+        row = await self.run_fixture(model, context_limit=len(prompt) + 200)
+        self.assertEqual(row["status"], "FAILED")
+        self.assertEqual(row["tools"], [])
+
+    async def test_malformed_stream_metadata_preserves_partial_evidence(self):
+        async def handler(request):
+            return httpx.Response(
+                200,
+                text='data: {"output_ids":[1],"meta_info":null}\n\ndata: [DONE]\n\n',
+            )
+
+        async with httpx.AsyncClient(
+            base_url="http://fixture", transport=httpx.MockTransport(handler)
+        ) as http:
+            with self.assertRaisesRegex(ValueError, "metadata") as raised:
+                await GenerationTransport(http).generate([2], "salt")
+        partial = raised.exception.generation_evidence
+        self.assertEqual(partial["output_ids"], [1])
+        self.assertIsNone(partial["meta_info"])
+        self.assertEqual(partial["sampling_params"]["max_new_tokens"], 256)
+
     async def test_continuation_does_not_wait_for_slow_submit(self):
         continuation = asyncio.Event()
         requests = []

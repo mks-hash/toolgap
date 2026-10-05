@@ -200,6 +200,7 @@ def live_result(rows, expected_ids, unresolved):
         r.get("generations")
         and all(
             g.get("rid")
+            and isinstance(g.get("meta_info"), dict)
             and g.get("meta_info", {}).get("finish_reason") is not None
             and not g.get("validation_type", "").startswith("SCRIPTED")
             for g in r["generations"]
@@ -337,6 +338,7 @@ def pressure_gate_workload(packet):
         expected_ids=[item["task"]["id"] for item in items],
         representatives_sha256=digest(items),
         max_tool_rounds=packet["measurement_contract"]["max_tool_rounds"],
+        generation=packet["measurement_contract"]["generation"],
     )
 
 
@@ -389,6 +391,10 @@ def require_live(directory, profile, packet=None):
                 != item["task"]["initial_input_ids"]
                 or row.get("cache_salt") != item["cache_salt"]
                 or len(row.get("tools", [])) > contract["max_tool_rounds"]
+                or any(
+                    g.get("sampling_params") != contract["generation"]
+                    for g in row["generations"]
+                )
             ):
                 raise ValueError("Live task inputs/limits differ from pressure packet")
     verified = live_result(rows, expected_ids, record.get("cleanup_unresolved", True))
@@ -399,10 +405,16 @@ def require_live(directory, profile, packet=None):
 
 def measurement_contract():
     from .workloads import tool_contract
+    from .runner import generation_contract
+    from .load import (
+        MAX_COMPARISON_DEGRADATION_FRACTION,
+        MAX_OBSERVER_RELATIVE_CHANGE_FRACTION,
+    )
 
     return dict(
         schema_version=3,
         max_tool_rounds=6,
+        generation=generation_contract(),
         repository_tools=tool_contract(),
         sampling=DEFAULT_SAMPLING,
         experimental_unit="WHOLE_SHARED_WORKER_BLOCK",
@@ -412,7 +424,9 @@ def measurement_contract():
         median_degradation_endpoint="ALL_CALLER_ARRIVAL_TO_FINALIZED_MS",
         interrupted_callers="ALL_DECLARED_ROWS_RETAINED; CANCELLED_LATENCIES_CENSORED",
         quality_rule="ALL_DECLARED_CALLERS_PASS",
-        max_competing_caller_median_degradation_fraction=0.05,
+        max_competing_caller_median_degradation_fraction=MAX_COMPARISON_DEGRADATION_FRACTION,
+        max_observer_relative_change_fraction=MAX_OBSERVER_RELATIVE_CHANGE_FRACTION,
+        observer_calibration="SYMMETRIC_LATENCY_AND_THROUGHPUT_CHANGE; DESCRIPTIVE_ONLY",
         latency_secondary="ALL_CALLER_ARRIVAL_TO_COMPLETED; ALL_CALLER_ARRIVAL_TO_FINALIZED; CONTINUATION_TTFT; TOOL_DISPATCH_TO_FIRST_TOKEN",
         dispatch_state="UNKNOWN_WITH_BACKGROUND_SAMPLES",
         wasted_prefetch_bytes=None,

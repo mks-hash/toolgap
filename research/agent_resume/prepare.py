@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 
 from .adapters import FamilyAdapter, ToolCall, UnsupportedTemplate
-from .runner import run_task
+from .runner import DEFAULT_MAX_NEW_TOKENS, run_task
 from .workloads import RepositoryTools, SCHEMA, TASKS, snapshot
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -98,6 +98,8 @@ def call_text(family, call):
 
 class ScriptedModel:
     """Transport fixture; native tokenizer, deliberately scripted decisions."""
+
+    max_new_tokens = DEFAULT_MAX_NEW_TOKENS
 
     def __init__(self, tokenizer, texts):
         self.tokenizer, self.texts = tokenizer, iter(texts)

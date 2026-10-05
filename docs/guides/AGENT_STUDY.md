@@ -66,22 +66,16 @@ checks cover two canonical tool rounds and reference agreement; they do not
 establish whether a model generates valid calls. The pinned Mistral no-ID native
 call remains semantic-valid but unsupported for its HF continuation history.
 
-On a separately approved live server, use the actual packet for the useful gate:
-
-```bash
-python -m research.agent_resume.live \
-  --profile work/study/profile.json --packet work/study/packet.json \
-  --tokenizer "$TOKENIZER_DIR" --native-evidence work/study/native.json \
-  --deployment "$DEPLOYMENT_FILE" --probe-dir "$PROBE_DIR" \
-  --server "$SERVER_URL" --mode request_time --reconcile-ms 50 \
-  --output work/study/representative-live
-```
-
-This executes one actual declared representative per task type, sequentially,
+The [live-gate command below](#live-gate-then-baseline--only-with-applicable-execution-approval)
+executes one actual declared representative per task type, sequentially,
 with the packet's exact long context, initial IDs, salt and round limit. It
 checks useful quality, not contention or opportunity prevalence. Pressure
 rejects unrelated legacy diagnostic evidence and any changed packet. Preserve
 failed answers and reset the whole worker between this gate and measured blocks.
+The packet freezes temperature 0, sampling seed 42 and 256 maximum output
+tokens. Scripted and live paths reserve the same output budget. Pressure checks
+the actual parameters recorded by every useful-live request; an altered limit
+cannot qualify an otherwise successful live proof.
 
 ## File storage and an existing approved server
 
@@ -215,7 +209,7 @@ evidence or a declaration of live support. Qwen3 remains an unprepared candidate
 Mistral's 0/3 live failure is unchanged. No model is silently substituted on fit
 or task failure.
 
-Local packet preparation produced 12 distinct source-audit contexts of
+An earlier local preparation checkpoint produced 12 distinct source-audit contexts of
 3801–3994 tokens. The derived profile passed two-round native reference checks,
 and scripted model decisions ran all 12 useful CPU-tool trajectories, including
 108 fixed regression executions. These checks validate mechanics; actual model
@@ -268,6 +262,12 @@ client shell does not reconfigure an existing server. Restart only between
 whole blocks, then repeat the identical fixed warmup/reset protocol. Keep the
 same persistent compiler-cache policy, no global OS cache drop, and retain
 residual warmup/order effects as limitations.
+Calibration requires absolute relative changes in both median all-caller
+arrival-to-finalization latency and successful-task throughput to be at most
+5%, including unexpected improvements. An observer that speeds up cache reads
+can perturb the comparison too. This is a descriptive sensitivity check with
+few blocks, not statistical equivalence. Proactive comparison separately permits
+improvements and limits degradation to 5%; these are different decisions.
 
 Report all-caller quality, successful tasks/block-second, arrival-to-finalization
 latency (including client queue and owned cleanup), useful full task latency,
@@ -292,17 +292,18 @@ no confidence/p95 claim, no release claim, and no automatic second session.
 
 ```bash
 python -m research.agent_resume.live \
-  --profile work/study/profile.json --tokenizer "$TOKENIZER_DIR" \
+  --profile work/study/profile.json --packet work/study/packet.json \
+  --tokenizer "$TOKENIZER_DIR" \
   --native-evidence work/study/native.json --deployment "$DEPLOYMENT_JSON" \
   --server "$SERVER_URL" --probe-dir "$PROBE_DIR" \
-  --mode request_time --output work/study/live
+  --mode request_time --reconcile-ms 50 --output work/study/live
 # Proceed only if readiness.json records study_success=true.
 python -m research.agent_resume.pressure run \
   --packet work/study/packet.json --tokenizer "$TOKENIZER_DIR" \
   --native-evidence work/study/native.json --live-evidence work/study/live \
   --deployment "$DEPLOYMENT_JSON" --server "$SERVER_URL" \
   --probe-dir "$PROBE_DIR" --observation memory-and-stat \
-  --mode request_time --output work/study/baseline
+  --mode request_time --reconcile-ms 50 --output work/study/baseline
 # Retain the dedicated raw server trace as baseline/server-trace.jsonl.
 python -m research.agent_resume.trace_report \
   --block work/study/baseline --trace work/study/baseline/server-trace.jsonl \

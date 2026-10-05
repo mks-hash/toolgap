@@ -3,7 +3,6 @@
 import argparse
 import asyncio
 import copy
-import hashlib
 import json
 import subprocess
 import time
@@ -20,6 +19,7 @@ from .runner import GenerationTransport, run_task
 from .sampling import FileObserver, clock_domain
 from .workloads import RepositoryTools, snapshot
 from .readiness import (
+    digest,
     measurement_contract,
     provenance,
     require_baseline,
@@ -28,10 +28,6 @@ from .readiness import (
     verify_storage,
     verify_initial_state,
 )
-
-
-def digest(value):
-    return hashlib.sha256(json.dumps(value, sort_keys=True).encode()).hexdigest()
 
 
 def pressure_profile(profile):

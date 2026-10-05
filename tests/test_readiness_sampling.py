@@ -172,6 +172,13 @@ class TestReadiness(unittest.TestCase):
             self.assertEqual(result["dimensions"]["exact_continuation"], "FAIL")
             self.assertFalse(result["study_success"])
 
+    def test_malformed_retained_metadata_is_failure_not_classification_crash(self):
+        rows = live_rows()
+        rows[0]["generations"][0]["meta_info"] = None
+        result = readiness.live_result(rows, [t["id"] for t in TASKS], False)
+        self.assertFalse(result["study_success"])
+        self.assertEqual(result["dimensions"]["transport"], "FAIL")
+
     def test_live_gate_binds_code_packages_profile_and_raw_artifacts(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -220,6 +227,8 @@ class TestReadiness(unittest.TestCase):
         rows = live_rows()
         for row, item in zip(rows, items):
             row.update(task_id=item["task"]["id"], cache_salt=item["cache_salt"])
+            for generation in row["generations"]:
+                generation["sampling_params"] = dict(contract["generation"])
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "tasks.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
@@ -239,6 +248,22 @@ class TestReadiness(unittest.TestCase):
             )
             (root / "readiness.json").write_text(json.dumps(record))
             self.assertTrue(readiness.require_live(root, self.profile, packet))
+            changed_rows = json.loads(json.dumps(rows))
+            changed_rows[0]["generations"][0]["sampling_params"]["max_new_tokens"] = 512
+            (root / "tasks.jsonl").write_text(
+                "\n".join(json.dumps(r) for r in changed_rows)
+            )
+            record["artifacts_sha256"]["tasks.jsonl"] = readiness.file_hash(
+                root / "tasks.jsonl"
+            )
+            (root / "readiness.json").write_text(json.dumps(record))
+            with self.assertRaisesRegex(ValueError, "inputs/limits"):
+                readiness.require_live(root, self.profile, packet)
+            (root / "tasks.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+            record["artifacts_sha256"]["tasks.jsonl"] = readiness.file_hash(
+                root / "tasks.jsonl"
+            )
+            (root / "readiness.json").write_text(json.dumps(record))
             for kind in ("context", "budget", "unrelated", "changed-ids", "salt"):
                 changed = copy.deepcopy(packet)
                 if kind == "context":

@@ -24,6 +24,8 @@ criteria live only in [WORK_TRACKER](../WORK_TRACKER.md).
   [admission policy](evidence/ADMISSION_POLICY_VALIDATION.md).
 - [Failed Mistral live pilot](evidence/MISTRAL_PILOT_2026-10-05.md),
   [integration architecture review](evidence/ENGINEERING_REVIEW_2026-10-05.md).
+- [Local integration/preparation checkpoint history](evidence/LOCAL_CHECKPOINTS_2026-10-05.md)
+  preserves the dated sections formerly embedded in the active tracker.
 
 Preparation history: [research design](plans/RESEARCH_PLAN.md),
 [cross-family CPU harness](plans/CROSS_FAMILY_PREPARATION.md),

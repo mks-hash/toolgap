@@ -12,6 +12,10 @@ from .runner import initial_messages
 from .workloads import SCHEMA
 
 
+MAX_COMPARISON_DEGRADATION_FRACTION = 0.05
+MAX_OBSERVER_RELATIVE_CHANGE_FRACTION = 0.05
+
+
 AUDITS = [
     dict(
         id="ownership-audit",
@@ -344,8 +348,10 @@ def summarize(block):
     )
 
 
-def compare_complete_blocks(baseline, treatment):
+def compare_complete_blocks(baseline, treatment, *, comparison="proactive"):
     """Descriptive gate including queue/finalization, never a significance test."""
+    if comparison not in ("proactive", "observation"):
+        raise ValueError("Declare proactive comparison or observation calibration")
     endpoint = "all_caller_arrival_to_finalized_ms"
     for summary in (baseline, treatment):
         values = summary.get(endpoint, [])
@@ -377,10 +383,21 @@ def compare_complete_blocks(baseline, treatment):
         - treatment["successful_tasks_per_second"]
         / baseline["successful_tasks_per_second"]
     )
+    if comparison == "observation":
+        acceptable = (
+            abs(latency) <= MAX_OBSERVER_RELATIVE_CHANGE_FRACTION
+            and abs(loss) <= MAX_OBSERVER_RELATIVE_CHANGE_FRACTION
+        )
+    else:
+        acceptable = (
+            latency <= MAX_COMPARISON_DEGRADATION_FRACTION
+            and loss <= MAX_COMPARISON_DEGRADATION_FRACTION
+        )
     return dict(
+        comparison=comparison,
         latency_endpoint=endpoint,
         median_task_degradation_fraction=latency,
         throughput_loss_fraction=loss,
         descriptive_only=True,
-        acceptable=latency <= 0.05 and loss <= 0.05,
+        acceptable=acceptable,
     )

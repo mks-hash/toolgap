@@ -57,6 +57,18 @@ calibration. Repeated reads can be valid after eviction; publication alone does
 not prove usage or absence of waste. Historical raw data and published results
 are not overwritten with the new schema.
 
+The follow-up consistency audit separates the decisions that formerly reused
+one predicate: observer calibration rejects absolute relative latency or
+throughput changes above 5%, including improvements; proactive comparison
+permits improvements and rejects degradation above 5%. The thresholds are
+shared constants bound into the packet, not independently copied literals.
+Generation parameters and the 256-token output reservation likewise have one
+source used by live transport and scripted preflight. Every actual live request
+must report the frozen sampling parameters. Hashing uses one canonical digest
+function. Malformed retained generation/cache metadata yields failed or unknown
+evidence instead of crashing its classifier. These checks do not establish
+statistical equivalence or useful live success.
+
 ## Applicability and alternatives
 
 At the pinned runtime, `CACHED` is an immediate terminal outcome; it does not

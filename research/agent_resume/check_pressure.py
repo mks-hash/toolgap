@@ -8,8 +8,7 @@ from pathlib import Path
 from .adapters import FamilyAdapter, ToolCall
 from .load import run_arrivals
 from .prepare import ROOT, ScriptedModel, call_text, tokenizer_manifest
-from .pressure import digest
-from .readiness import measurement_contract, provenance
+from .readiness import digest, measurement_contract, provenance
 from .runner import run_task
 from .workloads import RepositoryTools, snapshot
 
@@ -85,7 +84,14 @@ async def check(args):
 
     block = await run_arrivals(packet["arrivals"], run, max_active=packet["max_active"])
     passed = all(
-        r["task_success"] and r["exact_prefix_preserved"] for r in block["rows"]
+        r["task_success"]
+        and r["exact_prefix_preserved"]
+        and all(
+            len(g["output_ids"])
+            <= packet["measurement_contract"]["generation"]["max_new_tokens"]
+            for g in r["generations"]
+        )
+        for r in block["rows"]
     )
     result = dict(
         profile_id=profile["profile_id"],
@@ -93,6 +99,7 @@ async def check(args):
         passed=passed,
         validation_type="SCRIPTED_CPU_FIXTURE",
         model_generation=False,
+        generation_contract=packet["measurement_contract"]["generation"],
         gpu_execution=False,
         provenance=provenance(profile),
         procedure_completed=True,

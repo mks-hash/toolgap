@@ -26,8 +26,11 @@ def request_cache_usage(generation):
     """Actual request-tier counters, never ownership of a proactive operation."""
     unknown = dict(status="UNKNOWN", device=None, host=None, storage=None)
     meta = generation.get("meta_info", {})
+    ids = generation.get("input_ids", [])
+    if not isinstance(meta, dict) or not isinstance(ids, list):
+        return unknown
     details = meta.get("cached_tokens_details")
-    length = len(generation.get("input_ids", []))
+    length = len(ids)
     total = meta.get("cached_tokens")
     if not generation.get("rid") or not isinstance(details, dict):
         return unknown
