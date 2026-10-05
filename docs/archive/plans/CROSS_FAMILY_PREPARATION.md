@@ -1,9 +1,19 @@
 # Cross-family agent-resume harness: local preparation
 
+> Archived preparation/design snapshot. Current tasks and acceptance criteria
+> are maintained only in [WORK_TRACKER](../../WORK_TRACKER.md).
+
 Updated 2026-10-04. **Local foundation implemented; model/GPU research pending.**
 This is development work after v0.3.0, not a new release or performance result.
 The [research objective](RESEARCH_PLAN.md) remains useful multi-family agent
 completion under finite cache capacity. Historical GPU datasets are unchanged.
+
+**Current status update, 2026-10-05:** the
+[Mistral pressure-candidate pilot](../evidence/MISTRAL_PILOT_2026-10-05.md) loaded on L4 and
+generated three responses, but passed 0/3 useful tasks; no pressure block ran.
+The preparation results below are the earlier CPU snapshot, not a live readiness
+proof. See [review](../evidence/ENGINEERING_REVIEW_2026-10-05.md) and
+[task map](../../WORK_TRACKER.md) for the required contract correction.
 
 ## What runs now
 
@@ -80,7 +90,7 @@ Python 3.12.14 and Transformers 5.17.0 were used. Sandbox restrictions stalled
 asyncio executor wakeup/shutdown; the completed checks ran outside that sandbox.
 
 Raw local results/logs are in ignored `work/cross-family/`. The compact checked-in
-summary is [local-validation.json](../research/agent_resume/local-validation.json).
+summary is [local-validation.json](../../../research/agent_resume/local-validation.json).
 Per-run manifests include source SHA, tokenizer/config hashes and harness hashes.
 
 ## Reproduce CPU preparation
@@ -110,7 +120,7 @@ snapshot at `fe6217292ce4f01c592a2d7274137d826a75e1a0`.
 
 Each profile defines candidate server settings explicitly, independently of the
 historical `Engine.start()` command. TP1/PP1/DP1, BF16, resident FULL, file storage,
-8192 context/total-token limits, a 4 GiB host pool and one running request are
+8192 context/total-token limits, a 4 GB decimal host pool and one running request are
 **initial compatibility candidates**, not validated fits or pressure profiles.
 Raw BF16 KV estimates from config are 28 KiB/token for Qwen1.5B, 56 KiB/token for
 Qwen7B and 128 KiB/token for Mistral7B. They exclude weights and runtime overhead.
@@ -172,8 +182,9 @@ Its earlier controlled-flush datasets retain their original methodology.
 
 The [passive observer and competing-arrival workload](PASSIVE_PRESSURE_PREPARATION.md)
 are now implemented and CPU checked. They retain the same runtime/source identity
-and keep GPU fit/performance unvalidated. Next perform a separately approved non-Qwen
-compatibility pilot and persistent-worker pressure comparison without per-target
-flush/restart. Measure opportunities, physical I/O, occupancy, evictions, waste,
+and do not establish GPU fit/performance. The subsequent Mistral pressure-candidate
+pilot passed fit but failed useful live tasks. First close the local adapter
+contract gaps in the task map, then validate the live loop before any pressure
+comparison without per-target flush/restart. Measure opportunities, physical I/O, occupancy, evictions, waste,
 all-caller latency and task quality. These steps complete the research objective;
 this local foundation alone does not.

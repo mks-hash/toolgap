@@ -1,7 +1,7 @@
 # v0.3: bounded admission across callers
 
 This is an **experimental process-local coordinator**, included in v0.3.0.
-The [two-caller GPU smoke](MULTI_SESSION_GPU_SMOKE.md) passed; broader load and
+The [two-caller GPU smoke](../archive/evidence/MULTI_SESSION_GPU_SMOKE.md) passed; broader load and
 statistical performance evaluation remain unvalidated.
 It uses the pinned v0.2 SGLang runtime and does not change the published benchmark,
 runtime patches, storage format, scheduler, upstream PRs, or report.
@@ -31,7 +31,7 @@ admission across orchestrator processes, or an L2 occupancy/eviction policy.
 The existing server admission is authoritative across other clients.
 
 Post-v0.3.0 development offers optional caller hints for known-resident prefixes
-and estimated tool/restore overlap. [Design and API](ADMISSION_DESIGN.md) describe
+and estimated tool/restore overlap. [Design and API](../decisions/admission-policy.md) describe
 `PrefetchHint`, local fallback decisions and reservation telemetry. Without hints
 and a configured threshold, existing behavior is retained.
 
@@ -108,7 +108,7 @@ those require runtime trace evidence such as the recorded two-caller GPU smoke.
 
 ## CPU verification
 
-[Recorded local result: 70 passed / 1 tokenizer skip](MULTI_SESSION_VALIDATION.md).
+[Recorded local result: 70 passed / 1 tokenizer skip](../archive/evidence/MULTI_SESSION_VALIDATION.md).
 
 Transport/admission races plus the existing client/tool tests:
 
@@ -135,4 +135,4 @@ Larger-load and statistical performance evaluation remain future work.
 
 The [two-trajectory demo harness](MULTI_SESSION_DEMO.md) covers baseline,
 shared-admission and owned-abandonment treatments. Its
-[one-repeat real-GPU smoke](MULTI_SESSION_GPU_SMOKE.md) has now completed.
+[one-repeat real-GPU smoke](../archive/evidence/MULTI_SESSION_GPU_SMOKE.md) has now completed.

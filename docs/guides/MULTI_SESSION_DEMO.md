@@ -2,7 +2,7 @@
 
 This harness is included in experimental v0.3.0 and uses the v0.2 pinned SGLang
 runtime. One separately authorized
-[single-repeat GPU smoke](MULTI_SESSION_GPU_SMOKE.md) has passed; the default
+[single-repeat GPU smoke](../archive/evidence/MULTI_SESSION_GPU_SMOKE.md) has passed; the default
 three-repetition evaluation below has not been run. Another paid GPU run
 requires separate authorization.
 
@@ -129,6 +129,6 @@ bash scripts/test_client.sh
 ```
 
 Ruff, shell syntax and command-line import/help checks passed. The subsequent
-[GPU smoke](MULTI_SESSION_GPU_SMOKE.md) verifies live admission, model execution,
+[GPU smoke](../archive/evidence/MULTI_SESSION_GPU_SMOKE.md) verifies live admission, model execution,
 ordinary H2D and correctness for two callers in one repetition. Published
 v0.1/v0.2 numbers, report, runtime patches and upstream PRs are unchanged.

@@ -1,12 +1,17 @@
 # ToolGap: cross-family agent-resume research
 
-Status: **local cross-family harness, passive observation and competing workload implemented; GPU research not executed**.
+> Archived preparation/design snapshot. Current tasks and acceptance criteria
+> are maintained only in [WORK_TRACKER](../../WORK_TRACKER.md).
+
+Status: **local harness implemented; Mistral GPU pilot failed the useful tool-loop
+gate; competing-agent pressure and performance remain not evaluated**.
 See [CPU preparation and limits](CROSS_FAMILY_PREPARATION.md) and
-[passive pressure workload preparation](PASSIVE_PRESSURE_PREPARATION.md).
-Updated 2026-10-05 with passive observation and competing arrivals, following
-the 2026-10-04 harness and official candidate model/config inspection. Existing
-v0.1/v0.2/v0.3 GPU evidence remains unchanged. No GPU resources, model-weight
-downloads, new runtime implementation or publication accompany this plan.
+[passive pressure workload preparation](PASSIVE_PRESSURE_PREPARATION.md),
+[pilot outcome](../evidence/MISTRAL_PILOT_2026-10-05.md), and the current
+[task map](../../WORK_TRACKER.md). Updated 2026-10-05 after the one approved pilot and
+[architecture review](../evidence/ENGINEERING_REVIEW_2026-10-05.md). Existing v0.1/v0.2/v0.3
+GPU evidence remains unchanged. This documentation update creates no GPU
+resources, new runtime implementation or publication.
 
 ## User-facing objective
 
@@ -41,7 +46,7 @@ a different `--model-path` alone does not make a valid cross-family experiment.
 |---|---|---|
 | Qwen/Qwen2.5-1.5B-Instruct | Historical reference and cheap harness checks | Existing GPU evidence only for pinned historical setup |
 | Qwen/Qwen2.5-7B-Instruct | Size change within Qwen | Candidate; ToolGap GPU validation pending |
-| mistralai/Mistral-7B-Instruct-v0.3 | Second family, comparable dense-model size | Native-template CPU checks passed; model/runtime validation pending |
+| mistralai/Mistral-7B-Instruct-v0.3 | Second family, comparable dense-model size | Native CPU fixtures passed; pressure-candidate L4 model fit/initial generation observed; useful live tool loop failed 0/3; pressure not run |
 | meta-llama/Llama-3.1-8B-Instruct | Third family | Candidate; model-access and runtime validation pending |
 
 These choices isolate useful axes rather than selecting models by popularity.

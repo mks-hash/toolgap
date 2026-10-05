@@ -25,7 +25,7 @@ by **Maxim Yakimov** (October 4, 2026).
 It covers architecture, lifecycle, methodology, both performance datasets,
 resident negative control, related work, limitations, and exact reproduction.
 [Zenodo report and DOI](https://doi.org/10.5281/zenodo.23130933) ·
-[LaTeX / Markdown / evidence audit](docs/report/) ·
+[LaTeX / Markdown / evidence audit](docs/report) ·
 [Report release](https://github.com/mks-hash/toolgap/releases/tag/report-v1.0.0).
 
 ## v0.2: real model → tool → continuation
@@ -62,7 +62,7 @@ provides enough time to restore it.
 **When ToolGap does not help:** KV is already GPU-resident, or the tool finishes too
 quickly to hide meaningful restore work.
 
-[Validation and provenance](docs/TOOL_LOOP_VALIDATION.md) ·
+[Validation and provenance](docs/archive/evidence/TOOL_LOOP_VALIDATION.md) ·
 [Raw CSV](results/tool-loop/tool-loop-trials.csv) ·
 [Full trials and timestamps](results/tool-loop/tool-loop-trials.json) ·
 [Trace](results/tool-loop/tool-loop-trace.jsonl) ·
@@ -81,7 +81,7 @@ python -m pip install -e .
 
 The installer creates a pinned SGLang checkout and applies the lifecycle and
 prefetch patches. It prepares source; install the locked GPU dependencies and
-pinned model as described in [reproduction](docs/REPRODUCE.md).
+pinned model as described in [reproduction](docs/guides/REPRODUCE.md).
 
 **One-command real tool-loop demo on an existing compatible GPU:**
 
@@ -93,7 +93,7 @@ SGLANG_CHECKOUT="$PWD/vendor/sglang" bash examples/tool_loop.sh
 The runner verifies source/tokenizer hashes, starts servers sequentially, executes
 all four conditions with three repetitions, and writes JSON/CSV/trace results
 under `work/`. It does not provision cloud resources. See
-[exact tool-loop instructions](docs/TOOL_LOOP.md) for model identity, cache controls,
+[exact tool-loop instructions](docs/guides/TOOL_LOOP.md) for model identity, cache controls,
 output validation, and cancellation/fallback policy.
 
 A Docker recipe for the same pinned dependencies is also provided:
@@ -107,7 +107,7 @@ docker run --rm --gpus all --shm-size=2g \
 
 The Docker recipe was not newly built or GPU-executed for v0.3.0.
 The recorded demo used the validated immutable CUDA image with the exact source
-and ToolGap overlay; [validation](docs/TOOL_LOOP_VALIDATION.md) records its digest.
+and ToolGap overlay; [validation](docs/archive/evidence/TOOL_LOOP_VALIDATION.md) records its digest.
 
 **Offline audit of both recorded datasets** (no GPU or model download):
 
@@ -120,36 +120,38 @@ python scripts/check_tool_loop_evidence.py
 
 A process-local coordinator shares one proactive restore slot across callers,
 with immediate fallback, owned cancellation, and explicit unknown-usage accounting.
-It retains the v0.2 runtime contract. A [two-caller real-GPU smoke](docs/MULTI_SESSION_GPU_SMOKE.md)
+It retains the v0.2 runtime contract. A [two-caller real-GPU smoke](docs/archive/evidence/MULTI_SESSION_GPU_SMOKE.md)
 passed: 80 regressions, five correct continuations, zero duplicate prefix reads
 and cleanup to baseline. One admitted caller benefited; pair-level latency did
-not improve in this single-repeat run. See [policy and API](docs/MULTI_SESSION.md)
-and the [demo plan and command](docs/MULTI_SESSION_DEMO.md).
+not improve in this single-repeat run. See [policy and API](docs/guides/MULTI_SESSION.md)
+and the [demo plan and command](docs/guides/MULTI_SESSION_DEMO.md).
 
-Post-v0.3.0 development adds [opt-in bounded status reconciliation](docs/RECONCILIATION.md)
+Post-v0.3.0 development adds [opt-in bounded status reconciliation](docs/guides/RECONCILIATION.md)
 for later callers: local admission is released after confirmed terminal cleanup
 while the earlier owner's tool/continuation may still run. Defaults remain manual;
 this increment has CPU validation and no new GPU performance claim.
-Optional [caller-hint admission](docs/ADMISSION_DESIGN.md) skips known-resident
+Optional [caller-hint admission](docs/decisions/admission-policy.md) skips known-resident
 prefixes or small estimated overlaps before HTTP and records local decisions
 and slot timing. Estimates stay separate from restore/usage evidence.
 
-The next [research milestone](docs/RESEARCH_PLAN.md) evaluates multiple model
-families and useful agent workloads under cache pressure. It is a plan, not new
-measured model support or a cross-family performance claim.
-The [local preparation](docs/CROSS_FAMILY_PREPARATION.md) adds native-tokenizer
-checks for Qwen/Mistral and a useful multi-round repository investigation runner.
-The [passive pressure harness](docs/PASSIVE_PRESSURE_PREPARATION.md) adds direct
-cache-state observation and twelve competing repository-audit trajectories with
-fixed arrivals, real CPU tools and all-caller accounting. It is locally CPU checked;
-actual cross-family generation, natural L3 opportunity rate and workload benefit
-remain unmeasured.
+Current [development work](docs/WORK_TRACKER.md) evaluates useful competing agents
+under natural cache pressure, with larger models and multiple families. The local
+harness has native-tokenizer checks, passive cache observation and twelve fixed
+repository-audit arrivals. These CPU checks do not establish model behavior or
+performance. The first [Mistral L4 pilot](docs/archive/evidence/MISTRAL_PILOT_2026-10-05.md) loaded the model and
+generated responses but failed the useful tool-loop gate (0/3 tasks); pressure
+blocks did not run. Cross-family useful tool-loop support, natural L3 opportunity
+rate and workload benefit remain unvalidated.
+
+[Documentation index](docs/README.md) · [Current task map](docs/WORK_TRACKER.md) ·
+[Architecture decisions](docs/decisions/README.md) ·
+[Engineering review](docs/archive/evidence/ENGINEERING_REVIEW_2026-10-05.md)
 
 ## CLI and diagnostics
 
 Available in experimental `v0.3.0`. Install from the tagged checkout with
 `python -m pip install -e .`.
-[Release notes](docs/RELEASE_v0.3.0.md) describe the scope and validation.
+[Release notes](docs/archive/releases/RELEASE_v0.3.0.md) describe the scope and validation.
 
 ```bash
 toolgap doctor --sglang /path/to/patched/sglang --model /path/to/pinned/model
@@ -164,8 +166,8 @@ not submit prefetch, generate tokens or prove cache residency. Control commands
 send one RPC, preserve the operation ID on uncertain outcomes, and distinguish
 logical cancellation from pending physical cleanup.
 
-[Installation, input format, authentication and exit codes](docs/CLI.md) ·
-[Local CLI verification](docs/CLI_VALIDATION.md)
+[Installation, input format, authentication and exit codes](docs/guides/CLI.md) ·
+[Local CLI verification](docs/archive/evidence/CLI_VALIDATION.md)
 
 ## Thin Python client and control API
 
@@ -187,7 +189,7 @@ early continuation can join it. Tool failure/cancel attempts bounded cancellatio
 of its owned operation; admission rejection falls back to ordinary generation.
 Transport errors can leave acceptance/cleanup uncertain; server TTL is a backstop.
 
-[API/lifecycle contract](docs/API.md) · [Integration policy](docs/TOOL_LOOP.md)
+[API/lifecycle contract](docs/guides/API.md) · [Integration policy](docs/guides/TOOL_LOOP.md)
 
 ```mermaid
 flowchart LR
@@ -219,7 +221,7 @@ numbers belong to that measured version and workload, not the v0.2 tool-loop dem
 
 All 45 outputs matched, with no duplicate backend reads or relevant host eviction.
 At zero gap there was no convincing benefit. Files may have warm OS page cache.
-[Historical Stage 2B report](docs/STAGE_2B.md) · [Raw CSV](results/trials.csv) ·
+[Historical Stage 2B report](docs/archive/evidence/STAGE_2B.md) · [Raw CSV](results/trials.csv) ·
 [Chart](results/ttft.png) · [Raw JSON/traces](results/raw)
 
 ## Compatibility and validation
@@ -235,11 +237,11 @@ At zero gap there was no convincing benefit. Files may have warm OS page cache.
 - Stage 2A: 41 passed / six SWA-only skips, real L3→L2→H2D and generation.
 - v0.1 measured feature: `4a7c68d30913cb084c821ad044ae4ef037933c29`.
 - The separate [feature PR #42434](https://github.com/sgl-project/sglang/pull/42434)
-  targets a later upstream main. Its [29-test GPU smoke](docs/UPSTREAM_SMOKE.md)
+  targets a later upstream main. Its [29-test GPU smoke](docs/archive/evidence/UPSTREAM_SMOKE.md)
   establishes compatibility; it does not replace either performance dataset.
 
-[Historical release review](docs/REVIEW.md) · [Stage 2A](docs/STAGE_2A.md) ·
-[Reproduction](docs/REPRODUCE.md)
+[Historical release review](docs/archive/evidence/REVIEW.md) · [Stage 2A](docs/archive/evidence/STAGE_2A.md) ·
+[Reproduction](docs/guides/REPRODUCE.md)
 The standalone project does not depend on upstream merging either PR.
 
 ## Limitations

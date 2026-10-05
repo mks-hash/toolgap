@@ -1,7 +1,7 @@
 # ToolGap v0.2: a real tool loop
 
 Status: experimental real model/tool/continuation demo validated in one L4 session.
-See [the measured results and controls](TOOL_LOOP_VALIDATION.md).
+See [the measured results and controls](../archive/evidence/TOOL_LOOP_VALIDATION.md).
 No production-readiness claim is made. The v0.1
 45-trial benchmark and its pinned release are unchanged.
 

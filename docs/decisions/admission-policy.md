@@ -10,12 +10,12 @@ ToolGap restores an exact prefix from file-backed L3 into resident L2 during
 useful tool work. H2D and generation remain ordinary inference. Value depends on
 prefix residency, remaining tool time and exposed restoration latency.
 
-The [v0.2 real tool-loop evaluation](TOOL_LOOP_VALIDATION.md) observed L3-only
+The [v0.2 real tool-loop evaluation](../archive/evidence/TOOL_LOOP_VALIDATION.md) observed L3-only
 median continuation TTFT of 512 → 134 ms, while GPU-resident control was
 128 → 127 ms (three runs per condition). That supports conditional value, rather
 than prefetching every tool call.
 
-In the [v0.3 two-caller smoke](MULTI_SESSION_GPU_SMOKE.md), one caller benefited
+In the [v0.3 two-caller smoke](../archive/evidence/MULTI_SESSION_GPU_SMOKE.md), one caller benefited
 but the pair's maximum dispatch-to-first-token did not improve (+2.0%, one
 repetition). One proactive slot cannot eliminate ordinary restore contention.
 An abandoned successful restore left 96.25 MiB of unused published L2: ordinary
@@ -147,21 +147,9 @@ safety is checked separately in CPU fixtures.
 No multi-process/global admission guarantee, distributed coordination, new
 backend, GPU prefetch, SWA or runtime scheduler change is introduced.
 
-## Next measurement
+## Evidence and further work
 
-This focused policy comparison is one part of the broader
-[cross-family agent-resume research plan](RESEARCH_PLAN.md). That milestone
-includes useful multi-round tools and workload-driven cache pressure; policy
-microbenchmarks alone do not establish application value.
-
-A future focused GPU comparison should vary **later caller arrival** relative
-to measured restoration: manual admission, reconciliation alone, then
-reconciliation plus hints. Keep verified L3-only prefixes, model, generation and
-useful tool work identical. Add short-tool/resident controls and stale/wrong
-estimates; randomize treatment order and repeat each condition.
-
-Measure local slot hold/release, status RPC count/duration, server publication,
-continuation arrival/TTFT, dispatch-to-first-token, duplicate prefix reads, host
-occupancy/evictions and attributable unused publication. Evaluate all callers
-and aggregate latency, not just the admitted winner. GPU execution needs separate
-approval. [Local validation](ADMISSION_POLICY_VALIDATION.md) is complete.
+[Local validation](../archive/evidence/ADMISSION_POLICY_VALIDATION.md) is complete;
+it does not establish GPU workload benefit. Current experiments and acceptance
+criteria are maintained only in [WORK_TRACKER](../WORK_TRACKER.md). Policy
+microbenchmarks alone do not complete its useful-agent objective.

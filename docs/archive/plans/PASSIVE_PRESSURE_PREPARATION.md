@@ -1,9 +1,16 @@
 # Passive observation and competing repository agents
 
-Status (2026-10-05): **local CPU preparation implemented and checked**. No new GPU
-run, model-weight download, runtime patch, cloud resource or publication. This is
-an experimental research harness, not a new performance result or production
-agent workload. Existing v0.1/v0.2/v0.3 datasets and compatibility pins are unchanged.
+> Archived preparation/design snapshot. Current tasks and acceptance criteria
+> are maintained only in [WORK_TRACKER](../../WORK_TRACKER.md).
+
+Status (2026-10-05): **CPU preparation checked; the subsequent Mistral live pilot
+failed; pressure blocks not run**. The CPU artifacts below were prepared before
+that pilot and are not model-behavior evidence. See
+[outcome](../evidence/MISTRAL_PILOT_2026-10-05.md),
+[engineering review](../evidence/ENGINEERING_REVIEW_2026-10-05.md) and
+[task map](../../WORK_TRACKER.md). This is an experimental research harness, not a new
+performance result or production agent workload. Existing v0.1/v0.2/v0.3
+datasets and compatibility pins are unchanged.
 
 ## What question the next experiment answers
 
@@ -99,7 +106,7 @@ tokenizers and new output paths. The check uses deliberately scripted model
 choices with actual native templates and real CPU tools. Its latencies are never
 GPU/model/performance evidence. Llama remains gated on access to official files.
 
-[Compact local verification record](../research/agent_resume/passive-pressure-validation.json).
+[Compact local verification record](../../../research/agent_resume/passive-pressure-validation.json).
 The real observer tests additionally use the existing SGLang CPU FULL/file fixtures;
 see `tests/test_passive_observer_real_cache.py` and the pinned runtime regression
 instructions in [cross-family preparation](CROSS_FAMILY_PREPARATION.md).
@@ -109,7 +116,7 @@ instructions in [cross-family preparation](CROSS_FAMILY_PREPARATION.md).
 **No execution is authorized by this document.** Use an independently validated,
 separately approved server and run the client on the same host. The packet contains
 all resolved settings checked by the runner. Relative to the diagnostic profile,
-only `max_running_requests=4` and `hicache_size=1` GiB are changed. GPU KV budget is
+only `max_running_requests=4` and `hicache_size=1` GB decimal are changed. GPU KV budget is
 8192 tokens, context limit 8192, TP1/PP1/DP1, BF16/FULL, page size 16, resident
 write-through/file cache and deterministic sampling. Runtime candidate is
 `3e60ad803c6b01832b527f4a1dcbeb7a5449964b`. GPU fit, model-selected tool quality and

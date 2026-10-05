@@ -98,7 +98,7 @@ python -m pytest \
   toolgap/tests -q
 ```
 
-Local command usage, input format and exit codes are documented in [CLI.md](CLI.md).
+Local command usage, input format and exit codes are documented in [CLI.md](../../guides/CLI.md).
 The project environment also has this development package installed editably;
 its `toolgap` command can run the source/tokenizer doctor without a server.
 

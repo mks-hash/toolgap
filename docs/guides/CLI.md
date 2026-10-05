@@ -192,9 +192,9 @@ no targets reports UNKNOWN and explains the available options.
 
 ## Local verification
 
-[Recorded result](CLI_VALIDATION.md): CPU regressions, installed wheel and
+[Recorded result](../archive/evidence/CLI_VALIDATION.md): CPU regressions, installed wheel and
 localhost HTTP fixture. This is separate from the existing
-[two-caller GPU smoke](MULTI_SESSION_GPU_SMOKE.md); no new GPU run was performed
+[two-caller GPU smoke](../archive/evidence/MULTI_SESSION_GPU_SMOKE.md); no new GPU run was performed
 for this CLI increment. Model, runtime patches and benchmark data are unchanged.
 
 ```bash

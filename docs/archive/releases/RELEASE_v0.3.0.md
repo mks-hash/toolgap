@@ -75,11 +75,11 @@ The release wheel installs the Python client/CLI only. Runtime setup still
 requires the guarded patches and the documented compatible GPU environment.
 No model weights or KV payloads are redistributed.
 
-[CLI and input contract](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/CLI.md) ·
-[Admission policy](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/MULTI_SESSION.md) ·
-[Two-caller demo](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/MULTI_SESSION_DEMO.md) ·
-[GPU smoke and raw evidence](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/MULTI_SESSION_GPU_SMOKE.md) ·
-[Local CLI validation](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/CLI_VALIDATION.md).
+[CLI and input contract](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/guides/CLI.md) ·
+[Admission policy](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/guides/MULTI_SESSION.md) ·
+[Two-caller demo](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/guides/MULTI_SESSION_DEMO.md) ·
+[GPU smoke and raw evidence](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/archive/evidence/MULTI_SESSION_GPU_SMOKE.md) ·
+[Local CLI validation](https://github.com/mks-hash/toolgap/blob/v0.3.0/docs/archive/evidence/CLI_VALIDATION.md).
 
 This remains experimental. No distributed recovery, SWA, remote backend,
 proactive GPU load, permanently blocked-I/O reclamation, or production-readiness

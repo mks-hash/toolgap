@@ -39,8 +39,8 @@ MODEL_PATH=/absolute/path/to/Qwen2.5-1.5B-Instruct \
 SGLANG_CHECKOUT="$PWD/vendor/sglang" bash examples/tool_loop.sh
 ```
 
-[Installation and demo](https://github.com/mks-hash/toolgap/blob/v0.2.0/docs/TOOL_LOOP.md),
-[validation/provenance](https://github.com/mks-hash/toolgap/blob/v0.2.0/docs/TOOL_LOOP_VALIDATION.md),
+[Installation and demo](https://github.com/mks-hash/toolgap/blob/v0.2.0/docs/guides/TOOL_LOOP.md),
+[validation/provenance](https://github.com/mks-hash/toolgap/blob/v0.2.0/docs/archive/evidence/TOOL_LOOP_VALIDATION.md),
 [raw CSV](https://github.com/mks-hash/toolgap/blob/v0.2.0/results/tool-loop/tool-loop-trials.csv),
 [chart](https://github.com/mks-hash/toolgap/blob/v0.2.0/results/tool-loop/ttft.png).
 

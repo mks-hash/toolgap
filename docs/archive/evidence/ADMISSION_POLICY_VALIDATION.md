@@ -97,4 +97,4 @@ zero RPCs; an eligible prefix sent one. This is a **local development wheel**
 with unchanged 0.3.0 package metadata, not a replacement published release.
 
 No new throughput, fairness, optimal-threshold, waste reduction or net-latency
-claim follows from these checks. See [design and future measurement](ADMISSION_DESIGN.md).
+claim follows from these checks. See [design and future measurement](../../decisions/admission-policy.md).

@@ -1,6 +1,6 @@
 # ToolGap v0.2 real-tool-loop GPU validation
 
-![Measured TTFT: L3-only and resident control](../results/tool-loop/ttft.png)
+![Measured TTFT: L3-only and resident control](../../../results/tool-loop/ttft.png)
 
 One approved session, no rerun. GPU resources deleted and instance/disk lists empty.
 
@@ -85,12 +85,12 @@ small storage/API/tax charges and pre-existing registry storage separate.
 Absolute native DELETE 55m/local backup 60m were not extended; explicit deletion
 occurred early. No quota/IAM/image change, automatic retry or additional run.
 
-Public evidence: [verdict](../results/tool-loop/VERDICT.json),
-[raw CSV](../results/tool-loop/tool-loop-trials.csv),
-[complete trials/timestamps](../results/tool-loop/tool-loop-trials.json),
-[trace](../results/tool-loop/tool-loop-trace.jsonl),
-[regression XML](../results/tool-loop/local-regressions.xml).
+Public evidence: [verdict](../../../results/tool-loop/VERDICT.json),
+[raw CSV](../../../results/tool-loop/tool-loop-trials.csv),
+[complete trials/timestamps](../../../results/tool-loop/tool-loop-trials.json),
+[trace](../../../results/tool-loop/tool-loop-trace.jsonl),
+[regression XML](../../../results/tool-loop/local-regressions.xml).
 
-Reproduce on an existing GPU with [TOOL_LOOP.md](TOOL_LOOP.md).
+Reproduce on an existing GPU with [TOOL_LOOP.md](../../guides/TOOL_LOOP.md).
 Generate the figure using matplotlib 3.10.8:
 `python examples/tool_loop/plot_results.py results/tool-loop`.

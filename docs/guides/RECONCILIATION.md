@@ -6,7 +6,7 @@ the SGLang patches, the CLI's one-RPC contract or existing measured results.
 
 ## Purpose and evidence
 
-The recorded [v0.3 two-caller smoke](MULTI_SESSION_GPU_SMOKE.md) published the
+The recorded [v0.3 two-caller smoke](../archive/evidence/MULTI_SESSION_GPU_SMOKE.md) published the
 admitted prefix about 359 ms after submit, but the first client status request
 was about 1815 ms after submit. The demo queried status after the full
 continuation response. The local slot therefore remained occupied after the
@@ -97,4 +97,4 @@ shutdown tests. With the pinned patched SGLang checkout, run
 `SGLANG_CHECKOUT=/path/to/sglang bash scripts/test_admission_cache.sh` for real
 file I/O, host allocation and cancelled-read terminal drain on CPU.
 
-See [local validation](RECONCILIATION_VALIDATION.md). No new GPU result is claimed.
+See [local validation](../archive/evidence/RECONCILIATION_VALIDATION.md). No new GPU result is claimed.

@@ -35,15 +35,23 @@ neither first invention of KV prefetch nor production readiness.
 From the repository root, without a GPU or model download:
 
 ```bash
-python docs/report/render_readable.py
-python docs/report/audit_report.py
+python docs/report/audit_report.py --check
 ```
 
 The audit checks recorded datasets, table rounding, reductions, all 12 real-tool
 plot points, a selected run's relative timestamps, overlap, byte conversions,
-and citation consistency. It does not execute new experiments. Runtime/model
+and citation consistency. `--check` preserves the historical audit manifest;
+the optional `render_readable.py` regenerates Markdown from the LaTeX source.
+It does not execute new experiments. Runtime/model
 identities and GPU reproduction commands are in the report and
-[REPRODUCE.md](../REPRODUCE.md).
+[REPRODUCE.md](../guides/REPRODUCE.md).
+
+The published manuscript's `docs/REPRODUCE.md` and `docs/UPSTREAM_SMOKE.md`
+refer to its release snapshot. In the current checkout these are
+[reproduction instructions](../guides/REPRODUCE.md) and
+[the archived smoke](../archive/evidence/UPSTREAM_SMOKE.md). The manuscript/PDF
+and historical evidence hashes retain their original bytes; the audit resolves
+the relocated smoke while preserving its original provenance key.
 
 ## Build and provenance
 

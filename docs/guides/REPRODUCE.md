@@ -49,7 +49,7 @@ The combined release image was not newly built/GPU-executed at publication;
 the source patches and CPU/controller imports/tests were checked from a clean
 checkout, and the recorded L4 results validate the pinned measured implementation.
 The v0.2 demo subsequently validated the exact release runtime and client/tool-loop
-overlay on L4; see [TOOL_LOOP_VALIDATION.md](TOOL_LOOP_VALIDATION.md).
+overlay on L4; see [TOOL_LOOP_VALIDATION.md](../archive/evidence/TOOL_LOOP_VALIDATION.md).
 This does not constitute a new test of the assembled public Docker recipe.
 
 ## Native commands inside that environment

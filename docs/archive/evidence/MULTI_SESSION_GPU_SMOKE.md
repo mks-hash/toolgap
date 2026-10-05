@@ -103,19 +103,19 @@ image extraction dominate total session time. No image rebuild was needed.
 
 ## Raw evidence and reproduction
 
-[Raw trials CSV](../results/multi-session-smoke/trials.csv),
-[full trials](../results/multi-session-smoke/trials.json),
-[round accounting](../results/multi-session-smoke/rounds.json),
-[trace](../results/multi-session-smoke/tool-loop-trace.jsonl),
-[regression XML](../results/multi-session-smoke/local-regressions.xml),
-[verdict](../results/multi-session-smoke/verdict.json),
-[source identity](../results/multi-session-smoke/source.json),
-[configuration](../results/multi-session-smoke/config.json),
-[provenance](../results/multi-session-smoke/provenance.json).
+[Raw trials CSV](../../../results/multi-session-smoke/trials.csv),
+[full trials](../../../results/multi-session-smoke/trials.json),
+[round accounting](../../../results/multi-session-smoke/rounds.json),
+[trace](../../../results/multi-session-smoke/tool-loop-trace.jsonl),
+[regression XML](../../../results/multi-session-smoke/local-regressions.xml),
+[verdict](../../../results/multi-session-smoke/verdict.json),
+[source identity](../../../results/multi-session-smoke/source.json),
+[configuration](../../../results/multi-session-smoke/config.json),
+[provenance](../../../results/multi-session-smoke/provenance.json).
 Exact producer/treatment server commands and NVIDIA inventory are alongside.
 Full host/server logs remain in the local `stage2b/v03_gpu/results` archive.
 
-Use the [prepared demo command](MULTI_SESSION_DEMO.md) on a separately authorized
+Use the [prepared demo command](../../guides/MULTI_SESSION_DEMO.md) on a separately authorized
 compatible host with `--repetitions 1` to reproduce this smoke plan. Do not silently
 reinterpret it as the default three-repetition evaluation.
 

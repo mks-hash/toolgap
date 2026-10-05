@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check report values against recorded evidence, without new GPU execution."""
 
+import argparse
 import hashlib
 import json
 import re
@@ -11,6 +12,9 @@ from pathlib import Path
 
 folder = Path(__file__).resolve().parent
 root = folder.parents[1]
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--check", action="store_true", help="Validate without rewriting the historical audit manifest")
+args = parser.parse_args()
 source = (folder / "toolgap-report.tex").read_text()
 for script in ("check_evidence.py", "check_tool_loop_evidence.py"):
     subprocess.run([sys.executable, str(root / "scripts" / script)], check=True)
@@ -82,6 +86,9 @@ paths = [
     "results/tool-loop/VERDICT.json", "results/tool-loop/demo-config.json",
     "docs/UPSTREAM_SMOKE.md", "docs/report/toolgap-report.tex", "docs/report/technical-report.md", "CITATION.cff", "docs/report/toolgap-technical-report.pdf", "docs/report/pdf-validation.json",
 ]
+# Keep the report's original provenance key while resolving its relocated file.
+# Published manuscript/PDF and historical hash records retain their exact bytes.
+relocated = {"docs/UPSTREAM_SMOKE.md": "docs/archive/evidence/UPSTREAM_SMOKE.md"}
 validation = json.loads((folder / "pdf-validation.json").read_text())
 source_compile_verified = validation["builtin_source_sha256"] == hashlib.sha256((folder / "toolgap-report.tex").read_bytes()).hexdigest()
 result = {
@@ -95,7 +102,8 @@ result = {
     "v1_trials": len(v1), "v1_groups": groups1, "v2_runs": len(v2), "v2_groups": groups2,
     "regressions": {"passed": 52, "failed": 0, "skipped": 0},
     "fresh_main_smoke": {"passed": 29, "purpose": "compatibility; separate from both performance datasets"},
-    "sha256": {p: hashlib.sha256((root / p).read_bytes()).hexdigest() for p in paths},
+    "sha256": {p: hashlib.sha256((root / relocated.get(p, p)).read_bytes()).hexdigest() for p in paths},
 }
-(folder / "evidence-audit.json").write_text(json.dumps(result, indent=2) + "\n")
+if not args.check:
+    (folder / "evidence-audit.json").write_text(json.dumps(result, indent=2) + "\n")
 print("REPORT_EVIDENCE: PASS (tables, raw plot points, relative timeline, overlap, percentages, bytes, citations)")
