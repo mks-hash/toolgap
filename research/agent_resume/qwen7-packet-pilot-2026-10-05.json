@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "validation_type": "LIVE_PACKET_BOUND_QWEN7_USEFUL_GATE_BEFORE_NATURAL_PRESSURE",
+  "approval": {
+    "one_paid_vm": true,
+    "any_available_region": true,
+    "minutes_max": 60,
+    "budget_usd_max": 1.5,
+    "condition": "Completed bounded local audit and CPU verification"
+  },
+  "provenance": {
+    "harness_sha": "b6b42e4d529963aa6996452fc41d4627edcec6dd",
+    "runtime_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+    "image_digest": "sha256:4ae0bb2222247e51d146ff0cb9807240d5abbfe7d1b5d7eb1c9db0b072da07ec",
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "packet_sha256": "0453ff5c1b716c14877349384dbb08596a190d1668f1182472b155fc0bf9305b",
+    "measurement_contract_version": 3,
+    "task_contract": {
+      "kind": "PRESSURE_PACKET_REPRESENTATIVES",
+      "packet_sha256": "0453ff5c1b716c14877349384dbb08596a190d1668f1182472b155fc0bf9305b",
+      "expected_ids": [
+        "ownership-audit",
+        "resident-audit",
+        "overlap-audit"
+      ],
+      "representatives_sha256": "fac1788aeaaf36b9d2309dd56871b2200b5a084929f1eb0e814977b2a6721b4f",
+      "max_tool_rounds": 6,
+      "generation": {
+        "temperature": 0,
+        "max_new_tokens": 256,
+        "sampling_seed": 42
+      }
+    },
+    "historical_datasets_unchanged": true,
+    "prepared_provenance_authorization_flag": "Preparation snapshot remains false; actual human approval and execution are separate private launch records"
+  },
+  "environment": {
+    "gpu": "NVIDIA L4",
+    "gpu_memory_mib": 23034,
+    "driver": "580.178.04",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "transformers": "5.17.0",
+    "dtype": "bfloat16",
+    "cache_mode": "FULL",
+    "storage": "file",
+    "tp": 1,
+    "pp": 1,
+    "dp": 1,
+    "context_length": 8192,
+    "token_capacity": 8192,
+    "max_running_requests": 4,
+    "host_pool_gib": 1,
+    "observed_weight_gb": 14.3,
+    "observed_kv_k_gb": 0.22,
+    "observed_kv_v_gb": 0.22,
+    "observed_available_gb_after_pool": 6.95
+  },
+  "execution": {
+    "procedure_completed": true,
+    "host_exit_code": 0,
+    "study_success": false,
+    "stop_reason": "USEFUL_LIVE_GATE_FAILED",
+    "tasks": 3,
+    "successful": 0,
+    "actual_generations": 13,
+    "actual_tools": 12,
+    "actual_cpu_regression_tests": 27,
+    "pressure_blocks": 0,
+    "proactive_control_events": 0
+  },
+  "dimensions": {
+    "transport": "PASS",
+    "actual_generation": "PASS",
+    "native_template": "PASS",
+    "exact_continuation": "PASS",
+    "useful_tool_loop": "FAIL",
+    "correctness": "FAIL",
+    "cleanup": "PASS",
+    "model_fit": "UNKNOWN",
+    "pressure_opportunity": "NOT_RUN",
+    "performance": "NOT_RUN"
+  },
+  "independent_evidence": {
+    "weights_and_tokenizer": "PINNED_MANIFEST_SIZE_AND_SHA256_VERIFIED",
+    "gpu_fit": "LOADED_AND_GENERATED_AT_DECLARED_POOLS",
+    "actual_full_prefix_preservation": "PASS_10_OF_10_SUBMITTED_CONTINUATIONS",
+    "model_fit_dimension_caveat": "Raw readiness remains UNKNOWN because this classifier does not inspect resolved pools; independent loading/generation evidence does not make useful quality pass",
+    "cleanup_caveat": "Baseline has no owned proactive operation; cleanup PASS is not a new proactive cancellation/memory-safety proof"
+  },
+  "tasks": [
+    {
+      "id": "ownership-audit",
+      "status": "COMPLETED",
+      "task_success": false,
+      "generations": 4,
+      "tools": 3,
+      "actual_continuations": 3,
+      "generation_input_tokens": [
+        3971,
+        5331,
+        5634,
+        5847
+      ],
+      "error": null,
+      "failure": "Required source statements not cited; test line 109 was not returned by tools",
+      "actual_answer": "retain_until_cleanup",
+      "expected_answer": "retain_until_cleanup",
+      "answer_value_correct": true,
+      "source_evidence_correct": false
+    },
+    {
+      "id": "resident-audit",
+      "status": "FAILED",
+      "task_success": false,
+      "generations": 4,
+      "tools": 4,
+      "actual_continuations": 3,
+      "generation_input_tokens": [
+        3995,
+        5475,
+        5688,
+        7008
+      ],
+      "error": "ValueError: Tool result exceeds continuation token budget"
+    },
+    {
+      "id": "overlap-audit",
+      "status": "FAILED",
+      "task_success": false,
+      "generations": 5,
+      "tools": 5,
+      "actual_continuations": 4,
+      "generation_input_tokens": [
+        3801,
+        5157,
+        6570,
+        7186,
+        7399
+      ],
+      "error": "ValueError: Tool result exceeds continuation token budget"
+    }
+  ],
+  "live_outstanding": {
+    "natural_pressure_opportunities": "NOT_RUN",
+    "observation_calibration": "NOT_RUN",
+    "matched_prefetch_benefit": "NOT_RUN",
+    "operation_specific_consumption": "UNKNOWN",
+    "wasted_prefetch_bytes": null
+  },
+  "cleanup": {
+    "vm_absent": true,
+    "boot_disk_absent": true,
+    "confirmed_at_utc": "2026-10-05T20:44:46Z",
+    "elapsed_seconds_creation_to_confirmed_absence": 1005.021,
+    "budget_exceeded": false
+  },
+  "cost": {
+    "compute_disk_ipv4_estimate_usd": 0.24544070435456997,
+    "registry_transfer_estimate_usd": 0.14026152800768615,
+    "total_estimate_usd": 0.3857022323622561,
+    "invoice_inspected": false,
+    "regional_hourly_rate_usd": 0.879172212,
+    "pricing_checked_at_utc": "2026-10-05T15:43:47.988703+00:00",
+    "sources": [
+      "https://cloud.google.com/products/compute/pricing/accelerator-optimized",
+      "https://cloud.google.com/artifact-registry/pricing",
+      "https://cloud.google.com/vpc/network-pricing"
+    ]
+  },
+  "architecture_or_image_changed": false,
+  "second_execution": false,
+  "raw_evidence": {
+    "access": "PRIVATE_WORKSTATION; CLOUD_IDENTIFIERS_ADDRESSES_AND_FULL_LOGS_EXCLUDED_FROM_GIT",
+    "sha256": {
+      "results/host-results.tgz": "8e1c734bf9492cb97a9e3aaf87c037746499dfc15bae037aac41b375c2b3892f",
+      "results/results/pilot/tasks.jsonl": "3d48b029cc6c37c603f9d2781ca1cb0410c40fdaa6f09ab0aba86bcc763022a7",
+      "results/results/pilot/readiness.json": "1ab35b7548110b3875ccf5d30cf73b017b0318bee99221dff81a6664d6864571",
+      "results/results/pilot.server.log": "0dfd87168cb8a943e2f8328c2c81d557811d2309335ac8ea3cd8a036e3dadb76",
+      "results/results/pilot.server.jsonl": "d43db47a3e34401f7edc215b0a9dd48ece28e52ad860fe56b03c984c8784ce7a",
+      "results/results/native.json": "c3036e72bb634a5d13cd5123c6e2a373aada114dcb7d046fab92d46e9aa05502",
+      "results/results/model-download.json": "4e544ae7ab5e5aeaa306a752a9c45f08b604dade280df9de1ccf40aefabb6fbb",
+      "results/results/experiment-verdict.json": "8288f9959709e4f77cc92138e962f30c85f3bbe11f105c4799659d81554e1f81",
+      "results/results/provenance.json": "52a2031fa93db7b9bf50d5926da6d2c9a32214add7c109f9f346b7943e82dfea",
+      "evidence/preflight.json": "1b71ba68de7e66c59d2d53e4b7b7433842632d3b0ddc4683a901b88c27679344",
+      "evidence/post-run.json": "34c92eaedd0d28e083b701ca48d7bebc94e87ec68ceac543f43f1e8ca745af8a",
+      "evidence/instances-after-delete.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "evidence/disks-after-delete.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "evidence/budget-replay.json": "532e4819470bc20ce68834dbc11dbf421466231cf5f73e43c96150ad5b3d459e",
+      "evidence/budget-replay.log": "532e4819470bc20ce68834dbc11dbf421466231cf5f73e43c96150ad5b3d459e",
+      "evidence/budget-replay.first-attempt.log": "588ee19db6c254c1e6d64861e1814842b752b4033d2df46bb94a6a1f5d01a2ae",
+      "evidence/replay_budgets.py": "335f5efa417eb1db2442de72481d78ee5c5d137c95d8db731b44081cccfc1f2f"
+    }
+  },
+  "next_action": "Local continuation-budget and source-evidence review on retained actual calls. No new GPU authorization. Do not expand context/round limits, repair saved IDs or loosen grading to obtain success.",
+  "offline_budget_replay": {
+    "validation_type": "OFFLINE_REPLAY_OF_ACTUAL_LIVE_RESULTS",
+    "gpu_execution": false,
+    "network": false,
+    "same_committed_bundle": true,
+    "official_tokenizer_hashes_verified": true,
+    "all_submitted_continuations_exactly_reproduced": true,
+    "results": [
+      {
+        "task_id": "ownership-audit",
+        "steps": [
+          {
+            "tool": "search_repository",
+            "saved_prefix_tokens": 4000,
+            "suffix_tokens": 1331,
+            "continuation_tokens": 5331,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "read_source",
+            "saved_prefix_tokens": 5372,
+            "suffix_tokens": 262,
+            "continuation_tokens": 5634,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "run_regression",
+            "saved_prefix_tokens": 5657,
+            "suffix_tokens": 190,
+            "continuation_tokens": 5847,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          }
+        ]
+      },
+      {
+        "task_id": "resident-audit",
+        "steps": [
+          {
+            "tool": "search_repository",
+            "saved_prefix_tokens": 4017,
+            "suffix_tokens": 1458,
+            "continuation_tokens": 5475,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "run_regression",
+            "saved_prefix_tokens": 5498,
+            "suffix_tokens": 190,
+            "continuation_tokens": 5688,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "search_repository",
+            "saved_prefix_tokens": 5712,
+            "suffix_tokens": 1296,
+            "continuation_tokens": 7008,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "read_source",
+            "saved_prefix_tokens": 7049,
+            "suffix_tokens": 1187,
+            "continuation_tokens": 8236,
+            "maximum_input_tokens": 7936,
+            "fits": false,
+            "actual_continuation_submitted": false
+          }
+        ]
+      },
+      {
+        "task_id": "overlap-audit",
+        "steps": [
+          {
+            "tool": "search_repository",
+            "saved_prefix_tokens": 3840,
+            "suffix_tokens": 1317,
+            "continuation_tokens": 5157,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "search_repository",
+            "saved_prefix_tokens": 5178,
+            "suffix_tokens": 1392,
+            "continuation_tokens": 6570,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "read_source",
+            "saved_prefix_tokens": 6611,
+            "suffix_tokens": 575,
+            "continuation_tokens": 7186,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "run_regression",
+            "saved_prefix_tokens": 7209,
+            "suffix_tokens": 190,
+            "continuation_tokens": 7399,
+            "maximum_input_tokens": 7936,
+            "fits": true,
+            "actual_continuation_submitted": true
+          },
+          {
+            "tool": "read_source",
+            "saved_prefix_tokens": 7439,
+            "suffix_tokens": 619,
+            "continuation_tokens": 8058,
+            "maximum_input_tokens": 7936,
+            "fits": false,
+            "actual_continuation_submitted": false
+          }
+        ]
+      }
+    ],
+    "fixture_initial_attempt": "TypeError because diagnostic passed str to Path API; corrected diagnostic argument; first-attempt log retained"
+  }
+}

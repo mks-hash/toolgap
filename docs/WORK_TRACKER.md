@@ -3,17 +3,17 @@
 Updated: 2026-10-05. Owner for the work below: the coding agent in this project.
 Reviewer/approval authority: Maxim Yakimov. Work is local on
 `feat/passive-pressure-workload`. Maxim Yakimov authorized committing and
-pushing this branch on 2026-10-05. The subsequently authorized single Qwen7 GPU
-session in any available region is complete; no further paid session, release
-or upstream PR is authorized by this checkpoint.
+pushing this branch on 2026-10-05. Both explicitly authorized single Qwen7 GPU
+sessions are complete; the latest stopped at the useful-live gate. No further
+paid session, release or upstream PR is authorized by this checkpoint.
 
 ## Outcome and current state
 
 The current local audit is [ADR-0004](decisions/0004-hypothesis-aligned-measurement.md).
 Its purpose is to measure the original L3 → L2 → ordinary continuation hypothesis,
 not to expand the SDK or agent framework. Runtime and published benchmarks stay
-at their existing pins. Full-image CPU verification passed; the results below
-do not establish a new useful-live or pressure result.
+at their existing pins. Full-image CPU verification passed. The latest packet-bound live gate failed
+0/3; pressure and performance remain NOT_RUN.
 
 Answer whether useful competing agent trajectories naturally create L3 restore
 opportunities, and whether prefetch improves all-caller outcomes without lowering
@@ -33,6 +33,17 @@ returned no matches and the regression answer cited an unretrieved nonexistent
 path. Stop reason: `USEFUL_LIVE_GATE_FAILED`; no pressure/calibration/treatment
 block ran. This is a workload-integration finding, not a prefetch result. The
 single VM and boot disk were deleted; all failures are retained.
+
+The [packet-bound Qwen7 pilot](../research/agent_resume/qwen7-packet-pilot-2026-10-05.json)
+at `b6b42e4` then generated 13 actual responses, executed 12 tools and preserved
+all 10 submitted continuation prefixes, but again passed **0/3 useful tasks**.
+Two real tool results exceeded the 7936-input-token allowance (8192 context minus
+256 output tokens); independent official-tokenizer replay found 8236 and 8058
+required tokens. The remaining answer had the right answer value but invalid
+source evidence. Three real regression invocations passed 27 CPU tests. The
+gate stopped before calibration/pressure/treatment. Both VM and boot disk absence
+were confirmed after 16.75 minutes; total estimated session plus image-transfer
+cost was USD 0.386, not an invoice. This is not evidence against prefetch benefit.
 
 ## Ordered work
 
@@ -160,28 +171,33 @@ hashing and stale guide commands. The new committed bundle passed 176 ToolGap
 tests plus 128 subtests and 57 runtime tests plus 14 subtests, with no
 failures/errors/skips. Official-tokenizer two-round checks, 12 scripted callers
 with 108 real CPU regression executions, orchestration mocks and cleanup
-guards passed. The frozen private launch package is locally ready; execution
-is not authorized. This does not amend the old live 0/3 outcomes or validate
-natural pressure/performance.
+guards passed. The frozen private launch package was locally ready and was then used once
+under explicit approval. Its session marker prevents reuse. The new 0/3 result
+is separate from the historical pilots; natural pressure/performance remain
+unvalidated.
 
 ## Next acceptance checks and execution limits
 
-1. DONE locally: consistency audit, regression checks, code/decision commits
-   and sanitized evidence. Unrelated report working files remain untouched.
-2. DONE locally: frozen committed bundle/packet, packet-bound useful-gate
-   commands and CPU orchestration/cleanup checks. Prior failures remain intact;
-   local readiness does not imply useful live success.
-3. Only after a new explicit bounded GPU authorization: useful live quality,
-   fixed warmup/reset, first observed natural-pressure baseline, then symmetric
-   instrumentation calibration and conditional bracketed B/C/B comparison.
-   Stop on quality/cleanup/setup failure or no observed candidate; keep all
-   declared callers, failures and unknown usage. Do not expand tool rounds,
-   change precision/backend/model to manufacture success, or force eviction.
+1. DONE: bounded consistency audit, CPU regression, code/decision commits and
+   sanitized evidence; unrelated report working files remain untouched.
+2. DONE: frozen committed packet and one separately approved live attempt,
+   terminal failed useful gate, result collection, confirmed VM/disk deletion
+   and offline replay of actual outputs. No automatic rerun.
+3. LOCAL NEXT: close the tool-result budget gap using retained actual trajectories.
+   Specify budget-aware, paginated evidence responses separately from exact-prefix
+   serialization. The pre-dispatch empty envelope and ideal scripted sequence
+   did not bound cumulative real result sizes. Exercise near-limit actual suffixes,
+   repeated searches and reads without executing a model, trimming saved IDs,
+   changing model/context/round limits or weakening source grading. Diagnose the
+   cited-versus-retrieved lines independently of answer-value correctness.
+4. Only after that bounded correction and a new separately approved live gate:
+   useful quality, first natural-pressure baseline, symmetric observation
+   calibration and conditional B/C/B. Stop on quality/cleanup/setup failure or
+   no observed candidate; preserve all callers, failures and unknown usage.
 
-Local contract/preparation checks do not authorize paid execution. The previous
-single Qwen7 session is consumed. Proposed next-session bounds remain one worker,
-60 minutes including setup/cleanup, USD 1.50; provider auto-delete, guest cutoff
-and result collection must be verified before creation. No automatic second
-session, new IAM/storage/image architecture, model sweep, SWA, distributed
-support, new backend or proactive HBM expansion. Stop expensive exploratory
-work and continue locally when the user's limit requires it.
+Local fixes and the completed session do not authorize another paid run.
+The fresh single-session package is consumed. Any proposed session must again
+specify its budget and verify automatic cleanup before creation. No new
+IAM/storage/image architecture, model sweep, SWA, distributed support, new
+backend or proactive HBM expansion. Main and published benchmarks remain
+unchanged; continue this branch until a bounded research result is reviewable.

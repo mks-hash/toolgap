@@ -1,7 +1,8 @@
 # ADR-0003: bounded repository discovery and source-backed tool evidence
 
 Date: 2026-10-05. Status: accepted; local implementation and checks completed.
-Live useful-task behavior remains unverified after this change.
+Local readiness is distinct from useful live success; see the subsequent
+packet-bound pilot below.
 
 ## Context
 
@@ -72,3 +73,20 @@ arms; no historical latency or GPU pressure claim is reused. Results and next
 acceptance checks live in [WORK_TRACKER](../WORK_TRACKER.md). CPU/scripted checks
 do not complete TG-008, observer calibration, or the pressure comparison, and
 do not authorize another GPU session.
+
+## Subsequent packet-bound live finding
+
+The [new pinned Qwen7 pilot](../../research/agent_resume/qwen7-packet-pilot-2026-10-05.json)
+used ADR-0004's six-round pressure contract, which supersedes the legacy
+four-round diagnostic limit above. It passed exact continuation and returned
+source/search/regression evidence, but 0/3 tasks passed. One final answer cited
+an unreturned test line and omitted the required source statement; two tool
+results exhausted the remaining input budget. Offline replay with the official
+tokenizer reproduces every submitted continuation and both budget refusals.
+
+A line-count bound and a fitting empty tool envelope do not guarantee a fitting
+actual result or cumulative trajectory. The next local correction must specify
+budget-aware, paginated evidence output at the tool boundary, retain exact saved
+IDs, and test actual retained sequences. This is an outstanding contract gap,
+not an implemented policy or permission to raise limits or loosen grading.
+Useful live quality, natural pressure and prefetch benefit remain separate gates.
