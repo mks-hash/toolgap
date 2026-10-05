@@ -166,5 +166,80 @@
     "build_cache_bytes_display": "19.05GB",
     "action": "READ_ONLY; NO_GLOBAL_PRUNE; RETAIN_VALIDATED_IMAGE",
     "cloud_compute_charge": false
+  },
+  "repository_tool_contract_review": {
+    "validation_type": "LOCAL_RETRIEVAL_CONTRACT_REVIEW_AFTER_QWEN7_LIVE_FAILURE",
+    "code_parent_sha": "434b4de85708745b118fdac2dabf7dd96cd0261c",
+    "code_identity": "PARENT_SHA_PLUS_WORKING_TREE_SOURCE_HASHES",
+    "source_sha256": {
+      "research/agent_resume/workloads.py": "b288921e6975785f41944bbef624867f9f39a95b8b121fbcb5eb1d1e6c5a9148",
+      "research/agent_resume/runner.py": "d93af3919fbab13602ec4b02bd09b5a08df2e8cfd0fb9fb2b4ba952bfa016946",
+      "research/agent_resume/readiness.py": "9041b452850e28d126dd758f468de8a923e7129d2575171df4a28cd5ca67b9e0",
+      "tests/test_repository_tools.py": "c6463e1c1b487f9aa62b527faf8935fb82c64303beb7eb6823e0a621d213ace2"
+    },
+    "tool_contract_version": 2,
+    "changes": [
+      "Bounded literal-first inverse-frequency word/identifier search; no synonym/semantic/answer expansion",
+      "Paginated pinned file discovery; metadata does not satisfy source grading",
+      "Actual regression result includes pinned numbered test-class declarations",
+      "Generic prompt instructions; unchanged parser, exact saved IDs, strict grader and four-tool-round limit",
+      "Prepared measurement contract binds schema/executor/runner hashes; old packets fail before live operations"
+    ],
+    "local_checks": {
+      "historical_corpus_queries_replayed": 7,
+      "queries_returning_actual_source_lines": 7,
+      "replay_is_agent_success": false,
+      "final_image_tests_passed": 132,
+      "subtests_passed": 93,
+      "xml_checks": {
+        "tests": 225,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "actual_cpu_full_file_fixtures": 12,
+      "native_reference": "PASS_TWO_ROUNDS_FINAL_IMAGE",
+      "scripted_callers_passed": 12,
+      "actual_scripted_cpu_regression_tests": 108,
+      "network": "DISABLED_IN_FINAL_CONTAINER",
+      "gpu": "UNAVAILABLE_NOT_USED",
+      "ruff": "PASS",
+      "diff_check": "PASS"
+    },
+    "initial_container_failure": {
+      "failed": 1,
+      "passed": 131,
+      "reason": "Host Git worktree .git referenced an inaccessible host gitdir inside the container; runtime provenance was UNKNOWN",
+      "repair": "Use existing clean full checkout at the same runtime SHA; no runtime/image/test-condition change",
+      "raw_diagnostics_preserved": true
+    },
+    "historical_live_results_unchanged": {
+      "qwen7": "0/3",
+      "mistral": "0/3"
+    },
+    "live_after_change": {
+      "useful_tool_loop": "NOT_RUN",
+      "calibration": "NOT_RUN",
+      "natural_pressure": "NOT_RUN",
+      "prefetch_performance": "NOT_RUN"
+    },
+    "runtime_changed": false,
+    "production_sdk_changed": false,
+    "image_rebuilt": false,
+    "new_gpu_session": false,
+    "previous_launch_preflight": "DISABLED; original approved-session preflight preserved privately",
+    "raw_evidence_sha256": {
+      "historical-corpus-replay.json": "96ac8eb183ecaa3eaaafd710718c315a6fedcf73f11a9b959cb34c89eca85a96",
+      "packet.json": "e597cc991c8378a52bab4107a229c39a4cee86e96622f78feb415d9122f1cafd",
+      "native.json": "a6916d0a386914deaa8c562eead1e15c5031c17897ff5e503d15339e2f88b1cd",
+      "scripted.json": "5be6b4824417cfa5d1119911f90927117885a91d091ae41580f36bbd5475d91d",
+      "regressions.log": "e780dd10f5977eb53169067662eaefbcc17624866e2a05d50940379625c5fd6f",
+      "final-image.log": "d00f97e265680ccb8d2c18ea7fc0e5a97dcc875f9918e671cdee49c84feea181",
+      "final-image/regressions.xml": "e8e2c7022a4568891574a7af64929ea08323f35e58eeecbf75605c8cf10423f0",
+      "final-image/native.json": "a6916d0a386914deaa8c562eead1e15c5031c17897ff5e503d15339e2f88b1cd",
+      "final-image.log.first-attempt": "be1b34eef552c97dc505d925e6e2d9ddafa4f648bb953122eb27b012a70581a4",
+      "final-image/regressions.xml.first-attempt": "dc21c3cd529e9d658b84c1e3ac702b7e0cd2e421aa32d5fcb98ad72b78d8e6be"
+    },
+    "next_acceptance": "New frozen workload and useful live gate are required before pressure; no paid execution is authorized by these local checks"
   }
 }

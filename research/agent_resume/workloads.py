@@ -1,8 +1,10 @@
 """Useful tools over a bounded, immutable Git source snapshot."""
 
 import asyncio
+import ast
 import hashlib
 import json
+import math
 import re
 import subprocess
 import sys
@@ -25,8 +27,16 @@ SCHEMA = [
     for name, description, properties in (
         (
             "search_repository",
-            "Find source/documentation evidence by literal text.",
+            "Search pinned source by words or code identifiers; literal matches rank first. Returns at most 20 numbered source lines. Read nearby lines with read_source when needed.",
             {"query": {"type": "string", "minLength": 1, "maxLength": 128}},
+        ),
+        (
+            "list_repository",
+            "Discover pinned file paths and line counts, 40 per page. Start with prefix='' and offset=0; use next_offset for later pages. File metadata alone is not citation evidence.",
+            {
+                "prefix": {"type": "string", "maxLength": 128},
+                "offset": {"type": "integer", "minimum": 0},
+            },
         ),
         (
             "read_source",
@@ -39,7 +49,7 @@ SCHEMA = [
         ),
         (
             "run_regression",
-            "Run the allowed admission-hints CPU regression suite.",
+            "Run the allowed admission-hints CPU regression suite. Returns actual exit status/test count and numbered test-class source lines that can be cited; never invent test paths.",
             {"suite": {"type": "string", "enum": ["admission_hints"]}},
         ),
     )
@@ -69,6 +79,51 @@ TASKS = [
         required_tool="run_regression",
     ),
 ]
+
+
+def tool_contract():
+    """Bind prepared work to the schema, executor and initial prompt actually used."""
+    return dict(
+        version=2,
+        search="LITERAL_FIRST_IDF_WORD_OVERLAP; NO_SEMANTIC_OR_SYNONYM_EXPANSION",
+        search_limit=20,
+        listing_limit=40,
+        read_limit=80,
+        schema_sha256=hashlib.sha256(
+            json.dumps(SCHEMA, sort_keys=True).encode()
+        ).hexdigest(),
+        executor_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        runner_sha256=hashlib.sha256(
+            Path(__file__).with_name("runner.py").read_bytes()
+        ).hexdigest(),
+    )
+
+
+def search_terms(text):
+    # Split snake_case/camelCase without model/task-specific vocabulary or aliases.
+    text = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", text)
+    return set(re.findall(r"[^\W_]+", text.casefold())) - {
+        "a",
+        "an",
+        "and",
+        "are",
+        "as",
+        "at",
+        "be",
+        "by",
+        "for",
+        "from",
+        "in",
+        "is",
+        "it",
+        "of",
+        "on",
+        "or",
+        "the",
+        "to",
+        "which",
+        "with",
+    }
 
 
 def snapshot(repo, revision):
@@ -111,22 +166,92 @@ class RepositoryTools:
         self.corpus = corpus
         self.repo = Path(repo).resolve() if repo is not None else None
         self.artifacts = []
+        self._search_lines = None
 
     def search(self, query):
         self._validate_search(query)
+        if self._search_lines is None:
+            # Build inside the first measured search, not in an unreported warmup.
+            self._search_lines = [
+                (path, index, text, search_terms(text))
+                for path, data in sorted(self.corpus["files"].items())
+                for index, text in enumerate(data["text"].splitlines(), 1)
+            ]
+        terms = search_terms(query)
+        counts = {
+            term: sum(term in row[3] for row in self._search_lines) for term in terms
+        }
+        weights = {
+            term: math.log(1 + len(self._search_lines) / (1 + count))
+            for term, count in counts.items()
+        }
         hits = []
-        for path, data in sorted(self.corpus["files"].items()):
-            for index, text in enumerate(data["text"].splitlines(), 1):
-                if query.casefold() in text.casefold():
-                    hits.append(dict(path=path, line=index, text=text[:500]))
+        for path, index, text, line_terms in self._search_lines:
+            literal = query.casefold() in text.casefold()
+            matched = sorted(terms & line_terms)
+            if literal or matched:
+                score = sum(weights[term] for term in matched)
+                hits.append(
+                    (
+                        (-int(literal), -score, path, index),
+                        dict(
+                            path=path,
+                            line=index,
+                            text=text[:500],
+                            literal_match=literal,
+                            matched_terms=matched,
+                        ),
+                    )
+                )
+        hits.sort(key=lambda row: row[0])
         return dict(
-            matches=hits[:20], total_matches=len(hits), commit=self.corpus["commit"]
+            matches=[row[1] for row in hits[:20]],
+            total_matches=len(hits),
+            truncated=len(hits) > 20,
+            query_terms=sorted(terms),
+            method="literal-first-word-overlap-v2",
+            commit=self.corpus["commit"],
         )
 
     @staticmethod
     def _validate_search(query):
-        if not isinstance(query, str) or not 1 <= len(query) <= 128:
-            raise ValueError("query must contain 1..128 characters")
+        if (
+            not isinstance(query, str)
+            or not query.strip()
+            or not 1 <= len(query) <= 128
+        ):
+            raise ValueError("query must contain 1..128 nonblank characters")
+
+    @staticmethod
+    def _validate_listing(prefix, offset):
+        if (
+            not isinstance(prefix, str)
+            or len(prefix) > 128
+            or prefix.startswith("/")
+            or ".." in prefix.split("/")
+            or any(ord(c) < 32 for c in prefix)
+        ):
+            raise ValueError("prefix must be a relative pinned-file prefix")
+        if type(offset) is not int or offset < 0:
+            raise ValueError("offset must be a nonnegative integer")
+
+    def listing(self, prefix, offset):
+        self._validate_listing(prefix, offset)
+        paths = sorted(p for p in self.corpus["files"] if p.startswith(prefix))
+        page = paths[offset : offset + 40]
+        return dict(
+            files=[
+                dict(
+                    path=p,
+                    lines=len(self.corpus["files"][p]["text"].splitlines()),
+                    sha256=self.corpus["files"][p]["sha256"],
+                )
+                for p in page
+            ],
+            total_files=len(paths),
+            next_offset=offset + len(page) if offset + len(page) < len(paths) else None,
+            commit=self.corpus["commit"],
+        )
 
     def read(self, path, start, end):
         self._validate_read(path, start, end)
@@ -197,6 +322,14 @@ class RepositoryTools:
             raise
         text = (out + err).decode(errors="replace")
         ran = re.search(r"Ran (\d+) tests?", text)
+        test_path = "tests/test_admission_hints.py"
+        source = self.corpus["files"][test_path]
+        lines = source["text"].splitlines()
+        classes = [
+            node
+            for node in ast.parse(source["text"]).body
+            if isinstance(node, ast.ClassDef)
+        ]
         self.artifacts.append(
             dict(
                 command=command,
@@ -210,6 +343,15 @@ class RepositoryTools:
             exit_code=process.returncode,
             tests=int(ran[1]) if ran else None,
             passed=process.returncode == 0 and ran is not None,
+            matches=[
+                dict(
+                    path=test_path, line=node.lineno, text=lines[node.lineno - 1][:500]
+                )
+                for node in classes[:20]
+            ],
+            source_sha256=source["sha256"],
+            commit=self.corpus["commit"],
+            source_truncated=len(classes) > 20,
         )
 
     def validate_call(self, call):
@@ -217,6 +359,7 @@ class RepositoryTools:
         args = call.arguments
         expected = {
             "search_repository": {"query"},
+            "list_repository": {"prefix", "offset"},
             "read_source": {"path", "start", "end"},
             "run_regression": {"suite"},
         }
@@ -224,6 +367,8 @@ class RepositoryTools:
             raise ValueError("Tool arguments differ from the declared schema")
         if call.name == "search_repository":
             self._validate_search(**args)
+        elif call.name == "list_repository":
+            self._validate_listing(**args)
         elif call.name == "read_source":
             self._validate_read(**args)
         elif args["suite"] != "admission_hints" or self.repo is None:
@@ -234,6 +379,8 @@ class RepositoryTools:
         args = call.arguments
         if call.name == "search_repository":
             return await asyncio.to_thread(self.search, **args)
+        if call.name == "list_repository":
+            return await asyncio.to_thread(self.listing, **args)
         if call.name == "read_source":
             return await asyncio.to_thread(self.read, **args)
         return await self.regression(**args)

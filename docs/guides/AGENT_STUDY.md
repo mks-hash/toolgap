@@ -12,6 +12,23 @@ Use a reviewed pinned profile and its cached tokenizer. Commands below run from
 the repository root. Every output path must be new. Keep raw runs in ignored
 `work/`; sanitize summaries before public inclusion.
 
+## Repository tool contract
+
+The research tools operate on the same pinned Git source snapshot:
+
+| Tool | Result and limit |
+|---|---|
+| `search_repository(query)` | Literal-first ranked word/identifier matches; at most 20 numbered source lines. Lexical search, without semantic/synonym expansion. |
+| `list_repository(prefix, offset)` | At most 40 paths/line counts/hashes; start with `prefix=""`, `offset=0`, then use `next_offset`. Metadata alone cannot justify a citation. |
+| `read_source(path, start, end)` | 1–80 numbered lines from an existing pinned file. |
+| `run_regression("admission_hints")` | Actual CPU test status/count and bounded numbered test-class source lines. A successful exit does not authorize an invented source citation. |
+
+Call one tool at a time and cite only returned source lines. The four-tool-round
+limit and strict grading remain. Contract v2 binds schema/executor/runner hashes
+to the packet; prepare new packet/native/live evidence after tool or prompt
+changes. Old readiness does not establish useful behavior for the new workload.
+See [ADR-0003](../decisions/0003-repository-tool-evidence-contract.md).
+
 ## Prepare locally
 
 ```bash

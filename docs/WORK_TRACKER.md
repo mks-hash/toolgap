@@ -42,7 +42,7 @@ are [archived snapshots](archive/README.md); they do not introduce parallel task
 | TG-005 | P1 / DONE (local evidence enforcement) | Versioned capability/evidence report with independent statuses: transport, template contract, model fit, actual generation, useful tool loop, pressure opportunity, correctness and performance. Bind the profile to weights/revision, tokenizer/template, parser, dtype/quantization and resolved cache layout; distinguish declared identity from verified artifacts. Isolate file storage across incompatible profiles. Update software's preflight consumers, not just prose. CPU success cannot imply useful live model support. | TG-003, ADR-0002 |
 | TG-006 | P2 / DONE (local evidence scope) | Validate stream/finish reason and record explicit truncated/malformed/unsupported outcomes; keep generated IDs and client-observed first-token semantics. Identify run/code/package/config/schema hashes and preserve all failed outcomes. Procedure completion and study success must be separate. | TG-002, TG-005 |
 | TG-007 | P2 / IN PROGRESS | Close measurement design gaps: quantify observation delay/cost; specify bounded passive sampling at dispatch, during tool execution and before continuation, without delaying the tool or request. Separate L3 file availability, successful reads, publication and consumption. Report page-aligned spans and interval-censored transition times; unknown waste stays unknown. Freeze tool schema/executor, workload, grader, sampling budget and primary endpoints. | TG-004, TG-006 |
-| TG-008 | P1 / BLOCKED by useful workload integration; Qwen7 live 0/3 | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. Next local work: bounded generic repository discovery/search and citation evidence contract, replaying retained live failures. | TG-002 through TG-007 |
+| TG-008 | P1 / BLOCKED pending new useful live gate; Qwen7 history 0/3 | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. Generic repository discovery/search and citation contract v2 now passed local/native/scripted checks; any new paid gate needs applicable approval and a new frozen package. | TG-002 through TG-007 |
 | TG-009 | P1 / BLOCKED by TG-008; NOT_RUN | Baseline useful competing-agent block with no forced target eviction. Count opportunities at dispatch versus those arising during the tool gap, the remaining window, unknown/resident/missing spans and all-caller quality/latency. An L3 hit at continuation alone does not prove a usable pre-arrival opportunity. No opportunity is a feasibility result for this workload/resource point; do not manufacture one. Another paid session requires applicable approval. | TG-008 |
 | TG-010 | P1 / CONDITIONAL | Matched whole-worker baseline/prefetch comparisons if baseline supplies opportunities reachable by the specified trigger and quality/cleanup pass. Same model/config/arrivals/instrumentation; counterbalance treatment order and retain all callers/failures. Predeclare primary endpoint and acceptable competing-caller degradation. Report aggregate effects separately from conditional L3 effects, overhead/waste and uncertainty. No win is a valid outcome. Release/report decision follows evidence. | TG-009 |
 | TG-011 | P2 / CONDITIONAL | Reuse the same evidence contract for a larger FULL/GQA profile and an independent family, changing one axis at a time after one trustworthy study. Publish compatibility and negative outcomes as well as measured benefit. No model sweep or unsupported architecture is implied. | TG-008 through TG-010, or a documented TG-009 feasibility stop |
@@ -457,3 +457,42 @@ corpus and review **generic tool discoverability and evidence retrieval**, not
 model-specific JSON repairs. Keep the failing outputs and fixed grading; do not
 increase tool rounds or manufacture evidence to pass this run. Any changed
 workload/profile is new evidence and requires new pins before another paid run.
+
+## Repository tools v2 local checkpoint (2026-10-05)
+
+[ADR-0003](decisions/0003-repository-tool-evidence-contract.md) records the bounded
+tool changes: word/identifier retrieval with literal priority, paginated pinned
+file discovery, and actual test-class source evidence from the regression tool.
+The executor contains no model/task-specific query aliases or answer lookup.
+Listing metadata alone cannot satisfy grading; invented/unretrieved citations
+and unsuccessful required tools remain rejected. Parser, four-tool-round limit,
+runtime and production SDK are unchanged.
+
+The original-corpus CPU replay now returns actual source lines for all seven
+previously empty queries; it does not replay new model decisions or claim agent
+success. Some lexical matches still need a follow-up identifier search/read.
+The first search includes index construction in its measured duration. Token
+sizes, retrieval latency and quality belong to this new workload, not the old
+GPU results.
+
+Local final-image checks passed **132 tests + 93 subtests**, zero failures/errors/
+skips, including 12 actual CPU FULL/file fixtures. Official pinned-tokenizer
+conformance passed two rounds with the new schema. A new CPU packet ran 12/12
+scripted callers and 108 real CPU regression-test executions; native/scripted
+success remains distinct from useful live behavior. Ruff/diff checks pass.
+The initial container check's one provenance failure is retained: the host
+worktree's gitdir was inaccessible in the container. Mounting the existing
+clean checkout of the same runtime SHA resolved it; no code/test weakening or
+image rebuild was used.
+
+Evidence is appended as `repository_tool_contract_review` in the existing
+[local review record](../research/agent_resume/local-review-2026-10-05.json).
+Schema/executor/runner hashes are now bound into the measurement contract; a
+checksum-valid old packet stops before live HTTP or tools. The previous paid
+launcher's readiness flag is disabled and its original preflight preserved.
+
+TG-008 is still incomplete; both historical live pilots remain 0/3. Before
+another separately authorized live gate, freeze the new code/packet/evidence
+and verify the launch/collection guards. Do not run pressure or claim cache
+benefit until useful quality passes. No GPU, runtime/image change, new release
+or upstream PR was performed at this local checkpoint.

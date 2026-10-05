@@ -150,7 +150,11 @@ def initial_messages(adapter, task):
                 role="system",
                 content="Use repository tools to obtain evidence. Return final JSON only: "
                 '{"answer":"value","evidence":[{"path":"file","line":1}]}. '
-                "Call one tool at a time. Never invent file/line evidence.",
+                "Call one tool at a time. Never invent file/line evidence. "
+                "Search words or identifiers, not necessarily an exact phrase. "
+                "Use list_repository to discover paths when needed. "
+                "Cite numbered source lines actually returned by search_repository, "
+                "read_source or run_regression; a file listing is not evidence.",
             ),
             dict(
                 role="user",

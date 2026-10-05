@@ -330,8 +330,11 @@ def require_live(directory, profile):
 
 
 def measurement_contract():
+    from .workloads import tool_contract
+
     return dict(
         schema_version=2,
+        repository_tools=tool_contract(),
         sampling=DEFAULT_SAMPLING,
         experimental_unit="WHOLE_SHARED_WORKER_BLOCK",
         trigger="ONCE_AT_TOOL_DISPATCH",
