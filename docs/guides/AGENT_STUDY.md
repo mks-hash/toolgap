@@ -344,10 +344,13 @@ no confidence/p95 claim, no release claim, and no automatic second session.
 Two explicit purposes are available; the default is `evidence`.
 
 - `--purpose diagnostic`: request-time only. Requires genuine completed transport,
-  exact-token continuation, retained declared callers and resolved cleanup, but
+  valid actual token IDs, at least one exact-token tool continuation across the
+  block, retained declared callers and resolved cleanup, but
   keeps wrong answers/invalid citations as quality failures. Safety/protocol
   failures stop. Reports diagnostic cache observations and all-caller quality;
   it cannot produce proactive comparison or useful-agent speedup evidence.
+  A caller that returns a final answer without tools stays in the denominator
+  and contributes zero tool windows; that alone does not stop diagnostics.
 - `--purpose evidence`: additionally requires all declared representative tasks
   and all baseline callers to pass the original quality rules. Only this
   baseline can qualify a conditional proactive block, together with trace-bound

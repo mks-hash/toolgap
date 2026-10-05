@@ -32,6 +32,8 @@ See [retained pilot](../../research/agent_resume/qwen7-packet-pilot-2026-10-05.j
   evidence must identify pinned sources instead of inheriting a claim of realism.
 - Permit technically valid diagnostic baseline observations independently of
   task success, retaining every declared caller and its quality/censoring status.
+  Callers with a valid final answer but no tool call remain in the denominator;
+  at least one exact actual tool continuation across the block is required.
   A diagnostic run cannot authorize proactive evidence comparison or a headline.
   Evidence comparison retains the existing strict quality, provenance, resource,
   instrumentation, cleanup and opportunity checks until another policy is

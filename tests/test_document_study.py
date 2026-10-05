@@ -238,6 +238,50 @@ class TestDiagnostic(unittest.IsolatedAsyncioTestCase):
                     ]
                 )
 
+    def test_caller_without_tool_call_is_retained_in_diagnostics(self):
+        rows = live_rows()
+        expected = [r["task_id"] for r in rows]
+        rows[0].update(task_success=False, tools=[])
+        rows[0]["generations"] = rows[0]["generations"][:1]
+        result = readiness.live_result(rows, expected, False)
+        self.assertTrue(result["diagnostic_ready"])
+        self.assertFalse(result["study_success"])
+        self.assertEqual(result["tasks"], 3)
+        for row in rows:
+            row["tools"] = []
+            row["generations"] = row["generations"][:1]
+        self.assertFalse(
+            readiness.live_result(rows, expected, False)["diagnostic_ready"]
+        )
+        rows = live_rows()
+        rows[0]["tools"] = []
+        rows[0]["generations"] = rows[0]["generations"][:1]
+        rows[0]["generations"][0]["output_ids"] = []
+        self.assertFalse(
+            readiness.live_result(rows, expected, False)["diagnostic_ready"]
+        )
+
+    def test_document_native_proof_binds_document_schema_source(self):
+        from test_readiness_sampling import native_record
+
+        profile = json.loads(
+            (readiness.ROOT / "research/agent_resume/profiles/qwen.json").read_text()
+        )
+        record = native_record(profile)
+        record["workload_kind"] = "document-search"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "native.json"
+            path.write_text(json.dumps(record))
+            with self.assertRaisesRegex(ValueError, "documents.py"):
+                readiness.require_native(path, profile, workload="document-search")
+            record["source_sha256"]["documents.py"] = readiness.file_hash(
+                readiness.ROOT / "research/agent_resume/documents.py"
+            )
+            path.write_text(json.dumps(record))
+            self.assertTrue(
+                readiness.require_native(path, profile, workload="document-search")
+            )
+
     async def test_diagnostic_proactive_rejected_before_files_or_http(self):
         from types import SimpleNamespace
 

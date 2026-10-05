@@ -128,7 +128,10 @@ def require_native(path, profile, *, workload=None):
         raise ValueError("Missing/current native reference conformance is required")
     if workload is not None and evidence.get("workload_kind") != workload:
         raise ValueError("Native evidence uses a different tool schema/workload")
-    for name in NATIVE_SOURCES:
+    native_sources = NATIVE_SOURCES + (
+        ("documents.py",) if workload == "document-search" else ()
+    )
+    for name in native_sources:
         if evidence.get("source_sha256", {}).get(name) != file_hash(
             Path(__file__).parent / name
         ):
@@ -234,6 +237,11 @@ def live_result(rows, expected_ids, unresolved):
             and all(type(token) is int and token >= 0 for token in value)
         )
 
+    transport = transport and all(
+        token_ids(g.get("input_ids")) and token_ids(g.get("output_ids"))
+        for r in rows
+        for g in r.get("generations", [])
+    )
     exact = bool(pairs) and all(
         token_ids(a.get("input_ids"))
         and token_ids(a.get("output_ids"))
@@ -263,8 +271,10 @@ def live_result(rows, expected_ids, unresolved):
         and len(rows) == len(expected_ids)
         and Counter(r.get("task_id") for r in rows) == Counter(expected_ids)
         and all(
-            r.get("tools")
-            and len(r.get("generations", [])) > 1
+            (
+                r.get("status") == "COMPLETED"
+                or (r.get("tools") and len(r.get("generations", [])) > 1)
+            )
             and r.get("failure_kind")
             not in ("InvalidOutput", "UnsupportedOutput", "UnsupportedContinuation")
             for r in rows
