@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "validation_type": "LOCAL_BOUNDED_TOOLS_RECORDED_REPLAY_AND_DOCUMENT_STUDY_PREFLIGHT",
+  "harness_sha": "8a496d73eb1cf346dffe0145cb30f1e0156b0fc2",
+  "runtime_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+  "image_digest": "sha256:4ae0bb2222247e51d146ff0cb9807240d5abbfe7d1b5d7eb1c9db0b072da07ec",
+  "network": false,
+  "gpu_execution": false,
+  "model_generation": false,
+  "runtime_modified": false,
+  "sdk_modified": false,
+  "measurement_contract_version": 4,
+  "repository_tool_contract_version": 3,
+  "cpu_tests": {
+    "passed": 195,
+    "subtests_passed": 138,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "warnings": 36,
+    "elapsed_seconds": 32.25,
+    "scope": "Complete ToolGap suite including actual pinned HiCache CPU fixtures; runtime-only suite was not repeated because runtime is unchanged",
+    "warning_note": "CPU driver stub/dependency warnings; no GPU driver validation"
+  },
+  "native_template": {
+    "passed": true,
+    "rounds": 2,
+    "workload": "document-search",
+    "transformers": "5.17.0",
+    "tokenizer_files": {
+      "config.json": {
+        "bytes": 663,
+        "sha256": "7463bb0ea78315365e6c6b74de4e73bbcc8359dfb0c5a737584e077d42c0b03c"
+      },
+      "merges.txt": {
+        "bytes": 1671839,
+        "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3"
+      },
+      "tokenizer.json": {
+        "bytes": 7031645,
+        "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539"
+      },
+      "tokenizer_config.json": {
+        "bytes": 7305,
+        "sha256": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583"
+      },
+      "vocab.json": {
+        "bytes": 2776833,
+        "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+      }
+    }
+  },
+  "recorded_replay": {
+    "classification": {
+      "cases": 27,
+      "sources": 3,
+      "original_useful_passes": 0
+    },
+    "actual_submitted_continuations": 10,
+    "expected_budget_failures": 2,
+    "counterfactual_pages": 12,
+    "original_useful_passes": 0,
+    "historical_pilot_outcomes": "All three remain 0/3; expected failures are preserved, not repaired",
+    "counterfactual_useful_live": "NOT_RUN"
+  },
+  "document_workload": {
+    "kind": "PINNED_PUBLIC_SOURCE_DOCUMENTS",
+    "source_repository": "sgl-project/sglang",
+    "source_commit": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+    "source_paths": [
+      "docs/docs/advanced_features/hicache_best_practices.mdx",
+      "docs/docs/advanced_features/hicache_design.mdx",
+      "docs/docs/advanced_features/hicache_storage_runtime_attach_detach.mdx",
+      "docs/docs/advanced_features/server_arguments.mdx",
+      "docs/docs/advanced_features/tool_parser.mdx"
+    ],
+    "corpus_sha256": "1a339c5c45701a71fa2b00879e8234a406d83e456217cd418c6b67258fee845e",
+    "evidence_units": 780,
+    "unit": "Complete paragraphs and Markdown/MDX table rows",
+    "scripted_callers": 12,
+    "scripted_passed": 12,
+    "scripted_type": "ORACLE_GUIDED_CPU_FIXTURE_NOT_MODEL_NAVIGATION",
+    "initial_tokens": [
+      3910,
+      3995,
+      3997,
+      3926,
+      3900,
+      3877,
+      3983,
+      3998,
+      4000,
+      3978,
+      3951,
+      3884
+    ],
+    "actual_native_suffix_cap": 512,
+    "output_reservation": 256,
+    "context_limit": 8192,
+    "live_useful_behavior": "NOT_RUN",
+    "natural_pressure": "NOT_RUN",
+    "performance": "NOT_RUN"
+  },
+  "diagnostic_policy": {
+    "request_time_only": true,
+    "no_proactive_comparison": true,
+    "all_declared_callers_retained": true,
+    "no_tool_callers_retained": true,
+    "at_least_one_actual_exact_tool_continuation": true,
+    "quality_failures_retained": true,
+    "unsafe_protocol_or_cleanup_stops": true
+  },
+  "private_artifacts": {
+    "access_status": "Retained privately; hashes only, no raw host/cloud metadata published",
+    "sha256": {
+      "regressions.xml": "0457ee697fe791d56abd4b0a9bc15b7ce4f2a5808cbd4b973f2933368065ff6f",
+      "document-native.json": "3799322602a9d2f1a583927ae39058329b1f546f191aa79dc597c0a1a95610cf",
+      "replay.json": "276750c98329c7b90405eec8e1ac158cbf6e3fc73026e47cbda39af24f9cf0de",
+      "scripted.json": "d82937c0bff82382b3dc5f7af00ab9c1070dc57e8ba9023a9a339e2a8501566c",
+      "packet.json": "ce1d22b947f3c7b70d7a0bbba5fa34fe41f27a88016c34fa8f9f6fc3dc72ad5b",
+      "documents.json": "6642956c4e3b6929938380b1e4073c4ef19f2d20ecd5cbc3a9fb6bded7ccc6b3"
+    }
+  },
+  "public_fixture_sha256": {
+    "tests/fixtures/recorded_live/qwen7-continuations.json": "4871cbca04737aac570f126bdbb34cfc082f99411ac0640875d27b6baf518095",
+    "tests/fixtures/recorded_live/model-outputs.json": "291ab16b154ef56574015ff8feebdae83c8370795033a2fd4a8a94cb9a164be1"
+  },
+  "paid_session_authorized": false
+}

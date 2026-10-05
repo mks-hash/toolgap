@@ -1,6 +1,6 @@
 # ADR-0005: bounded tool evidence and separate diagnostic observation
 
-Date: 2026-10-06. Status: accepted; implementation in progress.
+Date: 2026-10-06. Status: accepted; implemented and locally verified (live study NOT_RUN).
 
 ## Context
 
@@ -71,3 +71,13 @@ quality and diagnostics; faithful replay of retained outputs including expected
 budget/citation failures. Use pinned official tokenizers for native checks.
 Keep raw cloud data private. Record checks in the existing tracker and sanitized
 research evidence; no GPU or runtime change is part of this implementation.
+
+Local verification on 2026-10-06 at `8a496d7`: complete existing-image CPU suite
+195 tests + 138 subtests, zero failures/errors/skips; two official Qwen7
+native-template rounds; 27 real-response classifications; ten faithful submitted
+continuations, two expected overflows and twelve separate bounded-page checks;
+twelve scripted document-search callers over 780 pinned public-source units.
+See [checkpoint](../../research/agent_resume/local-preflight-2026-10-06.json).
+No live model, GPU or natural-pressure result is implied. The source schema and
+public corpus pin are bound separately; legacy fixture formatting/data are not
+new model evidence.

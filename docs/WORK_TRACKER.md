@@ -11,10 +11,12 @@ paid session, release or upstream PR is authorized by this checkpoint.
 
 The current local work is [ADR-0005](decisions/0005-bounded-tools-and-diagnostic-study.md),
 building on [ADR-0004](decisions/0004-hypothesis-aligned-measurement.md).
+Its local implementation and verification are complete; see the
+[CPU checkpoint](../research/agent_resume/local-preflight-2026-10-06.json).
 Its purpose is to measure the original L3 → L2 → ordinary continuation hypothesis,
 not to expand the SDK or agent framework. Runtime and published benchmarks stay
-at their existing pins. The previous full-image CPU verification passed; it is not
-validation of the current uncommitted changes. The latest packet-bound live gate failed
+at their existing pins. The committed implementation at `8a496d7` passed the complete image CPU suite:
+195 tests and 138 subtests, with no failures/errors/skips. The latest packet-bound live gate failed
 0/3; pressure and performance remain NOT_RUN.
 
 Answer whether useful competing agent trajectories naturally create L3 restore
@@ -61,7 +63,7 @@ are [archived snapshots](archive/README.md); they do not introduce parallel task
 | TG-005 | P1 / DONE (local evidence enforcement) | Versioned capability/evidence report with independent statuses: transport, template contract, model fit, actual generation, useful tool loop, pressure opportunity, correctness and performance. Bind the profile to weights/revision, tokenizer/template, parser, dtype/quantization and resolved cache layout; distinguish declared identity from verified artifacts. Isolate file storage across incompatible profiles. Update software's preflight consumers, not just prose. CPU success cannot imply useful live model support. | TG-003, ADR-0002 |
 | TG-006 | P2 / DONE (local evidence scope) | Validate stream/finish reason and record explicit truncated/malformed/unsupported outcomes; keep generated IDs and client-observed first-token semantics. Identify run/code/package/config/schema hashes and preserve all failed outcomes. Procedure completion and study success must be separate. | TG-002, TG-005 |
 | TG-007 | P2 / IN PROGRESS | Close measurement design gaps: quantify observation delay/cost; specify bounded passive sampling at dispatch, during tool execution and before continuation, without delaying the tool or request. Separate L3 file availability, successful reads, publication and consumption. Report page-aligned spans and interval-censored transition times; unknown waste stays unknown. Freeze tool schema/executor, workload, grader, sampling budget and primary endpoints. | TG-004, TG-006 |
-| TG-008 | P1 / LOCAL REWORK; useful live NOT_RUN; Qwen7 history 0/3 | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. ADR-0005 adds bounded whole evidence pages and document search. Recorded failures remain failed; scripted checks cannot prove new model choices. Any new paid gate needs applicable approval and a new frozen package. | TG-002 through TG-007 |
+| TG-008 | P1 / LOCAL PREPARATION DONE; useful live NOT_RUN; Qwen7 history 0/3 | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. ADR-0005 adds bounded whole evidence pages and document search. Recorded failures remain failed; scripted checks cannot prove new model choices. Any new paid gate needs applicable approval and a new frozen package. | TG-002 through TG-007 |
 | TG-009 | P1 / NOT_RUN; diagnostic/evidence separated | Baseline useful competing-agent block with no forced target eviction. Count opportunities at dispatch versus those arising during the tool gap, the remaining window, unknown/resident/missing spans and all-caller quality/latency. An L3 hit at continuation alone does not prove a usable pre-arrival opportunity. No opportunity is a feasibility result for this workload/resource point; do not manufacture one. Explicit diagnostic request-time observation may proceed on technical readiness even with failed final grading; it cannot qualify treatment or useful performance. Paid execution still needs approval. | TG-008 technical readiness for diagnostic; useful readiness for evidence |
 | TG-010 | P1 / CONDITIONAL | Matched whole-worker baseline/prefetch comparisons if baseline supplies opportunities reachable by the specified trigger and quality/cleanup pass. Same model/config/arrivals/instrumentation; counterbalance treatment order and retain all callers/failures. Predeclare primary endpoint and acceptable competing-caller degradation. Report aggregate effects separately from conditional L3 effects, overhead/waste and uncertainty. No win is a valid outcome. Release/report decision follows evidence. | TG-009 |
 | TG-011 | P2 / CONDITIONAL | Reuse the same evidence contract for a larger FULL/GQA profile and an independent family, changing one axis at a time after one trustworthy study. Publish compatibility and negative outcomes as well as measured benefit. No model sweep or unsupported architecture is implied. | TG-008 through TG-010, or a documented TG-009 feasibility stop |
@@ -186,18 +188,24 @@ unvalidated.
 2. DONE: frozen committed packet and one separately approved live attempt,
    terminal failed useful gate, result collection, confirmed VM/disk deletion
    and offline replay of actual outputs. No automatic rerun.
-3. IN PROGRESS locally under ADR-0005: close the tool-result budget gap using retained actual trajectories.
-   Specify budget-aware, paginated evidence responses separately from exact-prefix
-   serialization. The pre-dispatch empty envelope and ideal scripted sequence
-   did not bound cumulative real result sizes. Exercise near-limit actual suffixes,
-   repeated searches and reads without executing a model, trimming saved IDs,
-   changing model/context/round limits or weakening source grading. Diagnose the
-   cited-versus-retrieved lines independently of answer-value correctness.
-4. IN PROGRESS locally: prepare real-document search and an explicit diagnostic
-   request-time observation mode. Quality failures remain data; they do not by
-   themselves forbid valid diagnostic observations. This mode cannot authorize
-   proactive comparison or useful-agent performance claims. Evidence mode remains
-   strict; its quality/opportunity conditions are separate from diagnostic safety.
+3. DONE locally under ADR-0005: actual native-token budget at the tool boundary,
+   whole evidence pages/cursors, raw/delivered hashes and serialization timing.
+   Minimum classified-response fit precedes effects; insufficient evidence ends
+   the retained caller and cancels owned work. Saved IDs, context/output/round
+   limits and source grading remain unchanged. Full-image verification at
+   `8a496d7`: 195 tests + 138 subtests, zero failures/errors/skips. Ruff and local
+   documentation links passed. CPU warnings are not GPU validation.
+4. DONE locally: 27 retained actual responses from three pilots; faithful latest
+   Qwen7 replay preserves ten submitted continuations and both expected overflow
+   failures, separately tests twelve bounded counterfactual pages, and keeps the
+   invalid final citation failed. Pinned SGLang public-document extraction yields
+   780 whole evidence units; twelve scripted trajectories and two official native
+   template rounds pass. These scripted choices are oracle-guided, not live
+   navigation. Explicit diagnostic mode retains wrong/no-tool final answers and
+   all callers, checks actual IDs/continuation/cleanup, and cannot authorize
+   treatment. Unknown useful behavior, natural opportunities and performance
+   remain NOT_RUN. See the [checkpoint](../research/agent_resume/local-preflight-2026-10-06.json)
+   and [commands](guides/AGENT_STUDY.md).
 5. Only after local preparation and a new separately approved GPU campaign:
    choose purpose before execution. Diagnostic request-time observation retains
    answer failures but stops unsafe/protocol/setup/cleanup failures and never

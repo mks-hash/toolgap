@@ -298,6 +298,11 @@ retains it as failed/cancelled and terminates the study. If the proposed sequenc
 cannot fit, report incomplete calibration/performance rather than exceed the
 ceiling or add a paid retry.
 
+The following quality/calibration/treatment sequence is for **evidence purpose**.
+A diagnostic campaign instead retains answer failures and ends with request-time
+cache observations; it does not enter calibration-for-speedup or proactive
+comparison solely because some callers succeeded.
+
 The first observed ordinary block is an early feasibility gate. If its useful
 quality, cleanup, trace or natural-candidate gate fails, retain the block and
 stop before the remaining calibration. No candidate at the sampled instants is
