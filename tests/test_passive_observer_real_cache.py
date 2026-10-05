@@ -327,11 +327,31 @@ class TestPassiveObserver(unittest.TestCase):
                     HiCacheFile, "_benchmark_trace_installed", False, create=True
                 )
             )
+            loads = []
+
+            def cpu_enqueue(cache, node_id, mem_quota=None, req=None):
+                loads.append((node_id, mem_quota, req))
+                if node_id == -1:
+                    raise RuntimeError("enqueue failure")
+                return node_id == 1
+
+            stack.enter_context(
+                mock.patch.object(UnifiedRadixCache, "load_back", cpu_enqueue)
+            )
             toolgap_pressure_probe.install()
             handle = self.f.submit()
             self.f.settle(handle)
             self.f.conservation(handle, resident=12)
+            req = types.SimpleNamespace(rid="tgp-continuation")
+            self.assertTrue(self.f.cache.load_back(1, mem_quota=8, req=req))
+            self.assertFalse(self.f.cache.load_back(0, req=req))
+            with self.assertRaisesRegex(RuntimeError, "enqueue failure"):
+                self.f.cache.load_back(-1, req=req)
+            self.assertEqual(loads, [(1, 8, req), (0, None, req), (-1, None, req)])
             events = [json.loads(line) for line in path.read_text().splitlines()]
+            enqueues = [e for e in events if e["kind"] == "request_h2d_enqueue"]
+            self.assertEqual([e["accepted"] for e in enqueues], [True, False, False])
+            self.assertTrue(all(e["rid"] == req.rid for e in enqueues))
             reads = [e for e in events if e["kind"] == "read"]
             self.assertTrue(reads)
             self.assertTrue(all(e["rid"] == handle.rid for e in reads))

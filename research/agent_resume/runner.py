@@ -120,7 +120,9 @@ async def settle_owned(policy, submissions, *, session_id, abandoned, timeout=3)
             while state.get("cleanup_pending"):
                 await asyncio.sleep(0.01)  # control polling, not tool latency
                 state = await lease.status()
-            lease.finish(used_tokens=0 if abandoned else None)
+            # Failure later in a trajectory does not prove this operation was
+            # unused by an earlier continuation. Keep operation usage unknown.
+            lease.finish(used_tokens=None)
             records.append(
                 dict(state=state, decision=lease.decision, timing=lease.timing)
             )
@@ -204,6 +206,7 @@ async def run_task(
     windows = []
 
     async def submit_step(step):
+        step["prefetch_submission_started_ns"] = time.monotonic_ns()
         lease = await policy.submit(
             row["cache_salt"],
             step["prefix_ids"],
@@ -211,6 +214,7 @@ async def run_task(
             hint=hint,
         )
         step["prefetch_operation_id"] = lease.operation_id
+        step["prefetch_submission_completed_ns"] = time.monotonic_ns()
         step["prefetch_decision"] = lease.decision
         return lease
 

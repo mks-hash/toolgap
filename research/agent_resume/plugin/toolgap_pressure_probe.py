@@ -116,6 +116,33 @@ def install():
         return original_match(self, params)
 
     UnifiedRadixCache.match_prefix = match
+    original_load = UnifiedRadixCache.load_back
+
+    @functools.wraps(original_load)
+    def load(self, node_id, mem_quota=None, req=None):
+        started = time.monotonic_ns()
+        try:
+            result = original_load(self, node_id, mem_quota=mem_quota, req=req)
+        except Exception as exc:
+            hicache_trace.event(
+                "request_h2d_enqueue",
+                rid=getattr(req, "rid", None),
+                start_ns=started,
+                end_ns=time.monotonic_ns(),
+                accepted=False,
+                error=type(exc).__name__,
+            )
+            raise
+        hicache_trace.event(
+            "request_h2d_enqueue",
+            rid=getattr(req, "rid", None),
+            start_ns=started,
+            end_ns=time.monotonic_ns(),
+            accepted=bool(result),
+        )
+        return result
+
+    UnifiedRadixCache.load_back = load
     original_tick = Scheduler._process_hicache_events
 
     @functools.wraps(original_tick)

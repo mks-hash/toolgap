@@ -22,6 +22,35 @@ def saved_span(state, length):
     )
 
 
+def request_cache_usage(generation):
+    """Actual request-tier counters, never ownership of a proactive operation."""
+    unknown = dict(status="UNKNOWN", device=None, host=None, storage=None)
+    meta = generation.get("meta_info", {})
+    details = meta.get("cached_tokens_details")
+    length = len(generation.get("input_ids", []))
+    total = meta.get("cached_tokens")
+    if not generation.get("rid") or not isinstance(details, dict):
+        return unknown
+    values = [details.get(k) for k in ("device", "host", "storage")]
+    if (
+        not all(type(v) is int and v >= 0 for v in values)
+        or sum(values) > length
+        or type(total) is not int
+        or total != sum(values)
+        or meta.get("prompt_tokens") != length
+    ):
+        return dict(unknown, status="INVALID")
+    return dict(status="REPORTED", device=values[0], host=values[1], storage=values[2])
+
+
+def physical_io(events, *, start=None, end=None):
+    if start is None or end is None:
+        return None
+    return sum(
+        max(0, min(e["end_ns"], end) - max(e["start_ns"], start)) / 1e6 for e in events
+    )
+
+
 def analyze(rows, events, domain):
     if any(e.get("clock_domain") != domain for e in events):
         raise ValueError("Server trace clocks differ or lack boot provenance")
@@ -50,6 +79,29 @@ def analyze(rows, events, domain):
                 if index + 1 < len(row.get("generations", []))
                 else None
             )
+            generation = (
+                row["generations"][index + 1] if continuation_rid is not None else {}
+            )
+            request_reads = [
+                e
+                for e in reads
+                if continuation_rid is not None and e.get("rid") == continuation_rid
+            ]
+            loads = [
+                e
+                for e in events
+                if continuation_rid is not None
+                and e["kind"] == "request_h2d_enqueue"
+                and e.get("rid") == continuation_rid
+            ]
+            publication = next(
+                (
+                    e["at_ns"]
+                    for e in sorted(pubs, key=lambda e: e["at_ns"])
+                    if e["restored_tokens"] > 0
+                ),
+                None,
+            )
             matches = [
                 e
                 for e in events
@@ -70,6 +122,35 @@ def analyze(rows, events, domain):
                     ],
                     operation_id=op,
                     restore_rid=rid,
+                    continuation_rid=continuation_rid,
+                    timeline_ns=dict(
+                        tool_dispatched=step.get("dispatched_ns"),
+                        prefetch_submission_started=step.get(
+                            "prefetch_submission_started_ns"
+                        ),
+                        prefetch_submission_completed=step.get(
+                            "prefetch_submission_completed_ns"
+                        ),
+                        first_positive_l2_publication=publication,
+                        tool_completed=step.get("completed_ns"),
+                        continuation_submitted=arrival,
+                        continuation_first_token=step.get(
+                            "continuation_first_token_ns"
+                        ),
+                    ),
+                    request_cache_usage=request_cache_usage(generation),
+                    request_time_physical_read_batches=len(request_reads)
+                    if continuation_rid is not None
+                    else None,
+                    request_time_physical_read_bytes=sum(
+                        e["bytes"] for e in request_reads
+                    )
+                    if continuation_rid is not None
+                    else None,
+                    request_time_physical_io_ms=physical_io(
+                        request_reads, start=arrival, end=generation.get("completed_ns")
+                    ),
+                    request_h2d_enqueue_events=loads,
                     pre_arrival_published_tokens=sum(
                         e["restored_tokens"]
                         for e in pubs
@@ -86,6 +167,11 @@ def analyze(rows, events, domain):
                     physical_read_bytes=sum(e["bytes"] for e in own_reads)
                     if rid is not None
                     else None,
+                    physical_io_overlapped_tool_ms=physical_io(
+                        own_reads,
+                        start=step.get("dispatched_ns"),
+                        end=step.get("completed_ns"),
+                    ),
                     continuation_ttft_ms=step.get("continuation_ttft_ms"),
                     tool_dispatch_to_first_token_ms=step.get(
                         "tool_dispatch_to_first_token_ms"
@@ -109,6 +195,7 @@ def analyze(rows, events, domain):
         consumed_restore_tokens=None,
         wasted_prefetch_bytes=None,
         usage_note="Publication and matching do not prove operation-specific consumption; waste remains unknown",
+        request_usage_note="Server-reported disjoint tier counters cover the whole continuation prompt, including its suffix; not operation-specific consumption. Missing details are unknown. H2D events report CPU enqueue attempts, not GPU completion.",
         observation_errors=[e for e in events if e["kind"] == "observation_error"],
         scheduler_observer_service_ns=[
             e["service_completed_ns"] - e["service_started_ns"]

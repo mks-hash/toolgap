@@ -376,6 +376,26 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                 self.assertIs(policy.active, lease)
                 self.assertFalse(records[-1]["cleanup_confirmed"])
 
+    async def test_abandoning_later_step_does_not_assert_all_restores_unused(self):
+        # An earlier continuation may have consumed this published restore;
+        # trajectory failure is not operation-specific evidence of zero usage.
+        from unittest.mock import AsyncMock, Mock
+
+        lease = types.SimpleNamespace(
+            cancel=AsyncMock(
+                return_value=dict(state="PUBLISHED", cleanup_pending=False)
+            ),
+            finish=Mock(),
+            decision={},
+            timing={},
+        )
+        task = asyncio.create_task(asyncio.sleep(0, result=lease))
+        policy = types.SimpleNamespace(active=None)
+        records = await settle_owned(policy, [task], session_id="owner", abandoned=True)
+        lease.cancel.assert_awaited_once()
+        lease.finish.assert_called_once_with(used_tokens=None)
+        self.assertEqual(records[0]["state"]["state"], "PUBLISHED")
+
     async def test_tool_failure_cancels_only_owned_operation(self):
         accepted = asyncio.Event()
         actions = []

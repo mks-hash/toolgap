@@ -72,6 +72,7 @@ async def check(args):
             tools,
             task,
             cache_salt=item["cache_salt"],
+            max_tool_rounds=packet["measurement_contract"]["max_tool_rounds"],
         )
         row["exact_prefix_preserved"] = all(
             b["input_ids"][: len(a["input_ids"]) + len(a["output_ids"])]

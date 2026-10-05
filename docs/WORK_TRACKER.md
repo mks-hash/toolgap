@@ -9,6 +9,12 @@ or upstream PR is authorized by this checkpoint.
 
 ## Outcome and current state
 
+The current local audit is [ADR-0004](decisions/0004-hypothesis-aligned-measurement.md).
+Its purpose is to measure the original L3 → L2 → ordinary continuation hypothesis,
+not to expand the SDK or agent framework. Runtime and published benchmarks stay
+at their existing pins. Full-image verification of the new measurement contract
+is in progress; no new useful-live or pressure claim follows from these edits.
+
 Answer whether useful competing agent trajectories naturally create L3 restore
 opportunities, and whether prefetch improves all-caller outcomes without lowering
 task quality at the same resource settings. Include larger models and a second

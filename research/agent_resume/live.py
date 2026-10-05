@@ -18,6 +18,8 @@ from .readiness import (
     file_hash,
     live_result,
     provenance,
+    pressure_gate_workload,
+    digest,
     require_native,
     verify_storage,
 )
@@ -82,6 +84,14 @@ async def execute(args):
     from transformers import AutoTokenizer
 
     profile = json.loads(args.profile.read_text())
+    task_contract = dict(kind="LEGACY_DIAGNOSTIC", max_tool_rounds=4)
+    items = [dict(task=t) for t in TASKS]
+    if getattr(args, "packet", None) is not None:
+        envelope = json.loads(args.packet.read_text())
+        packet = envelope["packet"]
+        if digest(packet) != envelope["sha256"] or packet["profile"] != profile:
+            raise ValueError("Packet hash/profile differs from live gate")
+        items, task_contract = pressure_gate_workload(packet)
     native_hash = require_native(args.native_evidence, profile)
     actual = tokenizer_manifest(args.tokenizer, profile["profile_id"])
     if actual["tokenizer_files"] != profile["tokenizer_files"]:
@@ -132,6 +142,7 @@ async def execute(args):
                     provenance=provenance(profile),
                     native_evidence_sha256=native_hash,
                     observed_storage=observed_storage,
+                    task_contract=task_contract,
                 ),
                 indent=2,
             )
@@ -147,7 +158,8 @@ async def execute(args):
                 max_prefix_tokens=profile["server_settings"]["context_length"],
                 reconcile_interval_ms=args.reconcile_ms,
             ) as policy:
-                for task in TASKS:
+                for item in items:
+                    task = item["task"]
                     tools = RepositoryTools(corpus, ROOT)
                     row = await run_task(
                         FamilyAdapter.from_profile(profile),
@@ -158,6 +170,8 @@ async def execute(args):
                         policy=policy if args.mode == "proactive" else None,
                         context_limit=profile["server_settings"]["context_length"],
                         on_record=write,
+                        max_tool_rounds=task_contract["max_tool_rounds"],
+                        cache_salt=item.get("cache_salt"),
                     )
                     rows.append(row)
                     (args.output / (task["id"] + "-tool-artifacts.json")).write_text(
@@ -170,10 +184,11 @@ async def execute(args):
         (args.output / "control-events.json").write_text(
             json.dumps(control_events, indent=2)
         )
-    result = live_result(rows, [t["id"] for t in TASKS], unresolved_cleanup)
+    result = live_result(rows, [i["task"]["id"] for i in items], unresolved_cleanup)
     result.update(
         provenance=provenance(profile),
         cleanup_unresolved=unresolved_cleanup,
+        task_contract=task_contract,
         artifacts_sha256={
             name: file_hash(args.output / name)
             for name in ("manifest.json", "tasks.jsonl", "control-events.json")
@@ -195,6 +210,11 @@ async def execute(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--profile", required=True, type=Path)
+    parser.add_argument(
+        "--packet",
+        type=Path,
+        help="Prepared pressure packet: run representative actual tasks/contexts/limits",
+    )
     parser.add_argument("--deployment", required=True, type=Path)
     parser.add_argument("--tokenizer", required=True, type=Path)
     parser.add_argument("--native-evidence", required=True, type=Path)

@@ -23,11 +23,15 @@ The research tools operate on the same pinned Git source snapshot:
 | `read_source(path, start, end)` | 1–80 numbered lines from an existing pinned file. |
 | `run_regression("admission_hints")` | Actual CPU test status/count and bounded numbered test-class source lines. A successful exit does not authorize an invented source citation. |
 
-Call one tool at a time and cite only returned source lines. The four-tool-round
-limit and strict grading remain. Contract v2 binds schema/executor/runner hashes
+Call one tool at a time and cite only returned source lines. Legacy diagnostics
+retain four tool rounds; the pressure packet and its representative live gate
+share the existing six-round limit, frozen in measurement contract v3. Strict
+grading remains. Tool contract v2 binds schema/executor/runner hashes
 to the packet; prepare new packet/native/live evidence after tool or prompt
 changes. Old readiness does not establish useful behavior for the new workload.
 See [ADR-0003](../decisions/0003-repository-tool-evidence-contract.md).
+The workload/measurement corrections are recorded in
+[ADR-0004](../decisions/0004-hypothesis-aligned-measurement.md).
 
 ## Prepare locally
 
@@ -61,6 +65,23 @@ profile: changed resource settings change its fingerprint. Native reference
 checks cover two canonical tool rounds and reference agreement; they do not
 establish whether a model generates valid calls. The pinned Mistral no-ID native
 call remains semantic-valid but unsupported for its HF continuation history.
+
+On a separately approved live server, use the actual packet for the useful gate:
+
+```bash
+python -m research.agent_resume.live \
+  --profile work/study/profile.json --packet work/study/packet.json \
+  --tokenizer "$TOKENIZER_DIR" --native-evidence work/study/native.json \
+  --deployment "$DEPLOYMENT_FILE" --probe-dir "$PROBE_DIR" \
+  --server "$SERVER_URL" --mode request_time --reconcile-ms 50 \
+  --output work/study/representative-live
+```
+
+This executes one actual declared representative per task type, sequentially,
+with the packet's exact long context, initial IDs, salt and round limit. It
+checks useful quality, not contention or opportunity prevalence. Pressure
+rejects unrelated legacy diagnostic evidence and any changed packet. Preserve
+failed answers and reset the whole worker between this gate and measured blocks.
 
 ## File storage and an existing approved server
 

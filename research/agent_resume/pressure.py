@@ -101,7 +101,7 @@ async def execute(args):
     if args.reconcile_ms != packet["measurement_contract"]["reconcile_interval_ms"]:
         raise ValueError("Reconciliation differs from the frozen study contract")
     native_hash = require_native(args.native_evidence, profile)
-    live_hash = require_live(args.live_evidence, profile)
+    live_hash = require_live(args.live_evidence, profile, packet)
     baseline_binding = None
     if args.mode == "proactive":
         baseline_binding = require_baseline(
@@ -222,7 +222,9 @@ async def execute(args):
                         tools,
                         item["task"],
                         policy=policy if args.mode == "proactive" else None,
-                        max_tool_rounds=6,
+                        max_tool_rounds=packet["measurement_contract"][
+                            "max_tool_rounds"
+                        ],
                         context_limit=profile["server_settings"]["context_length"],
                         cache_salt=item["cache_salt"],
                         on_boundary=observer.snapshot if observer else None,
@@ -279,7 +281,9 @@ async def execute(args):
         try:
             raise interrupted
         finally:
-            interrupted = None  # Do not retain this exception in its own traceback frame.
+            interrupted = (
+                None  # Do not retain this exception in its own traceback frame.
+            )
     return summary["study_success"]
 
 

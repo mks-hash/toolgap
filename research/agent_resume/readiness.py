@@ -217,11 +217,26 @@ def live_result(rows, expected_ids, unresolved):
             for r in rows
         )
     )
-    exact = bool(rows) and all(
-        b["input_ids"][: len(a["input_ids"]) + len(a["output_ids"])]
-        == a["input_ids"] + a["output_ids"]
+    pairs = [
+        (a, b)
         for r in rows
         for a, b in zip(r.get("generations", []), r.get("generations", [])[1:])
+    ]
+
+    def token_ids(value):
+        return (
+            isinstance(value, list)
+            and bool(value)
+            and all(type(token) is int and token >= 0 for token in value)
+        )
+
+    exact = bool(pairs) and all(
+        token_ids(a.get("input_ids"))
+        and token_ids(a.get("output_ids"))
+        and token_ids(b.get("input_ids"))
+        and b["input_ids"][: len(a["input_ids"]) + len(a["output_ids"])]
+        == a["input_ids"] + a["output_ids"]
+        for a, b in pairs
     )
     cleanup = not unresolved and all(
         not any(
@@ -244,7 +259,7 @@ def live_result(rows, expected_ids, unresolved):
             transport="PASS" if transport else "FAIL",
             actual_generation="PASS" if transport else "FAIL",
             native_template="PASS",
-            exact_continuation="PASS" if exact and useful else "FAIL",
+            exact_continuation=("PASS" if exact else "FAIL") if pairs else "NOT_RUN",
             useful_tool_loop="PASS" if useful else "FAIL",
             correctness="PASS" if useful else "FAIL",
             cleanup="PASS" if cleanup else "FAIL",
@@ -295,7 +310,37 @@ def verify_initial_state(deployment, state):
     )
 
 
-def require_live(directory, profile):
+def pressure_gate_workload(packet):
+    """Representative actual packet tasks, not a different diagnostic workload."""
+    from .load import AUDITS
+
+    if packet.get("measurement_contract") != measurement_contract():
+        raise ValueError("Prepare a packet with the current measurement contract")
+    known = {t["id"] for t in AUDITS}
+    representatives = {}
+    for item in packet["arrivals"]:
+        task = item["task"]
+        if (
+            item["audit_id"] not in known
+            or task["id"] != item["audit_id"]
+            or not task.get("initial_input_ids")
+            or not task.get("context_pack")
+        ):
+            raise ValueError("Pressure gate requires prepared code-audit tasks")
+        representatives.setdefault(task["id"], item)
+    if not representatives:
+        raise ValueError("Empty pressure workload")
+    items = list(representatives.values())
+    return items, dict(
+        kind="PRESSURE_PACKET_REPRESENTATIVES",
+        packet_sha256=digest(packet),
+        expected_ids=[item["task"]["id"] for item in items],
+        representatives_sha256=digest(items),
+        max_tool_rounds=packet["measurement_contract"]["max_tool_rounds"],
+    )
+
+
+def require_live(directory, profile, packet=None):
     directory = Path(directory)
     record = json.loads((directory / "readiness.json").read_text())
     if (
@@ -321,9 +366,32 @@ def require_live(directory, profile):
     ]
     from .workloads import TASKS
 
-    verified = live_result(
-        rows, [t["id"] for t in TASKS], record.get("cleanup_unresolved", True)
-    )
+    expected_ids = [t["id"] for t in TASKS]
+    if packet is not None:
+        if packet["profile"] != profile:
+            raise ValueError("Live gate profile differs from pressure packet")
+        items, contract = pressure_gate_workload(packet)
+        manifest = json.loads((directory / "manifest.json").read_text())
+        if (
+            manifest.get("task_contract") != contract
+            or record.get("task_contract") != contract
+            or manifest.get("profile") != profile
+        ):
+            raise ValueError("Live proof is not bound to this pressure workload")
+        expected_ids = contract["expected_ids"]
+        expected = {i["task"]["id"]: i for i in items}
+        for row in rows:
+            item = expected.get(row.get("task_id"))
+            if (
+                item is None
+                or not row.get("generations")
+                or row["generations"][0].get("input_ids")
+                != item["task"]["initial_input_ids"]
+                or row.get("cache_salt") != item["cache_salt"]
+                or len(row.get("tools", [])) > contract["max_tool_rounds"]
+            ):
+                raise ValueError("Live task inputs/limits differ from pressure packet")
+    verified = live_result(rows, expected_ids, record.get("cleanup_unresolved", True))
     if not verified["study_success"] or verified["dimensions"] != record["dimensions"]:
         raise ValueError("Live evidence does not demonstrate a useful tool loop")
     return file_hash(directory / "readiness.json")
@@ -333,7 +401,8 @@ def measurement_contract():
     from .workloads import tool_contract
 
     return dict(
-        schema_version=2,
+        schema_version=3,
+        max_tool_rounds=6,
         repository_tools=tool_contract(),
         sampling=DEFAULT_SAMPLING,
         experimental_unit="WHOLE_SHARED_WORKER_BLOCK",

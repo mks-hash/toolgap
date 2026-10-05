@@ -18,7 +18,7 @@ from research.agent_resume.load import (
     compare_complete_blocks,
 )
 from research.agent_resume.sampling import FileObserver
-from research.agent_resume.trace_report import analyze, saved_span
+from research.agent_resume.trace_report import analyze, saved_span, request_cache_usage
 from research.agent_resume.adapters import FamilyAdapter, ToolCall
 from research.agent_resume.workloads import RepositoryTools
 from research.agent_resume.runner import run_task
@@ -328,6 +328,97 @@ class TestPressure(unittest.IsolatedAsyncioTestCase):
 
 
 class TestTrace(unittest.TestCase):
+    def test_request_tier_usage_is_not_inferred_from_publication(self):
+        generation = dict(
+            rid="continuation",
+            input_ids=list(range(32)),
+            meta_info=dict(
+                prompt_tokens=32,
+                cached_tokens=24,
+                cached_tokens_details=dict(device=8, host=16, storage=0),
+            ),
+        )
+        self.assertEqual(
+            request_cache_usage(generation),
+            dict(status="REPORTED", device=8, host=16, storage=0),
+        )
+        self.assertEqual(request_cache_usage({})["status"], "UNKNOWN")
+        for details in (
+            {"device": 8, "host": 16},
+            {"device": 8, "host": 16, "storage": -1},
+            {"device": 8, "host": 16, "storage": True},
+            {"device": 8, "host": 16, "storage": 16},
+        ):
+            changed = dict(
+                generation,
+                meta_info=dict(generation["meta_info"], cached_tokens_details=details),
+            )
+            with self.subTest(details=details):
+                result = request_cache_usage(changed)
+                self.assertEqual(result["status"], "INVALID")
+                self.assertIsNone(result["host"])
+
+    def test_request_time_restore_and_h2d_are_bound_to_continuation_rid(self):
+        step = dict(
+            prefix_ids=[1] * 16,
+            dispatched_ns=60,
+            completed_ns=90,
+            prefetch_operation_id="op",
+            prefetch_submission_started_ns=65,
+            continuation_submitted_ns=100,
+            continuation_first_token_ns=150,
+        )
+        generation = dict(
+            rid="continuation",
+            input_ids=[1] * 32,
+            completed_ns=160,
+            meta_info=dict(
+                prompt_tokens=32,
+                cached_tokens=16,
+                cached_tokens_details=dict(device=0, host=0, storage=16),
+            ),
+        )
+        rows = [dict(trajectory_id="a", tools=[step], generations=[{}, generation])]
+        events = [
+            dict(kind="control_accepted_end", operation_id="op", rid="prefetch"),
+            dict(
+                kind="read",
+                rid="prefetch",
+                keys=["k"],
+                bytes=32,
+                start_ns=50,
+                end_ns=80,
+            ),
+            dict(kind="publish", rid="prefetch", restored_tokens=16, at_ns=85),
+            dict(
+                kind="read",
+                rid="continuation",
+                keys=["k2"],
+                bytes=64,
+                start_ns=105,
+                end_ns=130,
+            ),
+            dict(
+                kind="read",
+                rid="another-agent",
+                keys=["k3"],
+                bytes=128,
+                start_ns=105,
+                end_ns=130,
+            ),
+            dict(kind="request_h2d_enqueue", rid="continuation", accepted=True),
+            dict(kind="request_h2d_enqueue", rid="another-agent", accepted=True),
+        ]
+        report = analyze(rows, [dict(e, clock_domain="boot") for e in events], "boot")
+        boundary = report["boundaries"][0]
+        self.assertEqual(boundary["request_time_physical_read_bytes"], 64)
+        self.assertAlmostEqual(boundary["request_time_physical_io_ms"], 0.000025)
+        self.assertAlmostEqual(boundary["physical_io_overlapped_tool_ms"], 0.00002)
+        self.assertEqual(boundary["timeline_ns"]["first_positive_l2_publication"], 85)
+        self.assertEqual(boundary["request_cache_usage"]["storage"], 16)
+        self.assertEqual(len(boundary["request_h2d_enqueue_events"]), 1)
+        self.assertIsNone(report["consumed_restore_tokens"])
+
     def test_exact_rid_mapping_no_consumption_claim_or_inferred_duplicate_bug(self):
         rows = [
             dict(
@@ -644,6 +735,9 @@ class TestPlugin(unittest.TestCase):
         class Cache:
             def match_prefix(self, params):
                 return "ordinary-match"
+
+            def load_back(self, node_id, mem_quota=None, req=None):
+                return True
 
         class Control:
             def submit(self, operation_id, *args, **kwargs):

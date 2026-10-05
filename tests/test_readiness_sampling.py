@@ -151,6 +151,27 @@ class TestReadiness(unittest.TestCase):
                 self.assertTrue(result["procedure_completed"])
                 self.assertFalse(result["study_success"])
 
+    def test_exact_prefix_contract_is_independent_of_answer_quality(self):
+        rows = live_rows()
+        rows[0]["task_success"] = False
+        result = readiness.live_result(rows, [t["id"] for t in TASKS], False)
+        self.assertEqual(result["dimensions"]["exact_continuation"], "PASS")
+        self.assertEqual(result["dimensions"]["correctness"], "FAIL")
+        self.assertFalse(result["study_success"])
+        for row in rows:
+            row["generations"] = row["generations"][:1]
+        result = readiness.live_result(rows, [t["id"] for t in TASKS], False)
+        self.assertEqual(result["dimensions"]["exact_continuation"], "NOT_RUN")
+        self.assertFalse(result["study_success"])
+
+    def test_missing_or_changed_continuation_ids_fail_contract(self):
+        for key, value in (("input_ids", None), ("output_ids", []), ("input_ids", [9])):
+            rows = live_rows()
+            rows[0]["generations"][0][key] = value
+            result = readiness.live_result(rows, [t["id"] for t in TASKS], False)
+            self.assertEqual(result["dimensions"]["exact_continuation"], "FAIL")
+            self.assertFalse(result["study_success"])
+
     def test_live_gate_binds_code_packages_profile_and_raw_artifacts(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -179,6 +200,63 @@ class TestReadiness(unittest.TestCase):
             (root / "tasks.jsonl").write_text("[]")
             with self.assertRaises(ValueError):
                 readiness.require_live(root, self.profile)
+
+    def test_pressure_gate_rejects_unrelated_or_changed_workload(self):
+        from research.agent_resume.load import AUDITS, fixed_trace
+
+        packet = dict(
+            profile=self.profile,
+            arrivals=fixed_trace(6),
+            measurement_contract=readiness.measurement_contract(),
+        )
+        for item in packet["arrivals"]:
+            task = next(t for t in AUDITS if t["id"] == item["audit_id"])
+            item["task"] = dict(
+                task, initial_input_ids=[1], context_pack="actual pinned context"
+            )
+        items, contract = readiness.pressure_gate_workload(packet)
+        self.assertEqual(len(items), 3)
+        self.assertEqual(contract["max_tool_rounds"], 6)
+        rows = live_rows()
+        for row, item in zip(rows, items):
+            row.update(task_id=item["task"]["id"], cache_salt=item["cache_salt"])
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tasks.jsonl").write_text("\n".join(json.dumps(r) for r in rows))
+            (root / "manifest.json").write_text(
+                json.dumps(dict(profile=self.profile, task_contract=contract))
+            )
+            (root / "control-events.json").write_text("[]")
+            record = readiness.live_result(rows, contract["expected_ids"], False)
+            record.update(
+                task_contract=contract,
+                provenance=readiness.provenance(self.profile),
+                cleanup_unresolved=False,
+                artifacts_sha256={
+                    name: readiness.file_hash(root / name)
+                    for name in ("manifest.json", "tasks.jsonl", "control-events.json")
+                },
+            )
+            (root / "readiness.json").write_text(json.dumps(record))
+            self.assertTrue(readiness.require_live(root, self.profile, packet))
+            for kind in ("context", "budget", "unrelated", "changed-ids", "salt"):
+                changed = copy.deepcopy(packet)
+                if kind == "context":
+                    changed["arrivals"][0]["task"]["context_pack"] = "different"
+                elif kind == "budget":
+                    changed["measurement_contract"]["max_tool_rounds"] = 4
+                elif kind == "unrelated":
+                    changed["arrivals"][0]["task"] = TASKS[0]
+                elif kind == "changed-ids":
+                    changed["arrivals"][0]["task"]["initial_input_ids"] = [9]
+                else:
+                    changed["arrivals"][0]["cache_salt"] = "different"
+                with self.subTest(kind=kind), self.assertRaises(ValueError):
+                    readiness.require_live(root, self.profile, changed)
+            record["task_contract"] = dict(kind="LEGACY_DIAGNOSTIC", max_tool_rounds=4)
+            (root / "readiness.json").write_text(json.dumps(record))
+            with self.assertRaises(ValueError):
+                readiness.require_live(root, self.profile, packet)
 
     def test_namespace_isolated_by_revision_precision_layout_and_claim(self):
         with tempfile.TemporaryDirectory() as directory:
