@@ -239,10 +239,12 @@ class TestEffects(unittest.IsolatedAsyncioTestCase):
                     TASKS[0],
                     policy=policy,
                 )
-                self.assertEqual(row["status"], "FAILED")
+                self.assertEqual(row["status"], "INSUFFICIENT_EVIDENCE")
+                self.assertEqual(row["failure_kind"], "InsufficientEvidence")
                 self.assertIn("budget", row["error"])
                 self.assertEqual(len(row["tools"]), 1)
-                self.assertIn("result", row["tools"][0])
+                self.assertEqual(row["tools"][0]["raw_result"], dict(text="x" * 12000))
+                self.assertNotIn("continuation_submitted_ns", row["tools"][0])
                 self.assertEqual(actions, ["submit", "cancel"])
                 self.assertIsNone(policy.active)
 
