@@ -73,10 +73,11 @@
   "next_pilot": {
     "order": "USEFUL_LIVE_GATE; WARMUP_AND_RESET; FIRST_OBSERVED_B; STOP_IF_INELIGIBLE; REMAINING_ON_OFF_OFF_ON_CALIBRATION; CONDITIONAL_B_C_B",
     "early_stop": "FIRST_BLOCK_NO_USABLE_SAMPLED_CANDIDATE_IS_NOT_GLOBAL_ABSENCE_PROOF",
-    "prepared_runner": "PRIVATE_LOCAL_REVIEW_COPY; MOCKED_ONLY; NO_SERVER_LAUNCH",
+    "prepared_runner": "FROZEN_COMMITTED_BUNDLE; CPU_MOCKS_AND_FINAL_IMAGE_CHECKED",
     "old_launch_ready": false,
-    "new_frozen_launch_package_ready": false,
-    "remaining": "Clean pinned bundle/packet/launch hashes and final package checks before any new separately approved paid attempt"
+    "new_frozen_launch_package_ready": true,
+    "remaining": "New explicit bounded GPU approval; current useful-live quality, natural opportunities, live calibration and performance are NOT_RUN",
+    "execution_authorized": false
   },
   "runtime_changes": false,
   "production_sdk_changes": false,
@@ -367,5 +368,131 @@
       "distributed_exception_recovery": "OUT_OF_SCOPE"
     },
     "next_action": "Freeze this code and same representative pressure packet for a separately authorized useful live gate; then calibration/baseline; compare only if quality and natural opportunities pass"
+  },
+  "record_scope": "Root fields preserve the initial local review; named follow-up records describe later checks. Current checkpoint is consistency_review.",
+  "consistency_review": {
+    "validation_type": "LOCAL_CODE_DOCUMENTATION_AND_EXECUTION_CONTRACT_AUDIT",
+    "code_commit_sha": "b6b42e4d529963aa6996452fc41d4627edcec6dd",
+    "runtime_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+    "source_sha256": {
+      "research/agent_resume/check_pressure.py": "7d36f5d5e0ca8c05710d5b576013d537337e85dc19d31031cdcaaba226eed5a1",
+      "research/agent_resume/load.py": "956835cb06c949f467c3bc3e5e24b4420ab41e96afa9bd85271953e0e874b7e4",
+      "research/agent_resume/prepare.py": "621c389b95dc89290b3f9e5430997c71603faa39319b6d57607a7b5ba00e78e4",
+      "research/agent_resume/pressure.py": "57dec2a2d24f3800caa57f881b934c1cc7aaa55ef438419f45f4d9c7a71f48e2",
+      "research/agent_resume/readiness.py": "235bade9016bc7782f111f208b96718c2094a6afff7904400628f276a7406e7a",
+      "research/agent_resume/runner.py": "4ece594b3f1046ededb5837c2e569f6d3417061d91ce105003aca75a2858e6c3",
+      "research/agent_resume/trace_report.py": "a6e362f695793e43aae69f4e4e1a6fe706a1f91d15c998ed4262fdbde077b0f6",
+      "tests/test_pressure_workload.py": "389eaf7ae6aa61b3746160ba98bb672d96180fe5225a37f4ef11d8fc45305a64",
+      "tests/test_readiness_sampling.py": "bef1fb08cd3cd6f8f8a853f8e51de5d7e060afbf9c756534e5b935d3729e58dd",
+      "tests/test_research_harness.py": "f8de1e078a686668102689362e7e05a2259e9e61d3d2c841a4fda61c61756f72"
+    },
+    "findings": [
+      {
+        "id": "CALIBRATION_TREATMENT_COLLISION",
+        "before": "An approximately 20% observer-induced improvement passed a one-sided treatment gate",
+        "after": "Symmetric 5% descriptive observer sensitivity gate; separate proactive degradation gate allows improvement"
+      },
+      {
+        "id": "GENERATION_BUDGET_DRIFT",
+        "before": "Scripted reserve was zero while live output budget was 256 tokens",
+        "after": "One shared generation contract and positive output reservation; every live generation binds its actual sampling parameters"
+      },
+      {
+        "id": "MALFORMED_METADATA",
+        "before": "None metadata could crash evidence classification",
+        "after": "Retain output and classify invalid or unknown evidence without silently substituting zero hits"
+      },
+      {
+        "id": "CANONICAL_IDENTITY",
+        "before": "Duplicate digest implementations",
+        "after": "One canonical digest function"
+      },
+      {
+        "id": "GUIDE_TRACKER_DRIFT",
+        "before": "Duplicate command recipes omitted packet/reconciliation settings; active tracker mixed pending statements with history",
+        "after": "One current guide recipe; compact sole active tracker; historical checkpoints preserved in archive"
+      },
+      {
+        "id": "CLEANUP_POSTCONDITION",
+        "before": "Private launch helper could mark deletion and stop backup timer without confirming absence",
+        "after": "Confirm both VM and boot disk absent; ambiguous failure retains backup and reports unverified; explicit executable injection tested with CPU mocks"
+      }
+    ],
+    "local_checks": {
+      "toolgap_tests": 176,
+      "toolgap_subtests": 128,
+      "runtime_tests": 57,
+      "runtime_subtests": 14,
+      "xml": {
+        "regressions.xml": {
+          "tests": 304,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        },
+        "runtime.xml": {
+          "tests": 71,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0
+        }
+      },
+      "official_qwen7_native_reference": "PASS_TWO_ROUNDS",
+      "scripted_callers": 12,
+      "actual_scripted_cpu_regression_executions": 108,
+      "orchestration": "CPU_MOCK_PASS",
+      "cleanup": "CPU_MOCK_PASS_FOUR_POSTCONDITIONS_AND_UNAPPROVED_GUARD",
+      "container_network": "DISABLED",
+      "gpu_execution": false
+    },
+    "setup_failures_retained": [
+      "Host test fixture initially omitted required profile fields; repaired fixture without weakening contract",
+      "Cleanup mock executable selection and newline escaping corrected before final mock checks"
+    ],
+    "branch_strategy": {
+      "branch": "feat/passive-pressure-workload",
+      "main_changed": false,
+      "new_pr_created": false,
+      "runtime_changed": false,
+      "production_sdk_changed": false,
+      "historical_datasets_changed": false
+    },
+    "prepared_package": {
+      "harness_sha": "b6b42e4d529963aa6996452fc41d4627edcec6dd",
+      "packet_sha256": "0453ff5c1b716c14877349384dbb08596a190d1668f1182472b155fc0bf9305b",
+      "local_ready": true,
+      "execution_authorized": false,
+      "provenance_sha256": "52a2031fa93db7b9bf50d5926da6d2c9a32214add7c109f9f346b7943e82dfea",
+      "payload_archive_sha256": "84eb333819755db8051606b721bbaa392a6b63ea16c5cadbf04605a810106eab",
+      "launch_manifest_sha256": "0ee18156f72ccfba9bd92c4f6aa2bea492f84c5928c371850b12371c70f40cb3",
+      "private_cloud_config_excluded_from_git": true
+    },
+    "raw_evidence": {
+      "access": "PRIVATE_WORKSTATION; RAW_LOGS_AND_CLOUD_IDENTIFIERS_EXCLUDED_FROM_GIT",
+      "sha256": {
+        "cpu-final.log": "d5f268b382cd247e7558f590f7814b5b5f67a1a557c0938ae07dc9db4b8a18f3",
+        "cleanup-guards.json": "8867341a0832926346cf5c51e6ef7dc9789dfc9182174353112b25770436b197",
+        "fixture-setup-attempts.json": "2d1aadb234af82d4bbc83db9f681546389d3e9b1911c1b41dde9d410e1bdc0e3",
+        "cpu-final/native.json": "c3036e72bb634a5d13cd5123c6e2a373aada114dcb7d046fab92d46e9aa05502",
+        "cpu-final/orchestration.json": "23772b5d68c7a44e9565db364562d3fbc348d269ca6bde35ce9fe976b9bae332",
+        "cpu-final/regressions.xml": "d3ef59ef81639b127a692840ac3391d081739325938ccd353d296590812b6078",
+        "cpu-final/runtime.xml": "d44090419c48baa801977b72151888dfefeae2e9ed54583058e8dd12ee524ba2",
+        "cpu-final/scripted.json": "d751f3c35eeb19f2efbcfad99baa419d0c2f2105d26eecd68a32d02eb4bbea86"
+      },
+      "host_reproducer_sha256": {
+        "before-fix.json": "7a953b1a3e347c2ff5aafad054dc542ab8e3d3ae490893612eef72c009b6fe48",
+        "host-check-corrected.log": "1b1469c124f7e4d580524e8bdd8cd9c4aeb592991b34c99a2186bf09a8c9ebaa",
+        "host-check.log": "9a4da2596a13b7d24eb5fde393b8170244123d7679018ed93072425b4cf7a419"
+      }
+    },
+    "outstanding": {
+      "useful_live_tool_loop": "NOT_RUN",
+      "natural_pressure_opportunities": "NOT_RUN",
+      "live_observer_calibration": "NOT_RUN",
+      "whole_worker_benefit": "NOT_RUN",
+      "operation_specific_consumption": "UNKNOWN",
+      "wasted_prefetch_bytes": null
+    },
+    "next_action": "Continue this branch; separately authorized useful live gate then first natural baseline; stop on failure or no sampled usable candidate; compare only after calibration and cleanup pass"
   }
 }

@@ -156,17 +156,21 @@ The previous full CPU audit passed 173 ToolGap tests plus 124 subtests and 57
 runtime tests plus 14 subtests, with no failures/errors/skips. The consistency
 follow-up corrects symmetric observer calibration, shared output-budget and
 request-parameter contracts, malformed metadata classification, duplicated
-hashing and stale guide commands. Its new frozen package/full-image verification
-must finish before another proposed paid run. This does not amend the old live
-0/3 outcomes or validate natural pressure/performance.
+hashing and stale guide commands. The new committed bundle passed 176 ToolGap
+tests plus 128 subtests and 57 runtime tests plus 14 subtests, with no
+failures/errors/skips. Official-tokenizer two-round checks, 12 scripted callers
+with 108 real CPU regression executions, orchestration mocks and cleanup
+guards passed. The frozen private launch package is locally ready; execution
+is not authorized. This does not amend the old live 0/3 outcomes or validate
+natural pressure/performance.
 
 ## Next acceptance checks and execution limits
 
-1. Finish the consistency audit and regression checks; save code, decisions and
-   sanitized evidence in this branch. Preserve unrelated report working files.
-2. Freeze a fresh committed bundle/packet, use its actual tasks for the useful
-   live gate, validate orchestration/cleanup on CPU, and report the exact local
-   readiness versus remaining live unknowns. Retain previous failed attempts.
+1. DONE locally: consistency audit, regression checks, code/decision commits
+   and sanitized evidence. Unrelated report working files remain untouched.
+2. DONE locally: frozen committed bundle/packet, packet-bound useful-gate
+   commands and CPU orchestration/cleanup checks. Prior failures remain intact;
+   local readiness does not imply useful live success.
 3. Only after a new explicit bounded GPU authorization: useful live quality,
    fixed warmup/reset, first observed natural-pressure baseline, then symmetric
    instrumentation calibration and conditional bracketed B/C/B comparison.
