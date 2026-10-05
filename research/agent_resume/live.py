@@ -3,6 +3,7 @@
 import argparse
 import asyncio
 import json
+import os
 from pathlib import Path
 
 import httpx
@@ -23,6 +24,27 @@ from .readiness import (
 from .sampling import FileObserver, clock_domain
 
 
+def control_headers(deployment):
+    """Admin credentials are process-only; never put them in the study manifest."""
+    key = os.environ.get("TOOLGAP_STUDY_ADMIN_KEY")
+    if deployment.get("admin_auth_required") and not key:
+        raise ValueError("Set TOOLGAP_STUDY_ADMIN_KEY for the approved local server")
+    return {"Authorization": "Bearer " + key} if key else None
+
+
+def retained_server_info(info):
+    """Keep resolved settings, excluding credentials and the raw launch command."""
+    if isinstance(info, dict):
+        return {
+            k: retained_server_info(v)
+            for k, v in info.items()
+            if k not in ("api_key", "admin_api_key", "launch_command")
+        }
+    if isinstance(info, list):
+        return [retained_server_info(v) for v in info]
+    return info
+
+
 def validate_server(info, deployment, profile):
     """Compare resolved settings and declared identity; no weight attestation."""
     if (
@@ -33,6 +55,8 @@ def validate_server(info, deployment, profile):
     if deployment["resolved_cache_mode"] != "FULL":
         raise ValueError("An independently checked FULL cache mode is required")
     config = info.get("server_args", info)
+    if bool(config.get("admin_api_key")) != bool(deployment.get("admin_auth_required")):
+        raise ValueError("Declared admin authentication differs from the server")
     expected = dict(profile["server_settings"], model_path=deployment["model_path"])
     for key, value in expected.items():
         if config.get(key) != value:
@@ -63,6 +87,7 @@ async def execute(args):
     if actual["tokenizer_files"] != profile["tokenizer_files"]:
         raise ValueError("Local tokenizer files differ from pinned profile")
     deployment = json.loads(args.deployment.read_text())
+    headers = control_headers(deployment)
     if deployment.get("clock_domain") != clock_domain():
         raise ValueError("Live diagnostic and server must share a Linux boot")
     observer = FileObserver(args.probe_dir)
@@ -98,7 +123,7 @@ async def execute(args):
                 dict(
                     profile=profile,
                     deployment=deployment,
-                    server_info=info,
+                    server_info=retained_server_info(info),
                     mode=args.mode,
                     validation_type="LIVE_DIAGNOSTIC",
                     cache_state="UNMEASURED",
@@ -115,7 +140,7 @@ async def execute(args):
         unresolved_cleanup = False
         control_events = []
         async with PrefetchClient(
-            args.server, on_event=control_events.append
+            args.server, headers=headers, on_event=control_events.append
         ) as client:
             async with PrefetchAdmission(
                 client,

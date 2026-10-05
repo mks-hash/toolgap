@@ -138,6 +138,88 @@ class TestPassiveObserver(unittest.TestCase):
         self.assertTrue(runtime["tracked_runtime_clean"])
         self.assertEqual(len(runtime["head"]), 40)
 
+    def test_idle_reset_clears_resident_kv_but_preserves_file_l3(self):
+        f = self.f
+        handle = f.submit()
+        f.settle(handle)
+        f.conservation(handle, resident=len(f.tokens))
+        device = f.allocator.alloc(4)
+        f.cache.insert(InsertParams(key=RadixKey(f.tokens[:4]), value=device))
+        files = {p.name: p.read_bytes() for p in Path(f.directory.name).iterdir()}
+        self.assertEqual(
+            probe_prefix(f.cache, list(f.tokens), None)["device_hit_tokens"], 4
+        )
+        f.cache.reset()
+        f.allocator.clear()  # Scheduler.flush_cache also clears the device allocator.
+        state = probe_prefix(f.cache, list(f.tokens), None, include_storage=True)
+        self.assertEqual(state["device_hit_tokens"], 0)
+        self.assertEqual(state["host_hit_tokens"], 0)
+        self.assertEqual(state["storage_available_tokens"], len(f.tokens))
+        self.assertEqual(
+            {p.name: p.read_bytes() for p in Path(f.directory.name).iterdir()}, files
+        )
+        self.assertEqual(f.pool.available_size(), f.initial_slots)
+        self.assertEqual(f.allocator.available_size(), f.cfg.kv_size)
+        self.assertEqual(f.cache.ongoing_prefetch, {})
+        self.assertEqual(f.cc.prefetch_tokens_occupied, 0)
+        self.assertTrue(f.cc.prefetch_io_aux_thread.is_alive())
+        f.next_prefetch()
+
+    def test_detach_reset_owned_directory_reattach_starts_empty_and_reusable(self):
+        f = self.f
+        handle = f.submit()
+        f.settle(handle)
+        f.conservation(handle, resident=len(f.tokens))
+        model_name = f.cc.storage_config.model_name
+        threads = [
+            f.cc.prefetch_thread,
+            f.cc.prefetch_io_aux_thread,
+            f.cc.prefetch_sync_thread,
+            f.cc.backup_thread,
+        ]
+        ok, message = f.cache.detach_storage_backend()
+        self.assertTrue(ok, message)
+        self.assertTrue(all(not t.is_alive() for t in threads))
+        self.assertFalse(f.cache.enable_storage)
+        f.cache.reset()
+        f.allocator.clear()
+        # Only a fixture-owned temporary directory is touched; no active backend.
+        claim = Path(f.directory.name) / "toolgap-identity.json"
+        claim.write_text('{"fixture": true}')
+        archived = {
+            p.name: p.read_bytes() for p in Path(f.directory.name).glob("*.bin")
+        }
+        self.assertEqual(len(archived), len(f.hashes))
+        for path in Path(f.directory.name).glob("*.bin"):
+            path.unlink()
+        ok, message = f.cache.attach_storage_backend(
+            storage_backend="file",
+            storage_backend_extra_config_json=json.dumps({"prefetch_threshold": 4}),
+            served_model_name=model_name,
+            hicache_storage_prefetch_policy="wait_complete",
+            hicache_write_policy="write_through",
+        )
+        self.assertTrue(ok, message)
+        f.backend = f.cc.storage_backend
+        f.cc.prefetch_capacity_limit = max(f.cc.prefetch_capacity_limit, f.pool.size)
+        state = probe_prefix(f.cache, list(f.tokens), None, include_storage=True)
+        self.assertEqual(state["device_hit_tokens"], 0)
+        self.assertEqual(state["host_hit_tokens"], 0)
+        self.assertEqual(state["storage_available_tokens"], 0)
+        self.assertEqual(f.pool.available_size(), f.initial_slots)
+        self.assertEqual(f.allocator.available_size(), f.cfg.kv_size)
+        self.assertEqual(f.cache.ongoing_prefetch, {})
+        self.assertEqual(f.cc.prefetch_tokens_occupied, 0)
+        self.assertEqual(
+            [p.name for p in Path(f.directory.name).iterdir()], [claim.name]
+        )
+        self.assertEqual(claim.read_text(), '{"fixture": true}')
+        self.assertTrue(f.cc.prefetch_io_aux_thread.is_alive())
+        # A subsequent genuine L3 restore works after the block reset.
+        for name, payload in archived.items():
+            (Path(f.directory.name) / name).write_bytes(payload)
+        f.next_prefetch()
+
     def test_default_observation_performs_no_filesystem_query(self):
         with mock.patch(
             "research.agent_resume.observer.os.stat", side_effect=AssertionError("stat")

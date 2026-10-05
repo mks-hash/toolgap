@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "validation_type": "LOCAL_STUDY_SETUP_PREPARATION",
+  "provenance": {
+    "schema_version": 1,
+    "profile_sha256": "122081ae928b23f13ce7fb7da977d328f66c980417b861cf0040790d6c754521",
+    "adapter_profile_id": "1beede2efc85b9a24e0a490e2690c597ae8e87a775d66ea6f41ab4a051e62a4d",
+    "source_sha256": {
+      "research/agent_resume/__init__.py": "bce551d7a066fc9ffd16b021a537284ba9b01d03981166c2ac2ed547c84318db",
+      "research/agent_resume/adapters.py": "aa2d860c8e5a18f3cd2b4bafe9f72143237d4ccc06184f34b915984e7181938b",
+      "research/agent_resume/check_pressure.py": "cced5a9a825ab343cb0f2c9b8a0d812912d9ba414e5fc4d0d02ec0b365aceeb1",
+      "research/agent_resume/contracts.py": "e588fa200291dd4469c86039fe71ddcaa5d82fc0f6191ad8bab2e982bef91cf1",
+      "research/agent_resume/fetch.py": "bb6c06c5f72090ada346d315e56503a6fbf7110ab8acb0a33b5535b77b668d12",
+      "research/agent_resume/live.py": "250a4b03114c4b9cced1e97d5b12895ca7b6fa3f86db3fdae3ed85139762e9c7",
+      "research/agent_resume/load.py": "431f9e0485ef4e61ee10e87fd78c1047b934e33861deb80aa5b39ff52965844a",
+      "research/agent_resume/native_conformance.py": "3d73895f935ead66b188816fb32a5e9f72a34564cd796644ef779eca98f10fd5",
+      "research/agent_resume/observer.py": "d09214ec40e7b76fcb9d92a4005bf7d5d088b93686bbea61b79ed001d9c69397",
+      "research/agent_resume/plugin/toolgap_pressure_probe.py": "621bff458f371be5f6e1d9d1a42a3e703971e91db8dfc3ad186dff1d107ef92a",
+      "research/agent_resume/prepare.py": "e24a772b61f5ceecfb98328b2266e5cc6c7a03503ec51a15f024d91465322a03",
+      "research/agent_resume/pressure.py": "8ad624ea958a6b3e4440cf367bde35d4270a1de52050fe864ed23f7e12daa56b",
+      "research/agent_resume/readiness.py": "cfe7f4ecc0b4e30a05b7844bf195a2cbbd7d1297f69c535ec5d9a3e20345bbd9",
+      "research/agent_resume/runner.py": "675e38e5f192f54192600cb066ce13417ac2aaa5c819ae6438672cc6403a3d6f",
+      "research/agent_resume/sampling.py": "af5517b1ca5e055a27e5e6e15eeb17c5abaa1960ea0b3721d692b0ceadfaa8a7",
+      "research/agent_resume/trace_report.py": "6861b26a6020209febe8e55a4ddb55bd0226ebcca72a5126258b44b674a4ee1f",
+      "research/agent_resume/workloads.py": "ecbda9b9fd031cbb51d73c9153b8d693a9ad367e2bee336c2840586d878d16c0",
+      "src/toolgap/__init__.py": "82a4cbed43eb4b6de2d70d7531cbae70945dd0a4f1c17242476acf8ad218655c",
+      "src/toolgap/__main__.py": "935a1c1166b0c1ea35a82256345000bf2c73ded718d77773bc27a71ecce28f7d",
+      "src/toolgap/admission.py": "fb5b57ffdfe203b4fabf296546a35cbfffc452fd230f66fcf516e70f1369e424",
+      "src/toolgap/cli.py": "ebacc40492eb35107d27df57c8068bda91e34f99e1fe301dd131fa05b0be5f21",
+      "src/toolgap/client.py": "3ac2f040909975f35ac341c9e380cab65ac2a2320ba1e20be25c78b28694b496",
+      "src/toolgap/diagnostics.py": "46512e16d705398958765e8ba6c2ecd2db388c55b15e2aec6faa82e46e62d24b"
+    },
+    "harness_head": "bcd42419a8c23b4aa6b6b35e7f4365d6e82a96ae",
+    "python": "3.12.14",
+    "packages": {
+      "transformers": "5.17.0",
+      "tokenizers": "0.23.2",
+      "httpx": "0.28.1",
+      "mistral_common": "1.12.0",
+      "torch": "2.13.0+cu130"
+    }
+  },
+  "dirty_checkout": true,
+  "test_source_sha256": {
+    "tests/test_readiness_sampling.py": "49a7918b9a46b0ce66d4cf5b9e0c5cafdf31116d13f956b4fd16559e10a5d190",
+    "tests/test_passive_observer_real_cache.py": "be9feb85be666e88e431be023455f94b2b12b8d8afb2af7675f356d149f075f8",
+    "tests/test_agent_contract.py": "caa9c0fc539f08117302b11f91ecb12f92abeecc078cafcaa4b2e878859f6f6b",
+    "tests/test_research_harness.py": "b6b44ec060ef4b7cd5a7160c773cff38bb2220cc00206f25a3c447dd13af4345",
+    "tests/test_pressure_workload.py": "9c270f09eb8bba21bc01290db1792cb1e745b54324d4a78a6c387343c937f5ff",
+    "tests/test_admission.py": "d566c567178bbe6ed228652537db0c294e73377748726b644862934f323c1336",
+    "tests/test_admission_hints.py": "a036cdcc8e09022fe082e2eb4bdd22f30b4072bb1a067f3f4899d4fedec1bd58",
+    "tests/test_reconciliation.py": "8e038183f0c0358dabe969d07968f86744302792f2a2be513d6d55bdafc4c495",
+    "tests/test_client_policy.py": "cb87d5b13893f5a07575f548f3a04d9aa14e2605ba581a4320957bd2142165bc",
+    "tests/test_multi_session_workflow.py": "bd4deb08232cad97c1ab1d4398b050eb8349ff0b2ade97a5ac468886d582782c"
+  },
+  "tests": {
+    "passed": 122,
+    "subtests_passed": 69,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 19,
+    "real_cpu_full_file_cache_fixtures": 12,
+    "new_reset_fixtures": 2
+  },
+  "candidate": {
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "selection": "PROPOSED_SIZE_AXIS_PILOT; NOT_LIVE_SUPPORTED",
+    "packet_sha256": "a01f4121d28ae63d533ed84ecb46030b4f5de377ac1576588b637f2e4e00c2d8",
+    "initial_tokens": [
+      3992,
+      3994,
+      3816,
+      3888,
+      3922,
+      3882,
+      3942,
+      3986,
+      3827,
+      3801,
+      3850,
+      3923
+    ],
+    "native_reference": "PASS_TWO_ROUNDS",
+    "native_evidence_sha256": "068935a01df9b5deba9f026a2848cf79e6e1b4bbfad9db93ebc388445b036d8d",
+    "scripted_callers_passed": 12,
+    "scripted_cpu_regression_executions": 108,
+    "bf16_weights_config_derived_GiB": 14.18519115447998,
+    "raw_kv_bytes_per_token": 57344,
+    "gpu_fit": "NOT_RUN"
+  },
+  "checks": {
+    "cpu_reset_and_reattach": "PASS",
+    "admin_control_header_fixture": "PASS",
+    "retained_server_info_excludes_keys_and_launch_command": "PASS",
+    "useful_live_tool_loop": "NOT_RUN",
+    "actual_http_reset": "NOT_RUN",
+    "live_observer_calibration": "NOT_RUN",
+    "natural_pressure": "NOT_RUN",
+    "performance": "NOT_RUN"
+  },
+  "failed_setup_invocations": [
+    {
+      "stage": "sandbox_fixture_setup",
+      "failed": 2,
+      "reason": "torch extension cache lock read-only; no tested operation ran"
+    },
+    {
+      "stage": "new_reattach_fixture",
+      "passed": 11,
+      "failed": 1,
+      "reason": "fixture reattached a different model key suffix; corrected to preserve the actual original storage model_name"
+    }
+  ],
+  "pilot_mistral_outcome_unchanged": "0/3; PRESSURE_NOT_RUN",
+  "runtime_changes": false,
+  "production_sdk_changes": false,
+  "gpu_execution": false,
+  "public_push_at_checkpoint": false,
+  "proposed_execution_ceiling_minutes": 60,
+  "execution_authorized": false,
+  "artifacts": [
+    {
+      "path": "work/study-preflight-2026-10-05/packet.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "a0346f5aa8a03eda0ee9ab4701fc4e1a3a5e0fcea0ca2a2407f720438a84b428"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/profile.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "abb6fec269eafeddf1b8304a0f025a6d54b5846fd5518441b60d3ae49e91b93c"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/native.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "068935a01df9b5deba9f026a2848cf79e6e1b4bbfad9db93ebc388445b036d8d"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/scripted-final.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "9d22baa642baa0553e14be0361520d0374a57a91da5123d3a3110600b0c1afab"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/regressions.xml",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "dd100231ff1578244870b180c9b2057f50b533d6404e09ebaa8847671643db4a"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/regressions.txt",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "34c98af3affa5336191b017acb77fa8846b00dd6232249cde0c74d37443f6f28"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/reset-tests.txt",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "40cfa2a955bb8d1826e46c870afb87129c09e00ce4ac1d0ad88e97b1822082bd"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/reset-tests-final.txt",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "38c7aa7b90fe20ef22193de631b9c810f9d3e25a84edc1d5c602727e56134459"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/reset-tests-final.xml",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "627d029f8323e91e1aa42af3330005bae9436619d2b9ccc49b5c520c53672f83"
+    },
+    {
+      "path": "work/study-preflight-2026-10-05/source-snapshot.json",
+      "access": "PRIVATE_GIT_IGNORED",
+      "sha256": "3cee16b08ad9be07bedfb5603b82365da69fd5059195036bf1af3395a2317240"
+    }
+  ]
+}

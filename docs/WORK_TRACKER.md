@@ -258,3 +258,45 @@ another SDK feature milestone.
 Update this file at a material decision, scope change, completed acceptance
 check or discovered blocker. Link implementation/tests when marking TODO items
 done; discussion and a proposed design alone do not complete them.
+
+## Continuation after branch publication (2026-10-05)
+
+Committed local implementation as `d5dd49c` and documentation organization as
+`bcd4241`; both were pushed to `feat/passive-pressure-workload` with explicit
+user authorization. The immutable readiness checkpoint describes its earlier
+pre-publication state and is not rewritten.
+
+TG-007 source audit confirms that idle flush clears GPU/host state but retains
+file L3, and startup warmup covers only a short generation. The existing
+[study guide](guides/AGENT_STUDY.md#warmupreset-source-audit--local-preparation-not-live-validation)
+now proposes fixed warmup plus idle detach/reset/reattach of the owned namespace
+before whole blocks. Actual server validation, observation-on/off calibration
+and useful live integration remain pending; pressure readiness remains NO.
+
+## TG-007 local execution preparation (2026-10-05)
+
+- Two new real CPU FULL/file fixtures exercise flush retention and idle
+  detach/reset/owned-directory cleanup/reattach; restored state remains usable.
+  These are controller tests, not an HTTP/GPU initialization result.
+- The proposed server recipe requires admin auth. Harness live/pressure clients
+  now pass a process-only key through the existing SDK transport, check the
+  declared auth mode and exclude credentials/raw launch commands from retained
+  server-info manifests. Runtime and production SDK are unchanged.
+- Prepared the pinned Qwen2.5-7B pressure profile locally: 12 source contexts,
+  3801–3994 tokens, two-round native conformance and 12/12 scripted CPU callers
+  with 108 actual fixed CPU regression executions. It is the proposed size-axis
+  pilot; live support/fit remain unverified and Mistral stays 0/3.
+- The [study guide](guides/AGENT_STUDY.md#bounded-useful-model-pilot-proposal)
+  fixes useful-live-first ordering, a 60-minute proposed ceiling, off/on/on/off
+  calibration, block-specific server environments/traces and a conditional
+  bracketed B/C/B feasibility comparison (not independent replicated pairs).
+  This does not authorize provisioning; actual server reset/calibration and
+  natural opportunities remain NOT_RUN. TG-007 remains IN PROGRESS for its
+  live criteria. No new framework, runtime API or pressure claim is added.
+
+Local preparation evidence: [setup checkpoint](../research/agent_resume/study-preparation-2026-10-05.json).
+Final relevant regression suite: **122 passed + 69 subtests**, no failures/skips;
+12 are actual CPU FULL/file fixtures. Historical 119-test checkpoint, Mistral
+pilot, report and GPU datasets retain their original bytes. Remaining paid-run
+readiness is provisioning/fit verification plus the explicitly pending live
+gates above; CPU setup success is not a pressure result.

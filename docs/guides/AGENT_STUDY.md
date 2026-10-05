@@ -55,7 +55,8 @@ Use a canonical absolute directory path. Do not reuse another profile's director
 The namespace binds declared weights/revision, tokenizer, runtime, precision and
 settings. Deployment JSON must include `storage_path`, `clock_domain` (Linux
 boot ID plus time-namespace identity), model/revision/model_path, runtime_sha, resolved_cache_mode=`FULL`,
-and the actual `pressure_match_observation` toggle. The private plugin mailbox
+and the actual `pressure_match_observation` toggle. Declare
+`admin_auth_required: true` for the detach/attach recipe below. The private plugin mailbox
 must be mounted on the same host and named by `TOOLGAP_PRESSURE_PROBE_DIR`.
 Use the existing research plugin/trace setup from the archived
 [preparation](../archive/plans/PASSIVE_PRESSURE_PREPARATION.md); its older CLI
@@ -76,6 +77,165 @@ treatment checks observed capacities/layout/dtype/threshold against its baseline
 Freeze equal kernel/model warmup outside the measured blocks and validate the
 cold-start procedure on the real server before interpreting performance. Empty
 KV alone does not prove equal JIT/filesystem warmth.
+
+## Warmup/reset source audit — local preparation, not live validation
+
+Source inspected at SGLang runtime `3e60ad803c6b01832b527f4a1dcbeb7a5449964b`:
+
+- `http_server._execute_server_warmup` uses a short text/input-ID request with
+  at most 8 generated tokens. Startup readiness does not prove that the study's
+  long prefill, continuation or concurrent request shapes are warmed.
+- `Scheduler.flush_cache` requires full idle, including ongoing HiCache
+  writes, loads, backups and prefetch. `UnifiedRadixCache._reset_full` resets
+  the tree and host pool; `HiCacheController.reset` stops/restarts storage
+  threads and clears controller queues/accounting. It does **not** delete L3
+  files. A successful flush alone cannot satisfy the empty-file guard.
+- `HiCacheFile` selects its directory from the server process environment.
+  Its extra config is not a general directory-switch API. Do not assume an
+  attach request can redirect a running server to a new namespace.
+
+The next approved pilot must first validate this initialization recipe on the
+actual server, outside all measured blocks:
+
+1. Use the same startup settings and fixed warmup inputs in both arms. Retain
+   the warmup request/config hashes and terminal outcomes. Include the packet's
+   longest initial request and a real saved continuation from the useful live
+   pilot, at the declared concurrency; use two fixed passes, not an adaptive
+   loop until the timings look favorable. Native startup warmup is additional.
+2. Drain all requests and cache transfers. Detach the file backend using the
+   existing idle-gated API and require success; flush device/host state and
+   require success. With storage workers detached and no callers, preserve the
+   owned warmup files in private evidence and reset only this dedicated study
+   directory, retaining its profile claim. Never clear a shared cache or remove
+   files while storage workers are active.
+3. Reattach the same file backend/config/directory, require success, and verify
+   the actual imported runtime, layout, zero GPU/L2 use, no in-flight operations
+   and a file directory containing only its claim. This preserves the warmed
+   model process while separating warmup KV from the measured workload.
+4. Start a new raw trace segment and the frozen arrivals. No detach, flush,
+   directory reset or target eviction is allowed inside a measured block.
+   Repeat the same preparation for every calibration/treatment block.
+
+Two actual CPU FULL/file fixtures now exercise reset and detach/reset/reattach:
+resident pools return to baseline, flush preserves L3 bytes, the detached
+fixture directory can be cleared, and the next genuine restore works. This is
+a **proposed server recipe**, not an implemented reset command or a claim that
+live reset/warmup equivalence passes. Validate detach/reattach and the probe's
+post-reset view before using it; failure stops the pressure path. The owned
+warmup directory remains profile-bound and raw warmup records stay private.
+Persistent compiler caches and OS file-cache warmth must be recorded and held
+constant where possible; residual first-use effects remain a limitation, not a
+reason to discard slow or failed callers. Live observation-on/off calibration
+is still required. No GPU/server action is performed by this source audit.
+
+## Admin setup prerequisite
+
+The pinned HTTP detach/attach endpoints require a configured admin key. Start
+only a same-host study server bound to `127.0.0.1`, with `--admin-api-key` set to
+an ephemeral private key. Keep normal generation API authentication unset for
+this study. Set the matching `TOOLGAP_STUDY_ADMIN_KEY` only in the client process
+environment; never put the value in a profile, deployment JSON, recorded command
+or public log. `admin_auth_required` records presence, not the credential.
+The live/pressure harness passes it to the existing `PrefetchClient(headers=...)`
+and rejects a mismatched declaration. Returned keys and `launch_command` are
+excluded from its retained server-info manifest.
+
+Before warmup, test authenticated DELETE/PUT on the **dedicated idle study
+worker**. The endpoints are `DELETE /hicache/storage-backend` and
+`PUT /hicache/storage-backend`; PUT JSON is:
+
+```json
+{
+  "hicache_storage_backend": "file",
+  "hicache_storage_backend_extra_config_json": null,
+  "hicache_storage_prefetch_policy": "wait_complete",
+  "hicache_write_policy": "write_through"
+}
+```
+
+Use the exact declared extra config if non-null. Send the private Bearer header,
+require HTTP 200, and bound each attempt at 30 seconds. POST `/flush_cache`
+also uses that header and must return 200. A rejected/failed operation stops the
+block; do not continue with a changed backend, retry indefinitely or perform
+an unauthenticated fallback. Directory archival/cleanup occurs only after
+successful detach, with no callers, inside this worker's owned namespace.
+Reset requests are outside measurement and never evict a measured target.
+
+## Bounded useful-model pilot proposal
+
+The proposed first profile is the already pinned `Qwen/Qwen2.5-7B-Instruct`
+revision `a09a35458c702b33eeacc393d103063234e8bc28`, using its pressure overrides.
+This is a size extension of the historical Qwen control, not independent-family
+evidence or a declaration of live support. Qwen3 remains an unprepared candidate;
+Mistral's 0/3 live failure is unchanged. No model is silently substituted on fit
+or task failure.
+
+Local packet preparation produced 12 distinct source-audit contexts of
+3801–3994 tokens. The derived profile passed two-round native reference checks,
+and scripted model decisions ran all 12 useful CPU-tool trajectories, including
+108 fixed regression executions. These checks validate mechanics; actual model
+selection/continuation/grading remains NOT_RUN.
+
+The pinned config declares FULL attention (`use_sliding_window=false`), 28
+layers and 4 KV heads of dimension 128. Raw BF16 KV is 57,344 bytes/token:
+8192 device tokens occupy 448 MiB before pool/runtime overhead; one decimal-GB
+host budget could hold about 17,424 page-aligned tokens before overhead. Actual
+resolved pools must be observed. Config-derived dense parameter accounting is
+about 7.616 billion parameters (14.19 GiB of BF16 weights), excluding runtime,
+activations, graphs and allocator overhead. This is **not an L4 fit guarantee**.
+Use TP1/PP1, BF16, context/device budget 8192, host budget 1 GB, four server
+requests and eight active clients. No precision or resource change on failure.
+
+Proposed session has a 60-minute execution ceiling including setup and cleanup;
+VM creation/time/cost and automatic deletion remain subject to a separate
+reviewed provisioning preflight and explicit authorization. This guide never
+creates a VM. Do not spend paid time rewriting the image or debugging model
+protocols; retain failures and stop. Stages consume the remaining ceiling, not
+independent renewable budgets:
+
+| Stage | Maximum allocated time | Stop rule |
+|---|---:|---|
+| Existing image/runtime setup and model load | 15 min | Setup/fit fails or needs architecture/image changes |
+| Useful live gate, 3 declared tasks | 10 min | Any task fails, lacks actual tools/continuation, or cleanup is ambiguous |
+| Fixed warmup and actual reset check | 5 min | Idle/auth/reset/namespace guard fails |
+| Observation calibration and baseline | 20 min | Quality fails, instrumentation perturbs outcomes, or no usable observed window |
+| Conditional proactive feasibility | 5 min | No time remains, quality/cleanup fails, or aggregate outcome degrades |
+| Result archival and VM cleanup | 5 min reserved | Always execute, including earlier failures |
+
+Before spending time on repeated blocks, verify that a single block fits its
+allocation. Do not truncate a slow caller to label the block successful. Timeout
+retains it as failed/cancelled and terminates the study. If the proposed sequence
+cannot fit, report incomplete calibration/performance rather than exceed the
+ceiling or add a paid retry.
+
+Calibration uses four ordinary request-time blocks in fixed **off/on/on/off**
+order, with this identical frozen packet. Each worker process starts with its
+own mailbox, owned storage directory, `HICACHE_BENCH_LABEL` matching its output
+basename and dedicated trace. Set `TOOLGAP_PRESSURE_MATCH_OBSERVATION=0` for off,
+`1` for on, and match deployment metadata plus `--observation off` or
+`memory-and-stat`. The toggle and label are process environment; changing the
+client shell does not reconfigure an existing server. Restart only between
+whole blocks, then repeat the identical fixed warmup/reset protocol. Keep the
+same persistent compiler-cache policy, no global OS cache drop, and retain
+residual warmup/order effects as limitations.
+
+Report all-caller quality, successful tasks/block-second, full task latency,
+continuation TTFT and tool-dispatch-to-first-token for every block, including
+failures. Also retain scheduler service time, sample completeness and natural
+L3 candidates in the on blocks. As a conservative feasibility stop, any quality
+loss or more than 5% median full-task-latency degradation / throughput loss in
+either matched on-versus-off pair prevents a speedup interpretation. Two pairs
+are descriptive calibration, not a statistical non-inferiority claim.
+
+Only after a successful useful gate, reset and calibration, and baseline
+observed windows, run proactive C then ordinary B with observation on if time
+remains. Bind C to an earlier on-baseline with `--baseline`. This gives a bracketed
+B/C/B feasibility sequence, not a replicated counterbalanced experiment; the
+single C block must not be counted twice as independent evidence. All blocks retain all 12 callers. Later
+observed eligibility can be unreachable by the once-at-dispatch trigger;
+`dispatch_state=UNKNOWN` stays explicit. No adaptive resubmission, favorable-run
+selection or manufactured target eviction. The comparison remains exploratory:
+no confidence/p95 claim, no release claim, and no automatic second session.
 
 ## Live gate, then baseline — only with applicable execution approval
 

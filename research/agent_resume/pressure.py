@@ -13,7 +13,7 @@ import httpx
 
 from toolgap import PrefetchAdmission, PrefetchClient
 from .adapters import FamilyAdapter
-from .live import validate_server
+from .live import control_headers, retained_server_info, validate_server
 from .load import AUDITS, context_task, fixed_trace, run_arrivals, summarize
 from .prepare import ROOT, tokenizer_manifest
 from .runner import GenerationTransport, run_task
@@ -113,6 +113,7 @@ async def execute(args):
     ):
         raise ValueError("Tokenizer differs from workload")
     deployment = json.loads(args.deployment.read_text())
+    headers = control_headers(deployment)
     tokenizer = AutoTokenizer.from_pretrained(
         args.tokenizer, local_files_only=True, trust_remote_code=False
     )
@@ -169,7 +170,7 @@ async def execute(args):
                     packet_sha256=envelope["sha256"],
                     profile=profile,
                     deployment=deployment,
-                    server_info=info,
+                    server_info=retained_server_info(info),
                     mode=args.mode,
                     observation=args.observation,
                     block_id=block_id,
@@ -192,7 +193,9 @@ async def execute(args):
                 indent=2,
             )
         )
-        async with PrefetchClient(args.server, on_event=record_event) as client:
+        async with PrefetchClient(
+            args.server, headers=headers, on_event=record_event
+        ) as client:
             async with PrefetchAdmission(
                 client,
                 max_prefix_tokens=profile["server_settings"]["context_length"],

@@ -223,6 +223,7 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
             runtime_sha="a" * 40,
             resolved_cache_mode="FULL",
             clock_domain=clock_domain(),
+            admin_auth_required=True,
         )
         original_http = httpx.AsyncClient
         with tempfile.TemporaryDirectory() as directory:
@@ -235,7 +236,13 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                 def handler(request):
                     if request.url.path == "/get_server_info":
                         return httpx.Response(
-                            200, json=dict(context_length=8192, model_path="/model")
+                            200,
+                            json=dict(
+                                context_length=8192,
+                                model_path="/model",
+                                admin_api_key="fixture-admin",
+                                launch_command="--admin-api-key fixture-admin",
+                            ),
                         )
                     body = json.loads(request.content)
                     if request.url.path == "/generate":
@@ -247,6 +254,9 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                             200,
                             text="data: " + json.dumps(result) + "\n\ndata: [DONE]\n\n",
                         )
+                    self.assertEqual(
+                        request.headers.get("Authorization"), "Bearer fixture-admin"
+                    )
                     return httpx.Response(
                         200,
                         json=dict(
@@ -282,6 +292,7 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                     )
                 )
                 with (
+                    patch.dict("os.environ", TOOLGAP_STUDY_ADMIN_KEY="fixture-admin"),
                     patch.dict(sys.modules, transformers=fake_transformers),
                     patch(
                         "research.agent_resume.live.tokenizer_manifest",
@@ -302,10 +313,31 @@ class TestRunner(unittest.IsolatedAsyncioTestCase):
                     ),
                 ):
                     self.assertTrue(await execute(args))
+                self.assertNotIn(
+                    "fixture-admin", (args.output / "manifest.json").read_text()
+                )
                 row = json.loads((args.output / "tasks.jsonl").read_text())
                 self.assertTrue(row["task_success"])
                 self.assertEqual(bool(row["control_events"]), mode == "proactive")
                 self.assertEqual(row["cache_state"], "UNMEASURED")
+
+    async def test_declared_admin_auth_without_key_fails_before_transport(self):
+        from research.agent_resume.live import control_headers, retained_server_info
+
+        with patch.dict("os.environ", {}, clear=True):
+            with self.assertRaises(ValueError):
+                control_headers({"admin_auth_required": True})
+            self.assertIsNone(control_headers({}))
+        self.assertEqual(
+            retained_server_info(
+                {
+                    "server_args": {"admin_api_key": "secret", "page_size": 16},
+                    "launch_command": "secret",
+                    "states": [{"api_key": "secret"}],
+                }
+            ),
+            {"server_args": {"page_size": 16}, "states": [{}]},
+        )
 
     async def test_cleanup_timeout_retains_owner_and_cannot_cancel_other_session(self):
         actions = []
