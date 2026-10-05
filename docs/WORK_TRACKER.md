@@ -300,3 +300,36 @@ Final relevant regression suite: **122 passed + 69 subtests**, no failures/skips
 pilot, report and GPU datasets retain their original bytes. Remaining paid-run
 readiness is provisioning/fit verification plus the explicitly pending live
 gates above; CPU setup success is not a pressure result.
+
+
+## TG-008 provisioning checkpoint (2026-10-05; no execution)
+
+The pinned Qwen7 pilot now has a frozen private provisioning/cleanup package.
+[Final-image local summary](../research/agent_resume/provisioning-preflight-2026-10-05.json)
+records **122 regressions + 69 subtests**, zero failures/skips, two-round native
+conformance, and 12 scripted callers with real CPU tools. These checks ran inside
+the existing image with network and GPU disabled. Its actual CLI/imported clean
+runtime match the profile. Additional mocked checks stop file removal on idle or
+detach failure and always attempt VM deletion on collection failure.
+
+Read-only provisioning checks confirmed current quota, machine/OS/image, existing
+narrow service-account access, SSH source admission and pinned driver/runtime
+package availability. Quota/catalog presence does not reserve physical capacity.
+The reviewed private package pins harness `5d4d532` and runtime `3e60ad8`; historical
+records remain unchanged. Private host/cloud configuration and raw logs are
+outside the public Git repository; the summary binds them by checksums.
+
+**READY_FOR_EXPLICIT_PROVISIONING_APPROVAL: YES.** This is readiness to attempt
+one bounded pilot, not pressure readiness or live Qwen7 support. No VM, GPU,
+weight download, quota/IAM change, image rebuild, upstream PR or release occurred.
+TG-007 live reset/calibration and TG-008 useful model behavior remain pending.
+The agreed financial gate still requires explicit approval for this new session.
+
+The concrete runner gives setup including model download 15 minutes from the
+creation-request timestamp; study cutoff at minute 55, guest shutdown at minute
+60 and provider DELETE with auto-delete disk at minute 70. Stages share one
+absolute deadline. Useful gate failure ends execution before pressure; calibration
+failure or absent natural opportunity prevents C; degraded all-caller outcomes
+are retained as a negative feasibility result. No second attempt or silent
+model/resource/runtime change is authorized. This remains a single-worker
+feasibility pilot rather than independent caller repetitions or a release claim.

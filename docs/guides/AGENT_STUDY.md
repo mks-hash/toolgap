@@ -102,10 +102,13 @@ actual server, outside all measured blocks:
    longest initial request and a real saved continuation from the useful live
    pilot, at the declared concurrency; use two fixed passes, not an adaptive
    loop until the timings look favorable. Native startup warmup is additional.
-2. Drain all requests and cache transfers. Detach the file backend using the
-   existing idle-gated API and require success; flush device/host state and
-   require success. With storage workers detached and no callers, preserve the
-   owned warmup files in private evidence and reset only this dedicated study
+2. Drain all requests and cache transfers with authenticated
+   `POST /flush_cache?timeout=30`, requiring HTTP success. This idle-gated
+   flush preserves file L3. Detach the file backend using the existing
+   idle-gated API and require success; flush device/host state again and
+   require success. With storage workers detached and no callers, retain a private inventory
+   of owned warmup-file names, sizes and streaming SHA256s (not a bulk upload
+   of KV bytes), then reset only this dedicated study
    directory, retaining its profile claim. Never clear a shared cache or remove
    files while storage workers are active.
 3. Reattach the same file backend/config/directory, require success, and verify
@@ -119,8 +122,8 @@ actual server, outside all measured blocks:
 Two actual CPU FULL/file fixtures now exercise reset and detach/reset/reattach:
 resident pools return to baseline, flush preserves L3 bytes, the detached
 fixture directory can be cleared, and the next genuine restore works. This is
-a **proposed server recipe**, not an implemented reset command or a claim that
-live reset/warmup equivalence passes. Validate detach/reattach and the probe's
+a locally prepared execution recipe, not a claim that live HTTP/GPU
+reset/warmup equivalence passes. Validate detach/reattach and the probe's
 post-reset view before using it; failure stops the pressure path. The owned
 warmup directory remains profile-bound and raw warmup records stay private.
 Persistent compiler caches and OS file-cache warmth must be recorded and held

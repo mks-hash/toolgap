@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "validation_type": "OFFLINE_FINAL_IMAGE_PROVISIONING_PREFLIGHT",
+  "harness_sha": "5d4d532b580cecbd4cf4bc4cd7f8a9374cde0fc0",
+  "runtime_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+  "image_digest": "sha256:4ae0bb2222247e51d146ff0cb9807240d5abbfe7d1b5d7eb1c9db0b072da07ec",
+  "candidate": {
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "packet_sha256": "a01f4121d28ae63d533ed84ecb46030b4f5de377ac1576588b637f2e4e00c2d8"
+  },
+  "local_checks": {
+    "tests_passed": 122,
+    "subtests_passed": 69,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "actual_cpu_full_file_fixtures": 12,
+    "native_reference": "PASS_TWO_ROUNDS",
+    "scripted_callers_passed": 12,
+    "scripted_cpu_regression_executions": 108,
+    "cli_and_runtime_identity": "PASS",
+    "orchestration_failure_gates": "PASS_MOCKED",
+    "collection_failure_deletion": "PASS_MOCKED"
+  },
+  "ready_for_explicit_provisioning_approval": true,
+  "execution_authorized": false,
+  "gpu_execution": false,
+  "live_checks": {
+    "gpu_fit": "NOT_RUN",
+    "useful_tool_loop": "NOT_RUN",
+    "actual_http_reset": "NOT_RUN",
+    "observer_net_perturbation": "NOT_RUN",
+    "natural_pressure": "NOT_RUN",
+    "performance": "NOT_RUN"
+  },
+  "protocol": "Useful live gate, ordinary off/on/on/off calibration, conditional B/C/B feasibility; no forced measured eviction or resubmission",
+  "time_bounds_minutes": {
+    "setup_including_download": 15,
+    "study_cutoff": 55,
+    "guest_shutdown": 60,
+    "provider_delete": 70
+  },
+  "evidence_access": "PRIVATE_WORKSTATION; raw cloud and CPU logs excluded from Git",
+  "private_payload_sha256": "dd6a6dd8f98f61c1a16db7292d2351447d188b4a40be63050ce717fa56072f1e",
+  "raw_evidence_sha256": {
+    "cpu/native.json": "10b600c6665d8db1f63e0fb31c0558887a153db97ffbc9e1f1f88ae7ffa41a73",
+    "cpu/scripted.json": "ea86e0b1a48d8a2c83797c112a978d9bcb9ca508fd92c07b5300b6e4123cf717",
+    "cpu/regressions.xml": "ad9a97af444f12dd52f729c3c7242c4624cea07af486aec5d48a14fe1f01d18b",
+    "cpu/orchestration.json": "aef217db2b32a70f568467fe0a65908f45b0428b2900bae0e44e4711589b730b",
+    "cleanup-guard.json": "199e611d52a239c88985eaaba73e7ec8a855e33c1a4f53aa0d804e95e671db1b"
+  },
+  "historical_outcomes_unchanged": true,
+  "runtime_changes": false,
+  "image_rebuilt": false,
+  "warmup_retention": "PRIVATE_NAMES_SIZES_SHA256_INVENTORY; NO BULK KV UPLOAD"
+}
