@@ -3,8 +3,9 @@
 Updated: 2026-10-05. Owner for the work below: the coding agent in this project.
 Reviewer/approval authority: Maxim Yakimov. Work is local on
 `feat/passive-pressure-workload`. Maxim Yakimov authorized committing and
-pushing this branch on 2026-10-05. No new GPU run, release or upstream PR is
-authorized by this checkpoint.
+pushing this branch on 2026-10-05. The subsequently authorized single Qwen7 GPU
+session in any available region is complete; no further paid session, release
+or upstream PR is authorized by this checkpoint.
 
 ## Outcome and current state
 
@@ -18,6 +19,14 @@ tasks passed and no tools executed**. Pressure blocks did not run. Current
 milestone status: **LOCAL_READINESS_CHECKPOINT_PASSED; PRESSURE_NOT_READY**, not a failed prefetch hypothesis. The pilot itself remains 0/3; local changes do not revise its outcome.
 See [pilot evidence](archive/evidence/MISTRAL_PILOT_2026-10-05.md) and the
 [engineering review](archive/evidence/ENGINEERING_REVIEW_2026-10-05.md).
+
+The later [Qwen7 live pilot](../research/agent_resume/qwen7-live-pilot-2026-10-05.json)
+loaded and generated on L4, executed eight real tools, and preserved all eight
+actual continuation prefixes, but **0/3 useful tasks passed**. Literal searches
+returned no matches and the regression answer cited an unretrieved nonexistent
+path. Stop reason: `USEFUL_LIVE_GATE_FAILED`; no pressure/calibration/treatment
+block ran. This is a workload-integration finding, not a prefetch result. The
+single VM and boot disk were deleted; all failures are retained.
 
 ## Ordered work
 
@@ -33,8 +42,8 @@ are [archived snapshots](archive/README.md); they do not introduce parallel task
 | TG-005 | P1 / DONE (local evidence enforcement) | Versioned capability/evidence report with independent statuses: transport, template contract, model fit, actual generation, useful tool loop, pressure opportunity, correctness and performance. Bind the profile to weights/revision, tokenizer/template, parser, dtype/quantization and resolved cache layout; distinguish declared identity from verified artifacts. Isolate file storage across incompatible profiles. Update software's preflight consumers, not just prose. CPU success cannot imply useful live model support. | TG-003, ADR-0002 |
 | TG-006 | P2 / DONE (local evidence scope) | Validate stream/finish reason and record explicit truncated/malformed/unsupported outcomes; keep generated IDs and client-observed first-token semantics. Identify run/code/package/config/schema hashes and preserve all failed outcomes. Procedure completion and study success must be separate. | TG-002, TG-005 |
 | TG-007 | P2 / IN PROGRESS | Close measurement design gaps: quantify observation delay/cost; specify bounded passive sampling at dispatch, during tool execution and before continuation, without delaying the tool or request. Separate L3 file availability, successful reads, publication and consumption. Report page-aligned spans and interval-censored transition times; unknown waste stays unknown. Freeze tool schema/executor, workload, grader, sampling budget and primary endpoints. | TG-004, TG-006 |
-| TG-008 | P1 / BLOCKED by zone capacity; one approved attempt used | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. | TG-002 through TG-007 |
-| TG-009 | P1 / TODO; separate execution approval | Baseline useful competing-agent block with no forced target eviction. Count opportunities at dispatch versus those arising during the tool gap, the remaining window, unknown/resident/missing spans and all-caller quality/latency. An L3 hit at continuation alone does not prove a usable pre-arrival opportunity. No opportunity is a feasibility result for this workload/resource point; do not manufacture one. | TG-008 |
+| TG-008 | P1 / BLOCKED by useful workload integration; Qwen7 live 0/3 | One useful live compatibility pilot on a profile selected by local conformance and fit readiness, not family prestige or an obligation to rerun Mistral first. Actual tool execution, valid exact-prefix continuation, final grading and cleanup pass. Stop and retain all failures otherwise. CPU checks cannot satisfy this item. Next local work: bounded generic repository discovery/search and citation evidence contract, replaying retained live failures. | TG-002 through TG-007 |
+| TG-009 | P1 / BLOCKED by TG-008; NOT_RUN | Baseline useful competing-agent block with no forced target eviction. Count opportunities at dispatch versus those arising during the tool gap, the remaining window, unknown/resident/missing spans and all-caller quality/latency. An L3 hit at continuation alone does not prove a usable pre-arrival opportunity. No opportunity is a feasibility result for this workload/resource point; do not manufacture one. Another paid session requires applicable approval. | TG-008 |
 | TG-010 | P1 / CONDITIONAL | Matched whole-worker baseline/prefetch comparisons if baseline supplies opportunities reachable by the specified trigger and quality/cleanup pass. Same model/config/arrivals/instrumentation; counterbalance treatment order and retain all callers/failures. Predeclare primary endpoint and acceptable competing-caller degradation. Report aggregate effects separately from conditional L3 effects, overhead/waste and uncertainty. No win is a valid outcome. Release/report decision follows evidence. | TG-009 |
 | TG-011 | P2 / CONDITIONAL | Reuse the same evidence contract for a larger FULL/GQA profile and an independent family, changing one axis at a time after one trustworthy study. Publish compatibility and negative outcomes as well as measured benefit. No model sweep or unsupported architecture is implied. | TG-008 through TG-010, or a documented TG-009 feasibility stop |
 
@@ -389,3 +398,62 @@ and its launcher flag disabled; its raw evidence/payload is preserved. Freeze a
 new bundle/packet and rebind cleanup/provisioning checks before any separately
 authorized paid retry. TG-007 live initialization/calibration remains NOT_RUN;
 TG-008 remains blocked on external capacity. No new release, push or PR.
+
+## Revised Qwen7 pilot authorized (2026-10-05)
+
+Maxim Yakimov authorized pushing the reviewed branch and conducting one GPU pilot
+in any available region. `d510156` is now on the remote branch. Preserve the
+previous 60-minute / USD 1.50 session limit; do not change model, image or runtime.
+The committed v2 bundle passed final-image native/scripted/CPU checks and mocked
+orchestration again. Provider DELETE is now at minute 60, guest shutdown at 58,
+and study cutoff at 55; result collection/deletion remains mandatory.
+
+Read-only STANDARD Capacity Advice was unavailable to the project. An Oregon
+zone creation failed on capacity without an instance/disk; a second Oregon zone
+created the single intended L4 worker. No second paid VM or workload repetition.
+TG-008 is now RUNNING for the approved session; live quality, initialization,
+calibration and pressure remain pending until actual artifacts are evaluated.
+
+## Qwen7 authorized session completed (2026-10-05)
+
+[Sanitized live record](../research/agent_resume/qwen7-live-pilot-2026-10-05.json)
+binds the preserved raw evidence to `d510156`, runtime `3e60ad8`, the existing
+image and pinned Qwen2.5-7B weights/tokenizer. L4/driver 580.178.04,
+PyTorch 2.13.0+cu130, BF16 FULL/file, TP1/PP1/DP1 loaded and generated; resolved
+token capacity was 8192. Image/model setup finished within the declared setup
+budget. The actual useful pilot made 11 generations and eight tool executions.
+
+- `physical-cleanup`: three literal searches returned zero matches, then a
+  prose-plus-call response was classified unsupported and stopped before its
+  tool execution.
+- `overlap-estimate`: four literal searches returned zero matches; the next
+  generated call exceeded the frozen tool-round budget and was retained but
+  not executed.
+- `run-regression`: nine real CPU tests passed; the final response cited
+  nonexistent `admission_hints/test_class.py:1` without retrieved evidence and
+  failed grading. Procedure completion is not task success.
+
+All eight submitted continuations preserve the **full** preceding input and
+generated IDs, checked independently from aligned cache prefixes. The original
+readiness record nevertheless says `exact_continuation=FAIL`, because that
+summary couples the dimension to useful-task success; it also says
+`model_fit=UNKNOWN` without inspecting resolved server pools. Preserve these
+raw fields and document the separate checks instead of silently relabeling the
+pilot successful. Baseline policy cleanup with no proactive operations does
+not validate new live cancellation paths.
+
+No useful task passed: no HTTP reset, observation calibration, pressure window
+or proactive comparison was run. No speedup, window-absence or waste claim
+follows. The host's normal exit code 0 records orderly finalization after the
+failed gate. Runtime, image and published historical data remain unchanged.
+
+VM creation through verified deletion took 16m51s. Conservative machine/disk/IP
+plus inter-region image-pull estimate is approximately USD 0.40, not an invoice.
+Named instances and boot disks are both zero; the backup timer is inactive.
+No second paid worker or repeated workload ran.
+
+Next local checkpoint: replay retained searches/citations against the pinned
+corpus and review **generic tool discoverability and evidence retrieval**, not
+model-specific JSON repairs. Keep the failing outputs and fixed grading; do not
+increase tool rounds or manufacture evidence to pass this run. Any changed
+workload/profile is new evidence and requires new pins before another paid run.

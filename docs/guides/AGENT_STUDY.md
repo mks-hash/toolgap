@@ -2,7 +2,11 @@
 
 The active plan is [WORK_TRACKER](../WORK_TRACKER.md). This guide describes
 commands; it does not authorize a GPU session, launch a server or select a new
-model. The current Mistral live pilot remains 0/3; pressure has not run.
+model. The Mistral live pilot remains 0/3. The later
+[Qwen7 pilot](../../research/agent_resume/qwen7-live-pilot-2026-10-05.json)
+also remains 0/3 useful tasks despite real tool execution and eight preserved
+continuation prefixes. Pressure has not run; review repository retrieval and
+source-evidence discoverability locally before another paid session.
 
 Use a reviewed pinned profile and its cached tokenizer. Commands below run from
 the repository root. Every output path must be new. Keep raw runs in ignored

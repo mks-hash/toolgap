@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "validation_type": "LIVE_QWEN7_USEFUL_GATE_BEFORE_NATURAL_PRESSURE",
+  "approval": {
+    "one_paid_vm": true,
+    "any_available_region": true,
+    "minutes_max": 60,
+    "budget_usd_max": 1.5
+  },
+  "provenance": {
+    "toolgap_sha": "d5101567284c1f42b7d0e305f1f3e1789b437f52",
+    "runtime_sha": "3e60ad803c6b01832b527f4a1dcbeb7a5449964b",
+    "image_digest": "sha256:4ae0bb2222247e51d146ff0cb9807240d5abbfe7d1b5d7eb1c9db0b072da07ec",
+    "model": "Qwen/Qwen2.5-7B-Instruct",
+    "model_revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+    "measurement_contract_version": 2,
+    "historical_data_unchanged": true
+  },
+  "environment": {
+    "gpu": "NVIDIA L4",
+    "gpu_memory_mib": 23034,
+    "driver": "580.178.04",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "transformers": "5.17.0",
+    "dtype": "bfloat16",
+    "cache_mode": "FULL",
+    "storage": "file",
+    "tp": 1,
+    "pp": 1,
+    "dp": 1,
+    "max_running_requests": 4,
+    "context_length": 8192,
+    "token_capacity": 8192,
+    "reported_memory_gb": {
+      "weights": 14.297,
+      "kv_cache": 0.438,
+      "startup_available": 6.95
+    }
+  },
+  "provisioning": {
+    "capacity_only_attempts_before_success": 1,
+    "paid_vms": 1,
+    "suite_runs": 1,
+    "region": "us-west1",
+    "changed_model_or_runtime": false,
+    "image_rebuilt": false
+  },
+  "execution": {
+    "procedure_completed": true,
+    "host_exit_code": 0,
+    "study_success": false,
+    "stop_reason": "USEFUL_LIVE_GATE_FAILED",
+    "tasks": 3,
+    "successful": 0,
+    "actual_generations": 11,
+    "actual_tool_executions": 8,
+    "search_calls": 7,
+    "search_calls_with_results": 0,
+    "regression_calls": 1,
+    "actual_cpu_regression_tests": 9,
+    "actual_cpu_regression_exit_code": 0,
+    "pressure_blocks": 0,
+    "proactive_control_events": 0
+  },
+  "reported_readiness_dimensions": {
+    "transport": "PASS",
+    "actual_generation": "PASS",
+    "native_template": "PASS",
+    "exact_continuation": "FAIL",
+    "useful_tool_loop": "FAIL",
+    "correctness": "FAIL",
+    "cleanup": "PASS",
+    "model_fit": "UNKNOWN",
+    "pressure_opportunity": "NOT_RUN",
+    "performance": "NOT_RUN"
+  },
+  "independent_evidence": {
+    "weights_and_tokenizer": "PINNED_SIZE_AND_SHA256_VERIFIED",
+    "gpu_fit": "PASS_LOADED_AND_GENERATED_AT_DECLARED_POOLS",
+    "actual_generated_prefix_preservation": "PASS_8_OF_8_CONTINUATION_SUBMISSIONS",
+    "prefix_check": "Full preceding input_ids + output_ids, not only page-aligned prefix, is an unchanged prefix of the next actual input_ids",
+    "reporting_caveat": "Raw readiness reports exact_continuation FAIL because it is coupled to useful task success, and model_fit UNKNOWN because this function does not inspect resolved pools. These raw fields are preserved; independent checks do not make the failed useful gate pass.",
+    "physical_cleanup_scope": "No owned proactive operation existed; baseline policy cleanup PASS is not a new live cancellation or memory-safety proof"
+  },
+  "task_outcomes": [
+    {
+      "task_id": "physical-cleanup",
+      "status": "FAILED",
+      "success": false,
+      "tools_executed": 3,
+      "generations": 4,
+      "reason": "MIXED_TEXT_AND_TOOL_CALLS",
+      "context": "Three literal searches returned no matches. The next response included prose plus a call; the declared single-call adapter rejected it without executing the fourth call."
+    },
+    {
+      "task_id": "overlap-estimate",
+      "status": "FAILED",
+      "success": false,
+      "tools_executed": 4,
+      "generations": 5,
+      "reason": "TOOL_ROUND_BUDGET_EXHAUSTED",
+      "context": "Four literal searches returned no matches; the next generated call was retained but not executed."
+    },
+    {
+      "task_id": "run-regression",
+      "status": "COMPLETED",
+      "success": false,
+      "tools_executed": 1,
+      "generations": 2,
+      "reason": "INCORRECT_UNRETRIEVED_SOURCE_CITATION",
+      "context": "The actual admission_hints suite passed 9 tests, but the final answer cited a nonexistent admission_hints/test_class.py:1. Required source evidence was not retrieved."
+    }
+  ],
+  "research_checks": {
+    "actual_http_reset": "NOT_RUN",
+    "observer_calibration": "NOT_RUN",
+    "natural_l3_windows": "NOT_RUN",
+    "prefetch_comparison": "NOT_RUN",
+    "performance": "NOT_RUN",
+    "consumed_restore_tokens": null,
+    "wasted_prefetch_bytes": null
+  },
+  "interpretation": "Useful workload integration failed before pressure. This is neither a prefetch performance result nor evidence of missing natural L3 windows; literal retrieval and evidence discoverability need review before another paid run.",
+  "next_local_work": "Replay retained tool arguments against the pinned corpus; define and test a generic bounded repository discovery/search and citation contract. Preserve negative records and exact token IDs; do not loosen grading, extend tool rounds, or patch model-specific output merely to turn this pilot green.",
+  "cleanup": {
+    "remaining_named_instances": 0,
+    "remaining_named_disks": 0,
+    "backup_timer": "INACTIVE",
+    "results_downloaded": true,
+    "guest_shutdown": "AUTOMATIC_AFTER_FAILED_GATE",
+    "provider_delete": "VERIFIED"
+  },
+  "cost": {
+    "creation_to_deletion_seconds": 1011.147,
+    "vm_disk_ipv4_hourly_usd_estimate": 0.879172212,
+    "compute_upper_estimate_usd": 0.2469,
+    "cross_region_registry_pull_usd_estimate": 0.1403,
+    "session_total_rounded_usd_estimate": 0.4,
+    "invoice_inspected": false,
+    "scope": "Conservative compute through deletion plus inter-region image pull; excludes pre-existing ongoing registry storage and tiny result-transfer/storage charges. Not a billing invoice.",
+    "price_sources": [
+      "https://cloud.google.com/products/compute/pricing/accelerator-optimized",
+      "https://cloud.google.com/artifact-registry/pricing",
+      "https://cloud.google.com/vpc/network-pricing"
+    ]
+  },
+  "evidence_access": "PRIVATE_WORKSTATION_AND_RETAINED_RESULT_ARCHIVE; personal paths, cloud identities, raw logs and credentials excluded from Git",
+  "private_artifact_sha256": {
+    "experiment-verdict.json": "8288f9959709e4f77cc92138e962f30c85f3bbe11f105c4799659d81554e1f81",
+    "host-status.json": "74075c3380d60d88d78b596ff433ede3a1da4907d3c18cc6755ac75c4cfa8ba7",
+    "native.json": "90151ca722f4648bb494d0a6e2a83eadae5d6ab00f674d29d9c9970dffb1fa6c",
+    "model-download.json": "85340c0a8b25c64de218ba657b06e312a597905101853f11f6ae63f96cf6f38b",
+    "pilot/readiness.json": "064517775bc352753e84edd33494b589d11333156b0f597c4fd023335e6e257c",
+    "pilot/tasks.jsonl": "813ab49bb1cd1a01fa334e46888c0881d41a429b4f8aa24225f661aaf1a32ec9",
+    "pilot/manifest.json": "e551b22d9c48dae0d8ac278006232c9fb2ee74b82e7f714a917691b596dfc32e",
+    "pilot/control-events.json": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "pilot.server-info.json": "307bb14bf84b62899a2ffc9dd0c1cfe450b2a75570e6f3a3c739623b20b08cc4",
+    "pilot.server.jsonl": "60683bf135bb789445088f7d91de5225edc39453f47186dd6b21cd2c75d5cb8e"
+  },
+  "private_collection_sha256": {
+    "results/host-results.tgz": "71c733afc110c02da63d50bef13ed876d9c573864e1f4dae3e2d2e22c3b63c0a",
+    "evidence/instances-after-delete.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "evidence/disks-after-delete.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "evidence/timer-after-delete.txt": "e4f68690eb3431cab9ec1af2b5d08c7b1c6cb968e4f5b8348e9862e9e516d838"
+  },
+  "offline_followup": {
+    "validation_type": "OFFLINE_REPLAY_OF_RETAINED_LIVE_TOOL_ARGUMENTS",
+    "search_calls_reproduced": 7,
+    "all_queries_empty": true,
+    "expected_answer_sources_present": true,
+    "fabricated_citation_is_missing": true,
+    "model_generation": false,
+    "new_live_success": false,
+    "private_evidence_sha256": "f9f2e2071c21b4c50241009419b00dcfc12ec91d8149209cb1ef29a20c71a653"
+  }
+}
